@@ -33,11 +33,11 @@ export class MenuComponent implements OnInit {
 
 	createForm() {
 		this.searchForm = this.formBuilder.group({
-			title: ['']
+			title: ''
 		});
 	}
 
 	search() {
-		this.store.dispatch(new MovieActions.SearchMovie(this.searchForm.value));
+		this.store.dispatch(new MovieActions.SearchMovie(this.searchForm.value.title));
 	}
 }

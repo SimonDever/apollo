@@ -4,7 +4,8 @@ import { MoviesComponent } from './modules/movies/movies/movies.component';
 
 const routes: Routes = [
 	{ path: '', redirectTo: 'movies', pathMatch: 'full' },
-	{ path: 'movies', loadChildren: 'app/modules/movies/movies.module#MoviesModule' }
+	{ path: 'movies', loadChildren: 'app/modules/movies/movies.module#MoviesModule' },
+	{ path: '**', redirectTo: 'movies', pathMatch: 'full' }
 ];
 
 @NgModule({

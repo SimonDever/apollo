@@ -9,7 +9,6 @@ import { MovieSearchResultsComponent } from './movie-search-results/movie-search
 const routes: Routes = [
 	{
 		path: '', component: MoviesComponent,
-
 		children: [
 			{ path: 'h/:id', component: MovieComponent },
 			{ path: 'movie/:id', component: MovieEditComponent }
