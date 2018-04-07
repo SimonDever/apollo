@@ -1,0 +1,23 @@
+.close-icon {
+	border: 1px solid transparent;
+	background-color: transparent;
+	cursor: pointer;
+	position: relative;
+	margin: -15px 7px 0 -50px;
+	outline: 0;
+}
+
+.close-icon:after {
+	content: '\02297';
+	display: block;
+	width: 25px;
+	height: 25px;
+	position: relative;
+	color: #aaa;
+	font-size: 25px;
+	cursor: pointer;
+}
+
+input[type=search]:not(:valid) ~ .close-icon {
+	display: none;
+}

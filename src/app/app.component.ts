@@ -12,6 +12,6 @@ import { Store } from '@ngrx/store';
 export class AppComponent {
 
 	ngOnInit() {
-		console.debug('app-component ngOnInit entry');
+		console.debug('app component ngOnInit entry');
 	}
 }

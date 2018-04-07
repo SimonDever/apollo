@@ -21,7 +21,7 @@ export class MovieComponent implements OnInit {
 		private storageService: StorageService) { }
 
 	ngOnInit() {
-		console.debug('movie-component ngOnInit entry');
+		console.debug('movie component ngOnInit entry');
 		this.movie$ = this.store.select('movieState').select('selectedMovie');
 	}
 }

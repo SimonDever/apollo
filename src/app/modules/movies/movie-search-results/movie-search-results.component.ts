@@ -19,7 +19,7 @@ export class MovieSearchResultsComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		console.debug('movie-search-results-component ngOnInit entry');
+		console.debug('movie-search-results component ngOnInit entry');
 		this.movies$ = this.store.select('movieState').select('searchResults');
 	}
 }

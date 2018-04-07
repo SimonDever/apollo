@@ -27,7 +27,7 @@ export class MenuComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
-		console.debug('menu-component ngOnInit entry');
+		console.debug('menu component ngOnInit entry');
 		this.createForm();
 	}
 
@@ -35,6 +35,10 @@ export class MenuComponent implements OnInit {
 		this.searchForm = this.formBuilder.group({
 			title: ''
 		});
+	}
+
+	reset() {
+		this.store.dispatch(new MovieActions.ClearSearch());
 	}
 
 	search() {

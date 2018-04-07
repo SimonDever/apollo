@@ -6,6 +6,7 @@ import { Observable } from "rxjs/Observable";
 import { Action } from "@ngrx/store";
 import { StorageService } from "../../storage.service";
 import * as MovieAction from '../actions/movie.actions';
+import { Movie } from '../../models/movie';
 
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
@@ -55,5 +56,12 @@ export class MovieEffects {
 					if (title === '') return new MovieAction.MoviesLoaded(movies);
 					return new MovieAction.MovieSearched(movies);
 				})
+		);
+
+	@Effect({ dispatch: false })
+	clearSearch = this.actions$.ofType(MovieAction.CLEAR_SEARCH)
+		.map(action => (action as MovieAction.ClearSearch))
+		.map(_ =>
+			this.router.navigateByUrl('')
 		);
 }

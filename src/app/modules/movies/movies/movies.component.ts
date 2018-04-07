@@ -13,15 +13,12 @@ import * as MovieActions from '../../../redux/actions/movie.actions';
 })
 export class MoviesComponent implements OnInit {
 
-	movies$: Observable<Movie[]>;
-
 	constructor(private storageService: StorageService,
 		private store: Store<AppState>) {
 	}
 
 	ngOnInit() {
-		console.debug('movies-component ngOnInit entry');
-		this.store.dispatch(new MovieActions.LoadMovies());
+		console.debug('movies component ngOnInit entry');
 	}
 
 }

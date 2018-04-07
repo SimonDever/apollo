@@ -39,6 +39,12 @@ export function movieReducer(state = {} as MovieState, action: Action) {
 				searchResults: searchResults
 			});
 		}
+		case MovieActions.CLEAR_SEARCH: {
+			return Object.assign({}, state, {
+				searchResults: [],
+				searchTerms: ''
+			});
+		}
 		default: return state;
 	}
 }

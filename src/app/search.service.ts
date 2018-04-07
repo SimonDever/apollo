@@ -10,8 +10,7 @@ export class SearchService {
 
 	constructor(
 		private httpClient: HttpClient,
-		@Inject('MOVIEDB_API_KEY') movieDbApiKey,
-
+		@Inject('MOVIEDB_API_KEY') movieDbApiKey
 	) {
 		this.movieDb = new MovieDb(movieDbApiKey);
 	}

@@ -23,6 +23,13 @@ export class MovieSaved implements Action {
 	}
 }
 
+export const CLEAR_SEARCH = '[Movie] Clear Search';
+export class ClearSearch implements Action {
+	readonly type = CLEAR_SEARCH;
+	constructor() {
+	}
+}
+
 export const MOVIES_LOADED = '[Movie] Movies Loaded';
 export class MoviesLoaded implements Action {
 	readonly type = MOVIES_LOADED;
@@ -67,4 +74,4 @@ export class MovieSearched implements Action {
 
 export type All = LoadMovies | MoviesLoaded |
 	/*MovieLoaded | LoadMovie |*/ SelectMovie | SaveMovie |
-	MovieSaved | SearchMovie | MovieSearched;
+	MovieSaved | SearchMovie | MovieSearched | ClearSearch;

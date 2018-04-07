@@ -22,6 +22,7 @@ export class MovieEditComponent implements OnInit {
 		private store: Store<AppState>) { }
 
 	ngOnInit() {
+		console.debug('movie-edit component ngOnInit entry');
 		this.createForm();
 		this.route.params.map(params => params.id)
 			.switchMap(id => this.storageService.getMovie(id))
