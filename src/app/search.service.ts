@@ -1,20 +1,22 @@
 import { Injectable, Inject } from '@angular/core';
-//const MovieDb = require('moviedb-promise');
+import { HttpClient } from '@angular/common/http';
+
 import MovieDb from 'moviedb-promise-es6';
 
 @Injectable()
 export class SearchService {
 
-  movieDb;
+	movieDb: MovieDb;
 
-  constructor(@Inject('MOVIEDB_API_KEY') movieDbApiKey) {
-    this.movieDb = new MovieDb(movieDbApiKey);
-   }
+	constructor(
+		private httpClient: HttpClient,
+		@Inject('MOVIEDB_API_KEY') movieDbApiKey,
 
-  search() {
-    console.debug('SearchService->search(): method entry');
-    
-    this.movieDb
-  }
+	) {
+		this.movieDb = new MovieDb(movieDbApiKey);
+	}
 
+	search() {
+		console.debug('SearchService->search(): method entry');
+	}
 }

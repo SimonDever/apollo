@@ -1,0 +1,16 @@
+ <div class="container-fluid">
+	<div class="row">
+		<main class="col-sm-9 col-md-10 pt-3" role="main">
+			<h1>search results</h1>
+			<div *ngIf="movies$ | async">
+				<div *ngFor="let movie of movies$ | async">
+					<h3>{{ movie.title | uppercase }}</h3>
+					<div>
+						<span>id: {{ movie.id }}</span>
+					</div>
+					<button routerLink="../../movie/{{movie.id}}">Edit</button>
+				</div>
+			</div>
+		</main>
+	</div>
+</div>
