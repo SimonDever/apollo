@@ -1,0 +1,7 @@
+<div *ngIf="movie$ | async">
+	<h3>{{ (movie$ | async).title | uppercase }}</h3>
+	<div>
+		<span>id: {{ (movie$ | async).id }}</span>
+	</div>
+	<button routerLink="../../movie/{{(movie$|async).id}}">Edit</button>
+</div>

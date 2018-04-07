@@ -1,0 +1,22 @@
+<div>
+	<form [formGroup]="movieForm" (submit)="submit()">
+		<div>
+			<label for="id">ID</label>
+			<input type="text" id="id" formControlName="id">
+		</div>
+		<div>
+			<label for="title">Title</label>
+			<input type="text" id="title" formControlName="title">
+		</div>
+		<button type="submit" [disabled]="!movieForm.valid">Submit</button>
+	</form>
+</div>
+
+<hr />
+
+<div class="debugOutput">
+	Debuging output
+	<hr />
+	<div>Status: {{ movieForm.status | json }}</div>
+	<div>Valid: {{ movieForm.valid | json }}</div>
+</div>

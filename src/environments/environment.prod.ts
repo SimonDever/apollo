@@ -1,1 +1,4 @@
-Finished cleaning API key from environment.ts
+export const environment = {
+	production: true,
+	MOVIEDB_API_KEY: ''
+};
