@@ -20,9 +20,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { InMemoryApi } from './in-memory-api';
 import { MoviesRoutingModule } from './modules/movies/movies-routing.module';
 import { CommonModule } from '@angular/common';
-import { MoviesComponent } from './modules/movies/movies/movies.component';
-import { MovieListComponent } from './modules/movies/movie-list/movie-list.component';
-
 
 @NgModule({
 	declarations: [

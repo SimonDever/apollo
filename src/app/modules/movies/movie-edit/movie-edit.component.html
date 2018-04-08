@@ -1,4 +1,5 @@
 <div>
+	<app-back-button></app-back-button>
 	<form [formGroup]="movieForm" (submit)="submit()">
 		<div>
 			<label for="id">ID</label>
@@ -10,13 +11,4 @@
 		</div>
 		<button type="submit" [disabled]="!movieForm.valid">Submit</button>
 	</form>
-</div>
-
-<hr />
-
-<div class="debugOutput">
-	Debuging output
-	<hr />
-	<div>Status: {{ movieForm.status | json }}</div>
-	<div>Valid: {{ movieForm.valid | json }}</div>
 </div>

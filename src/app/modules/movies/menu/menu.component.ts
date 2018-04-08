@@ -37,10 +37,6 @@ export class MenuComponent implements OnInit {
 		});
 	}
 
-	reset() {
-		this.store.dispatch(new MovieActions.ClearSearch());
-	}
-
 	search() {
 		this.store.dispatch(new MovieActions.SearchMovie(this.searchForm.value.title));
 	}

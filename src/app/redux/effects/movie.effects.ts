@@ -31,6 +31,11 @@ export class MovieEffects {
 		});
 
 	@Effect({ dispatch: false })
+	moviesLoaded = this.actions$.ofType(MovieAction.MOVIES_LOADED)
+		.map(action => (action as MovieAction.MoviesLoaded).payload)
+		.map(movies => { });
+
+	@Effect({ dispatch: false })
 	selectMovie = this.actions$.ofType(MovieAction.SELECT_MOVIE)
 		.map(action => (action as MovieAction.SelectMovie).payload)
 		.map(movie => {
@@ -38,30 +43,23 @@ export class MovieEffects {
 		});
 
 	@Effect()
-	saveMovie: Observable<Action> = this.actions$.ofType(MovieAction.SAVE_MOVIE)
+	saveMovie$: Observable<Action> = this.actions$.ofType(MovieAction.SAVE_MOVIE)
 		.map(action => (action as MovieAction.SaveMovie).payload)
 		.mergeMap(movie =>
 			this.storageService.saveMovie(movie)
 				.do(_ => this.router.navigateByUrl('/movies/h/' + movie.id))
-				.map(_ => new MovieAction.MovieSaved(movie))
-		);
+				.map(_ => new MovieAction.MovieSaved(movie)));
 
 	@Effect()
-	searchMovie: Observable<Action> = this.actions$.ofType(MovieAction.SEARCH_MOVIE)
+	searchMovie$: Observable<Action> = this.actions$.ofType(MovieAction.SEARCH_MOVIE)
 		.map(action => (action as MovieAction.SearchMovie).payload)
 		.mergeMap(title =>
 			this.storageService.searchMovie(title)
 				.do(_ => this.router.navigateByUrl(title === '' ? '' : '/movies/s/' + title))
-				.map(movies => {
-					if (title === '') return new MovieAction.MoviesLoaded(movies);
-					return new MovieAction.MovieSearched(movies);
-				})
-		);
+				.map(movies => new MovieAction.MovieSearched(movies)));
 
 	@Effect({ dispatch: false })
 	clearSearch = this.actions$.ofType(MovieAction.CLEAR_SEARCH)
 		.map(action => (action as MovieAction.ClearSearch))
-		.map(_ =>
-			this.router.navigateByUrl('')
-		);
+		.map(_ => this.router.navigateByUrl(''));
 }

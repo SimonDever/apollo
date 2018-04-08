@@ -20,12 +20,10 @@
 				<a class="nav-link" routerLink="help">Help</a>
 			</li>
 		</ul>
-		<form [formGroup]="searchForm" (reset)="reset()" (submit)="search()" class="form-inline mt-2
-			mt-md-0">
+		<form [formGroup]="searchForm" (submit)="search()" class="form-inline mt-2 mt-md-0">
 			<input required id="title" formControlName="title" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
 			<button class="clear-icon" type="reset"></button>
-			<button [disabled]="!searchForm.valid" class="btn btn-outline-success my-2
-				my-sm-0" type="submit">Search</button>
+			<button [disabled]="!searchForm.valid" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 		</form>
 	</div>
 </nav>
