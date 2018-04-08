@@ -18,13 +18,22 @@ import { StorageService } from './storage.service';
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { InMemoryApi } from './in-memory-api';
-import { MoviesRoutingModule } from './modules/movies/movies-routing.module';
 import { CommonModule } from '@angular/common';
+import { MovieSearchResultsComponent } from './modules/movies/movie-search-results/movie-search-results.component';
+import { MovieListComponent } from './modules/movies/movie-list/movie-list.component';
+import { MovieEditComponent } from './modules/movies/movie-edit/movie-edit.component';
+import { MovieComponent } from './modules/movies/movie/movie.component';
+import { BackButtonComponent } from './modules/movies/back-button/back-button.component';
 
 @NgModule({
 	declarations: [
 		AppComponent,
-		MenuComponent
+		MenuComponent,
+		MovieListComponent,
+		MovieEditComponent,
+		MovieSearchResultsComponent,
+		MovieComponent,
+		BackButtonComponent
 	],
 	imports: [
 		CommonModule,

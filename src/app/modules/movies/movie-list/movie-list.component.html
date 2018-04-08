@@ -1,18 +1,10 @@
-<div class="container-fluid">
-	<div class="row">
-		<main class="col-sm-9 col-md-10 pt-3" role="main">
-			<table class='js-table-data'>
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Title</th>
-					</tr>
-				</thead>
-				<tr *ngFor="let movie of movies$ | async" (click)="movieClicked(movie)">
-					<td>{{ movie.id }}</td>
-					<td>{{ movie.title }}</td>
-				</tr>
-			</table>
-		</main>
+<main class="movie-list" role="main">
+	<div class="movie-box" *ngFor="let movie of movies$ | async" (click)="movieClicked(movie)" data-id="{{movie.id}}">
+		<div class="movie-box-2">
+			<img class="movie-poster" src="./assets/images/{{movie.poster}}" />
+			<span class="movie-box-title">
+				{{ movie.title }}
+			</span>
+		</div>
 	</div>
-</div>
+</main>
