@@ -1,10 +1,11 @@
-<div>
-	<app-back-button></app-back-button>
-	<div *ngIf="movie$ | async">
-		<h3>{{ (movie$ | async).title | uppercase }}</h3>
-		<div>
-			<span>id: {{ (movie$ | async).id }}</span>
+<button [routerLink]="previousLocation$|async">Back</button>
+<div *ngIf="movie$ | async">
+	<div class="movie-box" data-id="{{(movie$|async).id}}">
+		<div class="movie-box-2">
+			<img class="movie-poster" src="./assets/images/{{(movie$|async).poster}}" />
+			<span class="movie-box-title">
+				{{ (movie$|async).title }}
+			</span>
+			<button class="edit-button" routerLink="../../movie/{{(movie$|async).id}}">Edit</button>
 		</div>
-		<button routerLink="../../movie/{{(movie$|async).id}}">Edit</button>
 	</div>
-</div>

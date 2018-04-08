@@ -1,17 +1,15 @@
-<div class="container-fluid">
-	<div class="row">
-		<main class="col-sm-9 col-md-10 pt-3" role="main">
-			<h1>search results</h1>
-			<button (click)="close()">Close</button>
-			<div *ngIf="movies$ | async">
-				<div *ngFor="let movie of movies$ | async">
-					<h3>{{ movie.title | uppercase }}</h3>
-					<div>
-						<span>id: {{ movie.id }}</span>
-					</div>
-					<button routerLink="../../movie/{{movie.id}}">Edit</button>
-				</div>
+<h1>Search Results</h1>
+<button (click)="close()">Close</button>
+<div *ngIf="movies$ | async">
+	<main class="movie-list" role="main">
+		<input type="hidden" #searchTerms value="{{searchTerms$ | async}}">
+		<div class="movie-box" *ngFor="let movie of movies$ | async" (click)="movieClicked(movie, searchTerms.value)" data-id="{{movie.id}}">
+			<div class="movie-box-2">
+				<img class="movie-poster" src="./assets/images/{{movie.poster}}" />
+				<span class="movie-box-title">
+					{{ movie.title }}
+				</span>
 			</div>
-		</main>
-	</div>
+		</div>
+	</main>
 </div>

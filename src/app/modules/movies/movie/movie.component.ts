@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs/Observable';
 import { StorageService } from './../../../storage.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../redux/state/app.state';
@@ -14,6 +14,7 @@ import { Movie } from '../../../models/movie';
 export class MovieComponent implements OnInit {
 
 	movie$: Observable<Movie>;
+	previousLocation$: Observable<string>;
 
 	constructor(private store: Store<AppState>,
 		private route: ActivatedRoute,
@@ -23,5 +24,6 @@ export class MovieComponent implements OnInit {
 	ngOnInit() {
 		console.debug('movie component ngOnInit entry');
 		this.movie$ = this.store.select('movieState').select('selectedMovie');
+		this.previousLocation$ = this.store.select('movieState').select('previousLocation');
 	}
 }

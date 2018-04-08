@@ -25,6 +25,7 @@ export class MovieListComponent implements OnInit {
 	}
 
 	movieClicked(movie: Movie) {
-		this.store.dispatch(new MovieActions.SelectMovie(movie));
+		let location = '/movies';
+		this.store.dispatch(new MovieActions.SelectMovie(movie, location));
 	}
 }

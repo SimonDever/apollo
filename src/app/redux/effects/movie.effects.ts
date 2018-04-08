@@ -60,6 +60,9 @@ export class MovieEffects {
 
 	@Effect({ dispatch: false })
 	clearSearch = this.actions$.ofType(MovieAction.CLEAR_SEARCH)
-		.map(action => (action as MovieAction.ClearSearch))
-		.map(_ => this.router.navigateByUrl(''));
+		.map(action => (action as MovieAction.ClearSearch).destination)
+		.map(destination => {
+			console.log(destination);
+			this.router.navigateByUrl('/movies');
+		});
 }

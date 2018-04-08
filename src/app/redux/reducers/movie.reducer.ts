@@ -22,18 +22,25 @@ export function movieReducer(state = {} as MovieState, action: Action) {
 		}
 
 		case MovieActions.MOVIE_SAVED: {
-			let index = state.movies.findIndex(movie => movie.id == action.payload.id);
-			let a = [...state.movies];
-			a.splice(index, 1, action.payload);
+			let movieIndex = state.movies.findIndex(movie => movie.id == action.payload.id);
+			let movies = [...state.movies];
+			movies.splice(movieIndex, 1, action.payload);
+
+			let searchResultsIndex = state.searchResults.findIndex(movie => movie.id == action.payload.id);
+			let searchResults = [...state.searchResults];
+			searchResults.splice(searchResultsIndex, 1, action.payload);
+
 			return Object.assign({}, state, {
-				movies: a,
+				movies: movies,
+				searchResults: searchResults,
 				selectedMovie: action.payload
 			});
 		}
 
 		case MovieActions.SELECT_MOVIE: {
 			return Object.assign({}, state, {
-				selectedMovie: action.payload
+				selectedMovie: action.payload,
+				previousLocation: action.previousLocation
 			});
 		}
 
@@ -53,7 +60,8 @@ export function movieReducer(state = {} as MovieState, action: Action) {
 		case MovieActions.CLEAR_SEARCH: {
 			return Object.assign({}, state, {
 				searchResults: [],
-				searchTerms: ''
+				searchTerms: '',
+				selectedMovie: null
 			});
 		}
 

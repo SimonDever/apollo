@@ -10,4 +10,5 @@ export class MovieState {
 	movies: Movie[];
 	selectedMovie: Movie;
 	loading: boolean;
+	previousLocation: string;
 }

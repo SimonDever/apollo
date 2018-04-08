@@ -34,7 +34,8 @@ export class MovieEditComponent implements OnInit {
 	createForm() {
 		this.movieForm = this.formBuilder.group({
 			id: [''],
-			title: ['', Validators.required]
+			title: ['', Validators.required],
+			poster: ['']
 		});
 	}
 
