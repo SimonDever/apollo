@@ -1,72 +1,82 @@
-/* You can add global styles to this file, and also import other style files */
-
-/*
- * Base structure
- */
-
-/* Move down content because we have a fixed navbar that is 3.5rem tall */
 body {
   padding-top: 3.5rem;
 }
 
-/*
- * Typography
- */
+/* menu */
 
-h1 {
-  margin-bottom: 20px;
-  padding-bottom: 9px;
-  border-bottom: 1px solid #eee;
+.clear-icon {
+	border: 1px solid transparent;
+	background-color: transparent;
+	cursor: pointer;
+	position: relative;
+	margin: -15px 7px 0 -50px;
+	outline: 0;
 }
 
-/*
- * Sidebar
- */
-
-.sidebar {
-  position: fixed;
-  top: 51px;
-  bottom: 0;
-  left: 0;
-  z-index: 1000;
-  padding: 20px;
-  overflow-x: hidden;
-  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-  border-right: 1px solid #eee;
+.clear-icon:after {
+	content: '\02A2F';
+	display: block;
+	width: 25px;
+	height: 25px;
+	position: relative;
+	color: #aaa;
+	font-size: 25px;
+	cursor: pointer;
 }
 
-/* Sidebar navigation */
-.sidebar {
-  padding-left: 0;
-  padding-right: 0;
+input[type=search]:not(:valid) ~ .clear-icon {
+	display: none;
 }
 
-.sidebar .nav {
-  margin-bottom: 20px;
+/* /menu */
+
+/* movies */
+
+.movie-list {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+	grid-auto-rows: auto;
+	grid-gap: 10px;
+	background: #222;
+	padding-top: 10px;
 }
 
-.sidebar .nav-item {
-  width: 100%;
+.movie-poster {
+	height: 400px;
+	width: 290px;
+	z-index: 1;
+	position: absolute;
 }
 
-.sidebar .nav-item + .nav-item {
-  margin-left: 0;
+.poster-preview {
+	height: 400px;
+	width: 290px;
+	display: block;
 }
 
-.sidebar .nav-link {
-  border-radius: 0;
+.movie-box {
+	height: 400px;
+	width: 290px;
+	border: 1px solid #333;
 }
 
-/*
- * Dashboard
- */
-
- /* Placeholders */
-.placeholders {
-  padding-bottom: 3rem;
+.movie-box-2 {
+	position: relative;
 }
 
-.placeholder img {
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
+.movie-box-title {
+	font-weight: bold;
+	font-size: 18px;
+	text-align: center;
+	width: 100%;
+	color: #bbb;
+	z-index: 2;
+	position: absolute;
 }
+
+.edit-button {
+	z-index: 2;
+	position: absolute;
+}
+
+/* /movies */
