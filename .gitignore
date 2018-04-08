@@ -3,6 +3,9 @@
 # personal config
 .moviedb-api-key
 
+# unlicenced and unable to distribute
+/src/assets/images/poster-*
+
 # compiled output
 /dist
 /tmp
