@@ -52,6 +52,7 @@
 		"jquery": "^3.2.1",
 		"moviedb-promise": "^1.2.1",
 		"moviedb-promise-es6": "^0.1.7",
+		"octicons": "^7.2.0",
 		"popper.js": "^1.14.1",
 		"rxjs": "^5.5.7",
 		"zone.js": "^0.8.14"

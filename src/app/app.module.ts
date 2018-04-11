@@ -24,6 +24,7 @@ import { MovieListComponent } from './modules/movies/movie-list/movie-list.compo
 import { MovieEditComponent } from './modules/movies/movie-edit/movie-edit.component';
 import { MovieComponent } from './modules/movies/movie/movie.component';
 import { BackButtonComponent } from './modules/movies/back-button/back-button.component';
+import { OcticonDirective } from './directives/octicon.directive';
 
 @NgModule({
 	declarations: [
@@ -33,7 +34,8 @@ import { BackButtonComponent } from './modules/movies/back-button/back-button.co
 		MovieEditComponent,
 		MovieSearchResultsComponent,
 		MovieComponent,
-		BackButtonComponent
+		BackButtonComponent,
+		OcticonDirective
 	],
 	imports: [
 		CommonModule,
@@ -54,6 +56,9 @@ import { BackButtonComponent } from './modules/movies/back-button/back-button.co
 		StoreDevtoolsModule.instrument({
 			maxAge: 25
 		})
+	],
+	exports: [
+		OcticonDirective
 	],
 	providers: [
 		SearchService,
