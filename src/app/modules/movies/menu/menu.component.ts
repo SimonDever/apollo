@@ -17,6 +17,7 @@ import { Movie } from '../../../models/movie';
 export class MenuComponent implements OnInit {
 
 	searchForm: FormGroup;
+	contextTitle$: Observable<String>;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -29,6 +30,7 @@ export class MenuComponent implements OnInit {
 	ngOnInit() {
 		console.debug('menu component ngOnInit entry');
 		this.createForm();
+		this.contextTitle$ = this.store.select('movieState').select('contextTitle');
 	}
 
 	createForm() {

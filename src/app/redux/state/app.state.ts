@@ -11,4 +11,5 @@ export class MovieState {
 	selectedMovie: Movie;
 	loading: boolean;
 	previousLocation: string;
+	contextTitle: string;
 }

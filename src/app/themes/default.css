@@ -1,0 +1,42 @@
+:root {
+	--foreground: #ccc;
+	--border: #333;
+	--background: #222;
+	--input-placeholders: #aaa;
+}
+
+.movie-box {
+	border: 1px solid var(--border);
+}
+
+.movie-list {
+	background: var(--background);
+}
+
+.movie-box-title {
+	color: var(--foreground);
+}
+
+.search-results {
+	background: var(--background);
+}
+
+.search-results h1 {
+	color: var(--foreground);
+}
+
+.settings-icon {
+	fill: var(--foreground);
+}
+
+.clear-icon:after {
+	color: var(--input-placeholders);
+}
+
+.context-title {
+	color: var(--foreground);
+}
+
+.search-results .close-button svg {
+	fill: var(--foreground);
+}

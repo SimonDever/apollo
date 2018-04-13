@@ -17,7 +17,8 @@ export function movieReducer(state = {} as MovieState, action: Action) {
 		case MovieActions.MOVIES_LOADED: {
 			return Object.assign({}, state, {
 				movies: action.payload,
-				loading: false
+				loading: false,
+				contextTitle: ''
 			});
 		}
 
@@ -46,14 +47,15 @@ export function movieReducer(state = {} as MovieState, action: Action) {
 
 		case MovieActions.SEARCH_MOVIE: {
 			return Object.assign({}, state, {
-				searchTerms: action.payload
+				searchTerms: action.payload,
 			});
 		}
 
 		case MovieActions.MOVIE_SEARCHED: {
 			const searchResults = state.searchTerms === '' ? [] : action.payload;
 			return Object.assign({}, state, {
-				searchResults: searchResults
+				searchResults: searchResults,
+				contextTitle: 'Search Results'
 			});
 		}
 
@@ -61,7 +63,8 @@ export function movieReducer(state = {} as MovieState, action: Action) {
 			return Object.assign({}, state, {
 				searchResults: [],
 				searchTerms: '',
-				selectedMovie: null
+				selectedMovie: null,
+				contextTitle: ''
 			});
 		}
 

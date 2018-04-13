@@ -1,8 +1,6 @@
 <div class="search-results">
 	<div class="search-results-head">
-		<h1>Search Results</h1>
-		<button octicon="x" color="#ccc" width="25px" class="close-button"
-			(click)="close()"></button>
+		<button octicon="x" class="close-button" (click)="close()"></button>
 	</div>
 	<div *ngIf="movies$ | async">
 		<main class="movie-list" role="main">
