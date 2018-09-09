@@ -1,11 +1,12 @@
-<button [routerLink]="previousLocation$|async">Back</button>
-<div *ngIf="movie$ | async">
-	<div class="movie-box" data-id="{{(movie$|async).id}}">
-		<div class="movie-box-2">
-			<img class="movie-poster" src="./assets/images/{{(movie$|async).poster}}" />
-			<span class="movie-box-title">
-				{{ (movie$|async).title }}
-			</span>
-			<button class="edit-button" routerLink="../../movie/{{(movie$|async).id}}">Edit</button>
+<div class="movie-view">
+	<button octicon="x" class="close-button" (click)="close()"></button>
+	<button octicon="pencil" class="edit-button" (click)="edit()"></button>
+	<div class="movie-list">
+		<div *ngIf="movie$ | async as movie">
+			<div class="movie-box" data-id="{{movie.id}}">
+				<img class="movie-poster" src="./assets/images/{{movie.poster}}" />
+				<span class="movie-box-title">{{ movie.title }}</span>
+			</div>
 		</div>
 	</div>
+</div>

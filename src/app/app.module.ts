@@ -25,6 +25,7 @@ import { MovieEditComponent } from './modules/movies/movie-edit/movie-edit.compo
 import { MovieComponent } from './modules/movies/movie/movie.component';
 import { BackButtonComponent } from './modules/movies/back-button/back-button.component';
 import { OcticonDirective } from './directives/octicon.directive';
+import { AddMovieComponent } from './modules/movies/add-movie/add-movie.component';
 
 @NgModule({
 	declarations: [
@@ -35,7 +36,8 @@ import { OcticonDirective } from './directives/octicon.directive';
 		MovieSearchResultsComponent,
 		MovieComponent,
 		BackButtonComponent,
-		OcticonDirective
+		OcticonDirective,
+		AddMovieComponent
 	],
 	imports: [
 		CommonModule,

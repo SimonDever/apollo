@@ -1,5 +1,10 @@
 @import './app/themes/default.css';
 
+:root {
+	--grid-item-width: 290px;
+	--grid-item-height: 400px;
+}
+
 html {
 	height: 100%;
 }
@@ -7,6 +12,11 @@ html {
 body {
 	padding-top: 3.5rem;
 	height: 100%;
+	min-width: 360px;
+}
+
+.navbar-expand-md .navbar-nav .nav-link {
+	padding: 0;
 }
 
 .clear-icon {
@@ -34,28 +44,32 @@ input[type=search]:not(:valid) ~ .clear-icon {
 
 .movie-list {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-	grid-auto-rows: auto;
-	grid-gap: 10px;
-	padding-top: 10px;
+	/* grid-template-columns: 1fr 1fr 1fr 1fr 1fr; */
+	/* grid-auto-rows: 400px; */
+	/*grid-auto-columns: 290px;*/
+	grid-gap: 15px;
+	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
+	padding-top: 15px;
+	padding-right: 70px;
+	padding-left: 15px;
 }
 
 .movie-poster {
-	height: 400px;
-	width: 290px;
+	height: var(--grid-item-height);
+	width: var(--grid-item-width);
 	z-index: 1;
 	position: absolute;
 }
 
 .poster-preview {
-	height: 400px;
-	width: 290px;
+	height: var(--grid-item-height);
+	width: var(--grid-item-width);
 	display: block;
 }
 
 .movie-box {
-	height: 400px;
-	width: 290px;
+	height: var(--grid-item-height);
+	width: var(--grid-item-width);
 }
 
 .movie-box-2 {
@@ -66,50 +80,41 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	font-weight: bold;
 	font-size: 18px;
 	text-align: center;
-	width: 100%;
+	width: calc(100% - var(--grid-item-width) - 30px - 110px - 15px);
 	z-index: 2;
 	position: absolute;
+	left: calc(var(--grid-item-width) + 30px);
+	top: 15px;
 }
 
-.edit-button {
-	z-index: 2;
-	position: absolute;
-}
-
-.search-results {
+.edit-view,
+.movie-view,
+.search-view {
 	height: 100%;
 	position: relative;
 }
 
-.search-results h1 {
-	margin-top: 0;
-	margin-bottom: 0;
-	padding-top: 5px;
-	padding-bottom: 10px;
-	font-size: 1.6em;
-	text-align: center;
-}
-
+.edit-button,
 .close-button {
-	border-color: transparent;
-	background-color: transparent;
 	cursor: pointer;
-	position: relative;
 	outline: 0;
-}
-
-.search-results .close-button {
-	position: absolute;
-	top: 10px;
-	right: 15px;
-	z-index: 9;
 	background-color: var(--background);
 	border: 1px solid var(--foreground);
 	width: 40px;
 	height: 40px;
+	float: right;
+	margin-right: 15px;
+	margin-top: 15px;
 }
 
-.search-results .close-button svg {
+.clear-icon:focus,
+.edit-button:focus,
+.close-button:focus {
+	outline: 0;
+}
+
+.edit-button svg,
+.close-button svg {
 	width: 100%;
 	height: 100%;
 }
@@ -119,4 +124,6 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	vertical-align: middle;
 	margin-right: 5px;
 }
+
+
 

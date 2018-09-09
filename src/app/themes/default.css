@@ -17,12 +17,9 @@
 	color: var(--foreground);
 }
 
+.movie-view,
 .search-results {
 	background: var(--background);
-}
-
-.search-results h1 {
-	color: var(--foreground);
 }
 
 .settings-icon {
@@ -37,6 +34,7 @@
 	color: var(--foreground);
 }
 
-.search-results .close-button svg {
+.edit-button svg,
+.close-button svg {
 	fill: var(--foreground);
 }

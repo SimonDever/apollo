@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, Output } from '@angular/core';
 import * as MovieActions from './redux/actions/movie.actions';
 import { AppState } from './redux/state/app.state';
 import { StorageService } from './storage.service';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
 	selector: 'app-root',

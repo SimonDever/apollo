@@ -52,6 +52,7 @@
 		"jquery": "^3.2.1",
 		"moviedb-promise": "^1.2.1",
 		"moviedb-promise-es6": "^0.1.7",
+		"ngrx-forms": "^2.3.2",
 		"octicons": "^7.2.0",
 		"popper.js": "^1.14.1",
 		"rxjs": "^5.5.7",
@@ -100,7 +101,7 @@
 		"uglifyjs-webpack-plugin": "^1.1.8",
 		"url-loader": "^0.6.2",
 		"webpack": "~3.11.0",
-		"webpack-dashboard": "^1.1.1",
+		"webpack-dashboard": "^2.0.0",
 		"webpack-dev-server": "~2.11.0"
 	}
 }

@@ -1,17 +1,12 @@
-<div class="search-results">
-	<div class="search-results-head">
-		<button octicon="x" class="close-button" (click)="close()"></button>
-	</div>
-	<div *ngIf="movies$ | async">
+<div class="search-view">
+	<button octicon="x" class="close-button" (click)="close()"></button>
+	<div *ngIf="movies$ | async as movies">
 		<main class="movie-list" role="main">
-			<input type="hidden" #searchTerms value="{{searchTerms$ | async}}">
-			<div class="movie-box" *ngFor="let movie of movies$ | async"
-				(click)="movieClicked(movie, searchTerms.value)" data-id="{{movie.id}}">
+			<input type="hidden" #searchTerms value="{{searchTerms}}">
+			<div *ngFor="let movie of movies" class="movie-box"
+				(click)="movieClicked(movie)">
 				<div class="movie-box-2">
 					<img class="movie-poster" src="./assets/images/{{movie.poster}}" />
-					<span class="movie-box-title">
-						{{ movie.title }}
-					</span>
 				</div>
 			</div>
 		</main>

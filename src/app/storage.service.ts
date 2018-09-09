@@ -26,4 +26,8 @@ export class StorageService {
 	searchMovie(title: string): Observable<Movie[]> {
 		return this.http.get<Movie[]>('/api/movies/?title=' + title);
 	}
+
+	addMovie(movie: Movie): Observable<Movie> {
+		return this.http.put<Movie>('/api/movies/' + movie.id, movie);
+	}
 }

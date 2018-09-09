@@ -1,10 +1,8 @@
 <main class="movie-list" role="main">
-	<div class="movie-box" *ngFor="let movie of movies$ | async" (click)="movieClicked(movie)" data-id="{{movie.id}}">
+	<div class="movie-box" *ngFor="let movie of movies$ | async"
+		(click)="movieClicked(movie)">
 		<div class="movie-box-2">
 			<img class="movie-poster" src="./assets/images/{{movie.poster}}" />
-			<span class="movie-box-title">
-				{{ movie.title }}
-			</span>
 		</div>
 	</div>
 </main>

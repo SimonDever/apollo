@@ -1,0 +1,13 @@
+
+.navbar {
+	min-width: 360px;
+}
+
+.form-inline .form-control {
+	width: auto; /* prevent full width input in xs */
+}
+
+.button-group .btn {
+	margin-left: 2rem;
+	margin-right: 2rem;
+}

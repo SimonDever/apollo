@@ -5,6 +5,8 @@ import { AppState } from '../../../redux/state/app.state';
 import { Store } from '@ngrx/store';
 import * as MovieActions from '../../../redux/actions/movie.actions';
 import { Movie } from '../../../models/movie';
+import { ISubscription } from 'rxjs/Subscription';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
 	selector: 'app-movie-list',
@@ -13,19 +15,19 @@ import { Movie } from '../../../models/movie';
 })
 export class MovieListComponent implements OnInit {
 
-	movies$ = this.store.select('movieState').select('movies');
+	movies$: Observable<Movie[]>;
 
 	constructor(private router: Router,
 		private route: ActivatedRoute,
 		private store: Store<AppState>) { }
 
 	ngOnInit() {
-		console.debug('movie-list component ngOnInit entry');
+		this.movies$ = this.store.select('movieState').select('movies')
+			.publishReplay(1).refCount();
 		this.store.dispatch(new MovieActions.LoadMovies());
 	}
 
 	movieClicked(movie: Movie) {
-		let location = '/movies';
-		this.store.dispatch(new MovieActions.SelectMovie(movie, location));
+		this.store.dispatch(new MovieActions.SelectMovie(movie));
 	}
 }

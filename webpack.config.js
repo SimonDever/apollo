@@ -138,6 +138,9 @@ module.exports = {
 			"main"
 		]
 	},
+	node: {
+		"__dirname": true
+	},
 	"resolveLoader": {
 		"modules": [
 			"./node_modules"
@@ -404,11 +407,11 @@ module.exports = {
 			"sourceMap": true,
 			"filename": "scripts.bundle.js",
 			"scripts": [
-				"/Users/simon/code/movies/node_modules/jquery/dist/jquery.min.js",
-				"/Users/simon/code/movies/node_modules/popper.js/dist/umd/popper.min.js",
-				"/Users/simon/code/movies/node_modules/bootstrap/dist/js/bootstrap.min.js"
+				"node_modules/jquery/dist/jquery.min.js",
+				"node_modules/popper.js/dist/umd/popper.min.js",
+				"node_modules/bootstrap/dist/js/bootstrap.min.js"
 			],
-			"basePath": "/Users/simon/code/movies"
+			"basePath": ""
 		}),
 		new CopyWebpackPlugin([
 			{

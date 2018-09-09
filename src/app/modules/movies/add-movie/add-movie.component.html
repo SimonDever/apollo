@@ -1,12 +1,7 @@
 <div class="edit-view">
-
 	<button octicon="x" class="close-button" (click)="close()"></button>
 
 	<form [formGroup]="movieForm" (submit)="submit()">
-		<div>
-			<label for="id">ID</label>
-			<input type="text" id="id" formControlName="id">
-		</div>
 		<div>
 			<label for="title">Title</label>
 			<input type="text" id="title" formControlName="title">

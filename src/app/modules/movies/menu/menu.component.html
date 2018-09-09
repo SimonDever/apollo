@@ -2,35 +2,40 @@
 
 	<a class="navbar-brand" routerLink="movies">Movies</a>
 
-	<p class="context-title m-auto d-xs-block d-md-none">{{ contextTitle$ | async
-		}}</p>
+	<p class="context-title m-auto d-xs-block d-md-none">
+		{{ contextTitle$ | async }}
+	</p>
+
+	<div class="button-group">
+		<button class="btn btn-outline-success" (click)="addMovie()">Add Movie</button>
+	</div>
 
 	<button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse"
-		data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
+		data-target="#navbar" aria-controls="navbar"
 		aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
 
-	<div class="collapse navbar-collapse" id="navbarsExampleDefault">
+	<div class="collapse navbar-collapse" id="navbar">
 
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" routerLink="settings">
-					<span octicon="settings" class="settings-icon"></span>
-					Settings
+					<!--<span octicon="settings" class="settings-icon"></span>--> Settings
 				</a>
 			</li>
 		</ul>
 
-		<p class="context-title m-auto d-none d-md-block">{{ contextTitle$ | async }}</p>
-		<form [formGroup]="searchForm" (submit)="search()" class="form-inline mt-2
-			mt-md-0">
-			<input required id="title" formControlName="title" class="form-control
-				mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+		<p class="context-title m-auto d-none d-md-block">
+			{{ contextTitle$ | async }}
+		</p>
+
+		<form [formGroup]="searchForm" (submit)="search()" class="form-inline"> <!-- mt-md-0 mt-2 -->
+			<input required id="title" formControlName="title" class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
 			<button class="clear-icon" type="reset"></button>
-			<button [disabled]="!searchForm.valid" class="btn btn-outline-success my-2
-				my-sm-0" type="submit">Search</button>
+			<button [disabled]="!searchForm.valid" class="btn btn-outline-success" type="submit">Search</button>
 		</form>
 
 	</div>
+
 </nav>
