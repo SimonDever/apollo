@@ -1,8 +1,9 @@
-import { MenuComponent } from './modules/movies/menu/menu.component';
+import { MenuComponent } from './modules/shared/menu/menu.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 
 import { StoreModule } from '@ngrx/store';
@@ -10,40 +11,36 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 
-import { MovieEffects } from './redux/effects/movie.effects';
-import { movieReducer } from './redux/reducers/movie.reducer';
+import { MovieEffects } from './modules/movies/movie.effects';
+import { movieReducer } from './modules/movies/movie.reducer';
+
 import { AppComponent } from './app.component';
+
 import { SearchService } from './search.service';
 import { StorageService } from './storage.service';
+
 import { environment } from '../environments/environment';
+
 import { AppRoutingModule } from './app-routing.module';
+
+import { OcticonDirective } from './modules/shared/octicon.directive';
+
 import { InMemoryApi } from './in-memory-api';
-import { CommonModule } from '@angular/common';
-import { MovieSearchResultsComponent } from './modules/movies/movie-search-results/movie-search-results.component';
-import { MovieListComponent } from './modules/movies/movie-list/movie-list.component';
-import { MovieEditComponent } from './modules/movies/movie-edit/movie-edit.component';
-import { MovieComponent } from './modules/movies/movie/movie.component';
-import { BackButtonComponent } from './modules/movies/back-button/back-button.component';
-import { OcticonDirective } from './directives/octicon.directive';
-import { AddMovieComponent } from './modules/movies/add-movie/add-movie.component';
+
+import { MoviesModule } from './modules/movies/movies.module';
+import { SettingsModule } from './modules/settings/settings.module';
+import { SharedModule } from './modules/shared/shared.module';
 
 @NgModule({
 	declarations: [
-		AppComponent,
-		MenuComponent,
-		MovieListComponent,
-		MovieEditComponent,
-		MovieSearchResultsComponent,
-		MovieComponent,
-		BackButtonComponent,
-		OcticonDirective,
-		AddMovieComponent
+		AppComponent
 	],
 	imports: [
 		CommonModule,
-		FormsModule,
-		ReactiveFormsModule,
 		BrowserModule,
+		MoviesModule,
+		SettingsModule,
+		SharedModule,
 		AppRoutingModule,
 		HttpClientModule,
 		HttpClientInMemoryWebApiModule.forRoot(
@@ -60,7 +57,6 @@ import { AddMovieComponent } from './modules/movies/add-movie/add-movie.componen
 		})
 	],
 	exports: [
-		OcticonDirective
 	],
 	providers: [
 		SearchService,

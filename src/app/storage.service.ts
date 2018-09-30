@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Movie } from './models/movie';
+import { Movie } from './modules/movies/movie';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
 //import *  as sqlite3  from 'sqlite3';

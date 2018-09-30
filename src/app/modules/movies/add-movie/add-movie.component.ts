@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState } from '../../../redux/state/app.state';
-import * as MovieActions from '../../../redux/actions/movie.actions';
+import { AppState } from '../../../app.state';
+import * as MovieActions from '../movie.actions';
 
 @Component({
   selector: 'app-add-movie',

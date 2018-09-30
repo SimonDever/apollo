@@ -1,6 +1,6 @@
 import { Component, Output } from '@angular/core';
-import * as MovieActions from './redux/actions/movie.actions';
-import { AppState } from './redux/state/app.state';
+import * as MovieActions from './modules/movies/movie.actions';
+import { AppState } from './app.state';
 import { StorageService } from './storage.service';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';

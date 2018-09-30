@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs/Observable';
 import { Component, OnInit, Input } from '@angular/core';
-import * as MovieActions from '../../../redux/actions/movie.actions';
+import * as MovieActions from '../movie.actions';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AppState } from '../../../redux/state/app.state';
+import { AppState } from '../../../app.state';
 import { Store } from '@ngrx/store';
 import { Subscription } from '../../../../../node_modules/rxjs/Subscription';
 
@@ -33,12 +33,16 @@ export class MovieEditComponent implements OnInit {
 			.subscribe(selectedMovie => this.movieForm.setValue(selectedMovie));
 	}
 
+	ngOnDestroy(): void {
+		this.selectedMovieSubscription.unsubscribe();
+	}
+
 	submit() {
 		this.store.dispatch(new MovieActions.SaveMovie(this.movieForm.value));
 	}
 
+
 	close() {
-		this.selectedMovieSubscription.unsubscribe();
 		this.store.dispatch(new MovieActions.CloseEditView());
 	}
 }

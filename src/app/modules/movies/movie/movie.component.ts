@@ -4,9 +4,9 @@ import { Store } from '@ngrx/store';
 import { publishReplay } from 'rxjs/operators';
 import "rxjs/add/operator/publishReplay";
 
-import { AppState } from '../../../redux/state/app.state';
-import { Movie } from '../../../models/movie';
-import * as MovieActions from '../../../redux/actions/movie.actions';
+import { AppState } from '../../../app.state';
+import { Movie } from '../movie';
+import * as MovieActions from '../movie.actions';
 
 @Component({
 	selector: 'app-movie',

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StorageService } from '../../../storage.service';
-import { AppState } from '../../../redux/state/app.state';
+import { AppState } from '../../../app.state';
 import { Store } from '@ngrx/store';
-import * as MovieActions from '../../../redux/actions/movie.actions';
-import { Movie } from '../../../models/movie';
+import * as MovieActions from '../movie.actions';
+import { Movie } from '../movie';
 import { ISubscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 

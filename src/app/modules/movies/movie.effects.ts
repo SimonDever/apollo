@@ -1,13 +1,13 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { SelectMovie } from './../actions/movie.actions';
+import { SelectMovie } from './movie.actions';
 import { Injectable } from "@angular/core";
 import { Effect, Actions } from '@ngrx/effects';
 import { Observable } from "rxjs/Observable";
 import { Action, Store } from "@ngrx/store";
 import { StorageService } from "../../storage.service";
-import { Movie } from '../../models/movie';
-import { AppState } from '../state/app.state';
-import * as MovieAction from '../actions/movie.actions';
+import { Movie } from './movie';
+import { AppState } from '../../app.state';
+import * as MovieAction from './movie.actions';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';

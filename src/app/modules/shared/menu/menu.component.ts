@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
-import { AppState } from '../../../redux/state/app.state';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import * as MovieActions from '../../../redux/actions/movie.actions';
 import { Observable } from 'rxjs/Observable';
+import * as MovieActions from '../../movies/movie.actions';
+import { AppState } from '../../../app.state';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
 	selector: 'app-menu',
@@ -13,16 +14,20 @@ import { Observable } from 'rxjs/Observable';
 export class MenuComponent implements OnInit {
 
 	searchForm: FormGroup;
-	contextTitle$: Observable<string>;
+	contextTitle: string;
+	contextTitleSubscription: Subscription;
 
 	constructor(private formBuilder: FormBuilder,
 		private store: Store<AppState>) { }
 
 	ngOnInit() {
 		this.searchForm = this.formBuilder.group({ title: '' });
+		this.contextTitleSubscription = this.store.select('movieState').select('contextTitle')
+			.subscribe(contextTitle => this.contextTitle = contextTitle);
+	}
 
-		this.contextTitle$ = this.store.select('movieState').select('contextTitle')
-			.publishReplay(1).refCount();
+	ngOnDestroy(): void {
+		this.contextTitleSubscription.unsubscribe();
 	}
 
 	search() {

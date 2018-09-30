@@ -1,7 +1,7 @@
-import { SelectMovie } from './../actions/movie.actions';
-import * as MovieActions from '../actions/movie.actions';
-import { MovieState } from '../state/app.state';
-import { Movie } from '../../models/movie';
+import { SelectMovie } from './movie.actions';
+import * as MovieActions from './movie.actions';
+import { MovieState } from '../../app.state';
+import { Movie } from './movie';
 
 type Action = MovieActions.All;
 

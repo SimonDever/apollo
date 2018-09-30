@@ -1,4 +1,4 @@
-import { Movie } from "../../models/movie";
+import { Movie } from "./modules/movies/movie";
 
 export class AppState {
 	movieState: MovieState;
