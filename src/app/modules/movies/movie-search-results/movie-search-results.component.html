@@ -1,6 +1,6 @@
 <div class="search-view">
-	<button octicon="x" class="close-button" (click)="close()"></button>
-	<div *ngIf="movies$ | async as movies">
+	<button octicon="x" class="icon-button close-button" (click)="close()"></button>
+	<div *ngIf="movies">
 		<main class="movie-list" role="main">
 			<input type="hidden" #searchTerms value="{{searchTerms}}">
 			<div *ngFor="let movie of movies" class="movie-box"

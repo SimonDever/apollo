@@ -34,7 +34,11 @@
 	color: var(--foreground);
 }
 
+
 .edit-button svg,
-.close-button svg {
+.close-button svg,
+.search-metadata-provider-button svg
+/* button:not([type="submit"]) svg */
+{
 	fill: var(--foreground);
 }

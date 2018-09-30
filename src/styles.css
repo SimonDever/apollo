@@ -80,10 +80,10 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	font-weight: bold;
 	font-size: 18px;
 	text-align: center;
-	width: calc(100% - var(--grid-item-width) - 30px - 110px - 15px);
+	width: calc(100% - var(--grid-item-width) - 30px - 40px - 15px - 15px); /* screen width - poster width - poster padding - icon button width - icon button padding */
 	z-index: 2;
 	position: absolute;
-	left: calc(var(--grid-item-width) + 30px);
+	left: calc(var(--grid-item-width) + 15px + 15px); /* poster width + poster padding */
 	top: 15px;
 }
 
@@ -94,27 +94,28 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	position: relative;
 }
 
-.edit-button,
-.close-button {
+.icon-button-box {
+	right: 0;
+	position: absolute;
+}
+
+.icon-button {
+	display: block;
 	cursor: pointer;
 	outline: 0;
 	background-color: var(--background);
 	border: 1px solid var(--foreground);
 	width: 40px;
 	height: 40px;
-	float: right;
 	margin-right: 15px;
 	margin-top: 15px;
 }
 
-.clear-icon:focus,
-.edit-button:focus,
-.close-button:focus {
+.icon-button:focus {
 	outline: 0;
 }
 
-.edit-button svg,
-.close-button svg {
+.icon-button svg {
 	width: 100%;
 	height: 100%;
 }
