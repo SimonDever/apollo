@@ -5,7 +5,7 @@ import { AppState } from '../../../app.state';
 import { Store } from '@ngrx/store';
 import * as MovieActions from '../movie.actions';
 import { Movie } from '../movie';
-import { ISubscription } from 'rxjs/Subscription';
+import { ISubscription, Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
@@ -15,16 +15,22 @@ import { Observable } from 'rxjs/Observable';
 })
 export class MovieListComponent implements OnInit {
 
-	movies$: Observable<Movie[]>;
+	movies: Movie[];
+	moviesSubscription: Subscription;
 
 	constructor(private router: Router,
 		private route: ActivatedRoute,
 		private store: Store<AppState>) { }
 
 	ngOnInit() {
-		this.movies$ = this.store.select('movieState').select('movies')
-			.publishReplay(1).refCount();
+		this.moviesSubscription = this.store.select('movieState').select('movies')
+			.subscribe(movies => this.movies = movies);
+
 		this.store.dispatch(new MovieActions.LoadMovies());
+	}
+
+	ngOnDestroy(): void {
+		this.moviesSubscription.unsubscribe();
 	}
 
 	movieClicked(movie: Movie) {

@@ -14,17 +14,25 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class MovieSearchResultsComponent implements OnInit {
 
-	movies$: Observable<Movie[]>;
-	searchTerms$: Observable<string>;
+	movies: Movie[];
+	searchResultsSubscription: Subscription;
+	searchTerms: string;
+	searchTermsSubscription: Subscription;
 
 	constructor(private storageService: StorageService,
 		private store: Store<AppState>) { }
 
 	ngOnInit() {
-		this.searchTerms$ = this.store.select('movieState').select('searchTerms')
-			.publishReplay(1).refCount();
-		this.movies$ = this.store.select('movieState').select('searchResults')
-			.publishReplay(1).refCount();
+		this.searchTermsSubscription = this.store.select('movieState').select('searchTerms')
+			.subscribe(searchTerms => this.searchTerms = searchTerms);
+			
+		this.searchResultsSubscription = this.store.select('movieState').select('searchResults')
+			.subscribe(movies => this.movies = movies);
+	}
+
+	ngOnDestroy(): void {
+		this.searchTermsSubscription.unsubscribe();
+		this.searchResultsSubscription.unsubscribe();
 	}
 
 	close() {

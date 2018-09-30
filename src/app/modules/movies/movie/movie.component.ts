@@ -7,6 +7,7 @@ import "rxjs/add/operator/publishReplay";
 import { AppState } from '../../../app.state';
 import { Movie } from '../movie';
 import * as MovieActions from '../movie.actions';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
 	selector: 'app-movie',
@@ -15,13 +16,18 @@ import * as MovieActions from '../movie.actions';
 })
 export class MovieComponent implements OnInit {
 
-	movie$: Observable<Movie>;
+	movie: Movie;
+	selectedMovieSubscription: Subscription;
 
 	constructor(private store: Store<AppState>) { }
 
 	ngOnInit() {
-		this.movie$ = this.store.select('movieState').select('selectedMovie')
-			.publishReplay(1).refCount();
+		this.selectedMovieSubscription = this.store.select('movieState').select('selectedMovie')
+			.subscribe(selectedMovie => this.movie = selectedMovie);
+	}
+
+	ngOnDestroy() {
+		this.selectedMovieSubscription.unsubscribe();
 	}
 
 	edit() {
@@ -30,5 +36,9 @@ export class MovieComponent implements OnInit {
 
 	close() {
 		this.store.dispatch(new MovieActions.CloseMovieView());
+	}
+
+	searchMetadataProvider() {
+		this.store.dispatch(new MovieActions.SearchMetadataProvider(this.movie));
 	}
 }

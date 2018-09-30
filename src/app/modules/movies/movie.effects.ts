@@ -25,6 +25,11 @@ export class MovieEffects {
 		private store: Store<AppState>) {
 	}
 
+	@Effect({dispatch: false})
+	searchMetadataProvider = this.actions$.ofType(MovieAction.SEARCH_METADATA_PROVIDER)
+		.map(action => (action as MovieAction.SearchMetadataProvider).payload)
+		.map(movies => {});
+
 	@Effect()
 	loadMovies$: Observable<Action> = this.actions$.ofType(MovieAction.LOAD_MOVIES)
 		.mergeMap(action => {

@@ -8,6 +8,10 @@ type Action = MovieActions.All;
 export function movieReducer(state = {} as MovieState, action: Action) {
 	switch (action.type) {
 
+		case MovieActions.SEARCH_METADATA_PROVIDER: {
+			return Object.assign({}, state, {});
+		}
+
 		case MovieActions.LOAD_MOVIES: {
 			return Object.assign({}, state, {
 				loading: true,

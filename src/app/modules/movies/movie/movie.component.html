@@ -1,8 +1,9 @@
 <div class="movie-view">
 	<button octicon="x" class="close-button" (click)="close()"></button>
 	<button octicon="pencil" class="edit-button" (click)="edit()"></button>
+	<button octicon="search" class="search-meta-button" (click)="searchMetadataProvider()"></button>
 	<div class="movie-list">
-		<div *ngIf="movie$ | async as movie">
+		<div *ngIf="movie">
 			<div class="movie-box" data-id="{{movie.id}}">
 				<img class="movie-poster" src="./assets/images/{{movie.poster}}" />
 				<span class="movie-box-title">{{ movie.title }}</span>

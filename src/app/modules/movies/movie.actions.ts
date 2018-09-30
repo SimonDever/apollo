@@ -122,8 +122,16 @@ export class MovieSearched implements Action {
 	}
 }
 
+export const SEARCH_METADATA_PROVIDER = '[Movie] Search Metadata Provider';
+
+export class SearchMetadataProvider implements Action {
+	readonly type = SEARCH_METADATA_PROVIDER;
+	constructor(public payload: Movie) {
+	}
+}
+
 export type All = EditMovie | CloseMovieView | CloseEditView |
 	LoadMovies | MoviesLoaded | MovieViewClosed |
 	SelectMovie | SaveMovie | ShowAddMovieView | CloseAddMovieView | AddMovieViewClosed |
 	MovieSaved | SearchMovie | AddMovie | MovieAdded |
-	MovieSearched | CloseSearchView;
+	MovieSearched | CloseSearchView | SearchMetadataProvider;
