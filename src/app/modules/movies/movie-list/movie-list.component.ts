@@ -20,15 +20,15 @@ export class MovieListComponent implements OnInit {
 	constructor(private router: Router,
 		private route: ActivatedRoute,
 		private store: Store<fromLibrary.LibraryState>) {
-		}
+	}
 
 	ngOnInit() {
 		console.log('MovieListComponent Init')
-		
+
 		this.needMovies$ = this.store.pipe(select(fromLibrary.getNeedMovies));
 
 		this.needMoviesSub = this.needMovies$.subscribe(needMovies => {
-			if(needMovies) {
+			if (needMovies) {
 				this.store.dispatch(new LibraryActions.Load())
 			}
 		});
@@ -41,6 +41,6 @@ export class MovieListComponent implements OnInit {
 	}
 
 	movieClicked(movie: Movie) {
-		this.store.dispatch(new LibraryActions.SelectMovie({movie: movie}));
+		this.store.dispatch(new LibraryActions.SelectMovie({ movie: movie }));
 	}
 }
