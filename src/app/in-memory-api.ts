@@ -1,5 +1,4 @@
 import { InMemoryDbService } from 'angular-in-memory-web-api';
-import { Movie } from './modules/movies/movie';
 
 export class InMemoryApi implements InMemoryDbService {
 	createDb() {

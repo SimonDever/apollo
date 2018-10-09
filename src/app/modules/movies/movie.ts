@@ -1,5 +1,9 @@
 export class Movie {
-	id: number;
-	title: string;
-	poster: string;
+	constructor(public id: string,
+		public title: string,
+		public poster: string) {
+		this.id = '';
+		this.title = '';
+		this.poster = '';
+	}
 }

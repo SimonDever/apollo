@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Movie } from '../movie';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { StorageService } from '../../../storage.service';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../../app.state';
-import * as MovieActions from '../movie.actions';
-import { Subscription } from 'rxjs/Subscription';
+import { StorageService } from '../../shared/services/storage.service';
+import { Movie } from '../movie';
+import * as fromLibrary from '../redux/index';
+import * as LibraryActions from '../redux/library.actions';
 
 @Component({
 	selector: 'app-movie-search-results',
@@ -14,32 +13,20 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class MovieSearchResultsComponent implements OnInit {
 
-	movies: Movie[];
-	searchResultsSubscription: Subscription;
-	searchTerms: string;
-	searchTermsSubscription: Subscription;
+	movies$: Observable<Movie[]>;
 
 	constructor(private storageService: StorageService,
-		private store: Store<AppState>) { }
+		private store: Store<fromLibrary.LibraryState>) { }
 
 	ngOnInit() {
-		this.searchTermsSubscription = this.store.select('movieState').select('searchTerms')
-			.subscribe(searchTerms => this.searchTerms = searchTerms);
-			
-		this.searchResultsSubscription = this.store.select('movieState').select('searchResults')
-			.subscribe(movies => this.movies = movies);
-	}
-
-	ngOnDestroy(): void {
-		this.searchTermsSubscription.unsubscribe();
-		this.searchResultsSubscription.unsubscribe();
+		this.movies$ = this.store.pipe(select(fromLibrary.getSearchResults));
 	}
 
 	close() {
-		this.store.dispatch(new MovieActions.CloseSearchView());
+		this.store.dispatch(new LibraryActions.CloseSearchView());
 	}
 
 	movieClicked(movie: Movie) {
-		this.store.dispatch(new MovieActions.SelectMovie(movie));
+		this.store.dispatch(new LibraryActions.SelectMovie({ movie: movie }));
 	}
 }

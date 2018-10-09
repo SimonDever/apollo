@@ -1,10 +1,8 @@
-import { Injectable } from '@angular/core';
-import { Movie } from './modules/movies/movie';
-import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Movie } from '../../movies/movie';
 //import *  as sqlite3  from 'sqlite3';
-
-import { catchError, tap, map } from 'rxjs/operators';
 
 @Injectable()
 export class StorageService {
@@ -19,8 +17,8 @@ export class StorageService {
 		return this.http.get<Movie>('/api/movies/' + id);
 	}
 
-	saveMovie(movie: Movie): Observable<number> {
-		return this.http.put<number>('/api/movies/' + movie.id, movie);
+	updateMovie(movie: Movie): Observable<Movie> {
+		return this.http.put<Movie>('/api/movies/' + movie.id, movie);
 	}
 
 	searchMovie(title: string): Observable<Movie[]> {

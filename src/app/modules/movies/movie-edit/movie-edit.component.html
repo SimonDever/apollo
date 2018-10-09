@@ -1,7 +1,6 @@
 <div class="edit-view">
 
 	<button octicon="x" class="icon-button close-button" (click)="close()"></button>
-
 	<form [formGroup]="movieForm" (submit)="submit()">
 		<div>
 			<label for="id">ID</label>
@@ -16,6 +15,6 @@
 			<input #poster type="text" readonly id="poster" formControlName="poster" />
 			<img class="poster-preview" src="./assets/images/{{poster.value}}" />
 		</div>
-		<button type="submit" [disabled]="!movieForm.valid">Submit</button>
+		<button type="submit">Save</button>
 	</form>
 </div>

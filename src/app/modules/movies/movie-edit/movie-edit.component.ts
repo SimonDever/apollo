@@ -1,10 +1,13 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { Component, OnInit, Input } from '@angular/core';
-import * as MovieActions from '../movie.actions';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AppState } from '../../../app.state';
-import { Store } from '@ngrx/store';
-import { Subscription } from '../../../../../node_modules/rxjs/Subscription';
+import { Subscription } from 'rxjs/Subscription';
+import { NavigationService } from '../../shared/services/navigation.service';
+import { Movie } from '../movie';
+import * as fromLibrary from '../redux';
+import * as LibraryActions from '../redux/library.actions';
 
 @Component({
 	selector: 'app-movie-edit',
@@ -13,36 +16,68 @@ import { Subscription } from '../../../../../node_modules/rxjs/Subscription';
 })
 export class MovieEditComponent implements OnInit {
 
-	/* Do we need this if we're populating from store in ngOnInit?
-	Do I need to allow this to override what's in store or vice versa? */
-	@Input()
-	public movieForm: FormGroup;
-	selectedMovieSubscription: Subscription;
+	selectedMovie$: Observable<any>;
+	newMovie: Movie;
+	movieForm: FormGroup;
+	model$: Observable<FormGroup>;
+	selectedMovieSub: Subscription;
 
 	constructor(private formBuilder: FormBuilder,
-		private store: Store<AppState>) { }
+		private store: Store<fromLibrary.State>,
+		private router: Router,
+		private navigationService: NavigationService,
+		private route: ActivatedRoute) {
 
-	ngOnInit() {
+		this.newMovie = new Movie('', '', '');
 		this.movieForm = this.formBuilder.group({
-			id: [''],
+			id: '',
 			title: ['', Validators.required],
 			poster: ['']
 		});
-
-		this.selectedMovieSubscription = this.store.select('movieState').select('selectedMovie')
-			.subscribe(selectedMovie => this.movieForm.setValue(selectedMovie));
 	}
 
-	ngOnDestroy(): void {
-		this.selectedMovieSubscription.unsubscribe();
+	ngOnInit() {
+		console.log('MovieEditComponent Init');
+
+		this.selectedMovie$ = this.store.pipe(select(fromLibrary.getSelectedMovie));
+
+		this.selectedMovieSub = this.selectedMovie$.subscribe(selectedMovie => {
+			this.movieForm.patchValue({
+				id: selectedMovie.id,
+				title: selectedMovie.title,
+				poster: selectedMovie.poster
+			});
+		});
+
+		this.onChanges();
+	}
+
+	ngOnDestroy() {
+		this.selectedMovieSub.unsubscribe();
+	}
+
+	onChanges() {
+		this.movieForm.valueChanges.subscribe(val => {
+			this.newMovie.id = val.id;
+			this.newMovie.title = val.title;
+			this.newMovie.poster = val.poster;
+			console.log(`onChanges :: newMovie`, this.newMovie);
+		});
+
+		this.selectedMovieSub.unsubscribe();
 	}
 
 	submit() {
-		this.store.dispatch(new MovieActions.SaveMovie(this.movieForm.value));
+		this.store.dispatch(new LibraryActions.UpdateResults(this.newMovie));
+		this.store.dispatch(new LibraryActions.UpdateMovie({
+			movie: {
+				id: this.newMovie.id,
+				changes: this.newMovie
+			}
+		}));
 	}
 
-
 	close() {
-		this.store.dispatch(new MovieActions.CloseEditView());
+		this.router.navigate(['/movies/view']);
 	}
 }

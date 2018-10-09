@@ -1,14 +1,26 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { MoviesRoutingModule } from './modules/movies/movies-routing.module';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { PageNotFoundComponent } from './modules/shared/page-not-found/page-not-found.component';
 
-const routes: Routes = [
-	{ path: '', redirectTo: 'movies', pathMatch: 'full' },
-	{ path: '**', redirectTo: 'movies', pathMatch: 'full' }
-];
+const routes: Routes = [{
+	path: 'movies',
+	loadChildren: 'app/modules/movies/movies.module#MoviesModule'
+}, {
+	path: 'settings',
+	loadChildren: 'app/modules/settings/settings.module#SettingsModule',
+}, {
+	path: '',
+	redirectTo: '/movies',
+	pathMatch: 'full'
+}, {
+	path: '**',
+	component: PageNotFoundComponent
+}];
 
 @NgModule({
-	imports: [RouterModule.forRoot(routes)],
-	exports: [RouterModule, MoviesRoutingModule]
+	imports: [RouterModule.forRoot(routes, {
+		preloadingStrategy: PreloadAllModules
+	})],
+	exports: [RouterModule]
 })
 export class AppRoutingModule { }

@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { StorageService } from '../../../storage.service';
-import { AppState } from '../../../app.state';
-import { Store } from '@ngrx/store';
-import * as MovieActions from '../movie.actions';
-import { Movie } from '../movie';
-import { ISubscription, Subscription } from 'rxjs/Subscription';
+import { ActivatedRoute, Router } from '@angular/router';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+import { Movie } from '../movie';
+import * as fromLibrary from '../redux';
+import * as LibraryActions from '../redux/library.actions';
 
 @Component({
 	selector: 'app-movie-list',
@@ -15,25 +14,33 @@ import { Observable } from 'rxjs/Observable';
 })
 export class MovieListComponent implements OnInit {
 
-	movies: Movie[];
-	moviesSubscription: Subscription;
-
+	movies$: Observable<Movie[]>;
+	needMovies$: Observable<boolean>;
+	needMoviesSub: Subscription;
 	constructor(private router: Router,
 		private route: ActivatedRoute,
-		private store: Store<AppState>) { }
+		private store: Store<fromLibrary.LibraryState>) {
+		}
 
 	ngOnInit() {
-		this.moviesSubscription = this.store.select('movieState').select('movies')
-			.subscribe(movies => this.movies = movies);
+		console.log('MovieListComponent Init')
+		
+		this.needMovies$ = this.store.pipe(select(fromLibrary.getNeedMovies));
 
-		this.store.dispatch(new MovieActions.LoadMovies());
+		this.needMoviesSub = this.needMovies$.subscribe(needMovies => {
+			if(needMovies) {
+				this.store.dispatch(new LibraryActions.Load())
+			}
+		});
+
+		this.movies$ = this.store.pipe(select(fromLibrary.getAllMovies));
 	}
 
-	ngOnDestroy(): void {
-		this.moviesSubscription.unsubscribe();
+	ngOnDestroy() {
+		this.needMoviesSub.unsubscribe();
 	}
 
 	movieClicked(movie: Movie) {
-		this.store.dispatch(new MovieActions.SelectMovie(movie));
+		this.store.dispatch(new LibraryActions.SelectMovie({movie: movie}));
 	}
 }

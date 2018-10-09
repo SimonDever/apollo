@@ -1,13 +1,13 @@
-import { Observable } from 'rxjs/Observable';
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { publishReplay } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { select, Store } from '@ngrx/store';
 import "rxjs/add/operator/publishReplay";
-
-import { AppState } from '../../../app.state';
+import { Observable } from 'rxjs/Observable';
+import { NavigationService } from '../../shared/services/navigation.service';
 import { Movie } from '../movie';
-import * as MovieActions from '../movie.actions';
-import { Subscription } from 'rxjs/Subscription';
+import * as fromLibrary from '../redux';
+import * as LibraryActions from '../redux/library.actions';
+
 
 @Component({
 	selector: 'app-movie',
@@ -16,29 +16,30 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class MovieComponent implements OnInit {
 
-	movie: Movie;
-	selectedMovieSubscription: Subscription;
+	movie$: Observable<Movie>;
+	previousUrl: string;
 
-	constructor(private store: Store<AppState>) { }
+	constructor(private store: Store<fromLibrary.LibraryState>,
+		private router: Router,
+		private navigationService: NavigationService,
+		private route: ActivatedRoute) { }
 
 	ngOnInit() {
-		this.selectedMovieSubscription = this.store.select('movieState').select('selectedMovie')
-			.subscribe(selectedMovie => this.movie = selectedMovie);
-	}
-
-	ngOnDestroy() {
-		this.selectedMovieSubscription.unsubscribe();
+		this.movie$ = this.store.pipe(select(fromLibrary.getSelectedMovie));
+		this.previousUrl = this.navigationService.getPreviousUrl();
+		console.log('MovieComponent Init');
+		console.log(`previousUrl: ${this.previousUrl}`);
 	}
 
 	edit() {
-		this.store.dispatch(new MovieActions.EditMovie());
+		this.router.navigate(['/movies/edit']);
 	}
 
 	close() {
-		this.store.dispatch(new MovieActions.CloseMovieView());
+		this.store.dispatch(new LibraryActions.CloseMovieView({ previousUrl: this.previousUrl }));
 	}
 
 	searchMetadataProvider() {
-		this.store.dispatch(new MovieActions.SearchMetadataProvider(this.movie));
+		console.log('searchMetadataProvider() entry');
 	}
 }

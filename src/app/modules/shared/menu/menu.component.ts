@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import * as MovieActions from '../../movies/movie.actions';
-import { AppState } from '../../../app.state';
-import { Subscription } from 'rxjs/Subscription';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Movie } from '../../movies/movie';
+import * as LibraryActions from '../../movies/redux/movie.actions';
+import { StorageService } from '../services/storage.service';
 
 @Component({
 	selector: 'app-menu',
@@ -13,28 +12,37 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class MenuComponent implements OnInit {
 
+	@Input('title')
+	title: string;
+
 	searchForm: FormGroup;
-	contextTitle: string;
-	contextTitleSubscription: Subscription;
 
 	constructor(private formBuilder: FormBuilder,
-		private store: Store<AppState>) { }
+		private router: Router,
+		private route: ActivatedRoute,
+		private storageService: StorageService) { }
 
 	ngOnInit() {
 		this.searchForm = this.formBuilder.group({ title: '' });
-		this.contextTitleSubscription = this.store.select('movieState').select('contextTitle')
-			.subscribe(contextTitle => this.contextTitle = contextTitle);
 	}
 
-	ngOnDestroy(): void {
-		this.contextTitleSubscription.unsubscribe();
+	search(movies: Movie[], searchTerms: string) {
+		this.storageService.searchMovie(this.searchForm.value.title)
+			.map(movies => new LibraryActions.ShowResults({
+				results: movies,
+				searchTerms: searchTerms
+			}));
 	}
 
-	search() {
-		this.store.dispatch(new MovieActions.SearchMovie(this.searchForm.value.title));
+	showMovieList() {
+		this.router.navigate(['/movies']);
+	}
+
+	showSettings() {
+		this.router.navigate(['/settings']);
 	}
 
 	addMovie() {
-		this.store.dispatch(new MovieActions.ShowAddMovieView());
+		this.router.navigate(['/movies/add']);
 	}
 }

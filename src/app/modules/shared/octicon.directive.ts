@@ -1,5 +1,4 @@
-import { Directive, Input, OnInit, ElementRef, Renderer2 } from '@angular/core';
-
+import { Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
 import * as octicons from 'octicons';
 
 @Directive({
