@@ -1,32 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
+import { filter, map } from 'rxjs/operators';
+import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class NavigationService {
-	//private titleSource = new BehaviorSubject<string>("Page Title");
-	//currentTitle = this.titleSource.asObservable();
-	previousUrl = '';
-	currentUrl = '';
 
-	constructor(private router: Router) {
-		/*
-		this.currentUrl = this.router.url;
-		this.router.events.subscribe(event => {
-			if(event instanceof NavigationEnd) {
-				this.previousUrl = this.currentUrl;
-				this.currentUrl = event.url;
-			}
-		});
-		*/
+	constructor(private router: Router,
+		private location: Location,
+		private activatedRoute: ActivatedRoute) {
 	}
 
-	/*
-	changeTitle(title: string) {
-		this.titleSource.next(title);
-	}
-	*/
-
-	getPreviousUrl() {
-		return this.previousUrl;
+	goBack() {
+		this.location.back();
 	}
 }

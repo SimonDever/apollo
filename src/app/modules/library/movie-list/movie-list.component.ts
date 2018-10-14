@@ -3,9 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { Movie } from '../movie';
-import * as fromLibrary from '../redux';
-import * as LibraryActions from '../redux/library.actions';
+import { Movie } from '../store/movie';
+import * as fromLibrary from '../store';
+import * as LibraryActions from '../store/library.actions';
 
 @Component({
 	selector: 'app-movie-list',

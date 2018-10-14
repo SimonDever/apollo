@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Movie } from '../../movies/movie';
+import { Movie } from '../../library/store/movie';
 //import *  as sqlite3  from 'sqlite3';
 
 @Injectable()

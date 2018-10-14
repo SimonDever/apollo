@@ -4,17 +4,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import 'rxjs/add/operator/take';
 import { NavigationService } from '../../shared/services/navigation.service';
-import { Movie } from '../movie';
-import * as fromLibrary from '../redux';
-import * as LibraryActions from '../redux/library.actions';
+import { Movie } from '../store/movie';
+import * as fromLibrary from '../store';
+import * as LibraryActions from '../store/library.actions';
 
 @Component({
-	selector: 'app-movie-edit',
-	templateUrl: './movie-edit.component.html',
-	styleUrls: ['./movie-edit.component.css']
+	selector: 'app-edit-movie',
+	templateUrl: './edit-movie.component.html',
+	styleUrls: ['./edit-movie.component.css']
 })
-export class MovieEditComponent implements OnInit {
+export class EditMovieComponent implements OnInit {
 
 	selectedMovie$: Observable<any>;
 	newMovie: Movie;
@@ -28,7 +29,11 @@ export class MovieEditComponent implements OnInit {
 		private navigationService: NavigationService,
 		private route: ActivatedRoute) {
 
-		this.newMovie = new Movie('', '', '');
+		this.newMovie = {
+			id: '',
+			title: '',
+			poster: ''
+		};
 		this.movieForm = this.formBuilder.group({
 			id: '',
 			title: ['', Validators.required],
@@ -37,23 +42,19 @@ export class MovieEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		console.log('MovieEditComponent Init');
+		console.log('EditMovieComponent Init');
 
-		this.selectedMovie$ = this.store.pipe(select(fromLibrary.getSelectedMovie));
-
-		this.selectedMovieSub = this.selectedMovie$.subscribe(selectedMovie => {
-			this.movieForm.patchValue({
-				id: selectedMovie.id,
-				title: selectedMovie.title,
-				poster: selectedMovie.poster
+		this.store.pipe(select(fromLibrary.getSelectedMovie))
+			.take(1).subscribe(selectedMovie => {
+				this.newMovie = selectedMovie;
+				this.movieForm.patchValue({
+					id: selectedMovie.id,
+					title: selectedMovie.title,
+					poster: selectedMovie.poster
+				});
 			});
-		});
 
 		this.onChanges();
-	}
-
-	ngOnDestroy() {
-		this.selectedMovieSub.unsubscribe();
 	}
 
 	onChanges() {
@@ -63,12 +64,11 @@ export class MovieEditComponent implements OnInit {
 			this.newMovie.poster = val.poster;
 			console.log(`onChanges :: newMovie`, this.newMovie);
 		});
-
-		this.selectedMovieSub.unsubscribe();
 	}
 
-	submit() {
+	save() {
 		this.store.dispatch(new LibraryActions.UpdateResults(this.newMovie));
+		console.log(`saving: ${this.newMovie.title}`)
 		this.store.dispatch(new LibraryActions.UpdateMovie({
 			movie: {
 				id: this.newMovie.id,
@@ -78,6 +78,7 @@ export class MovieEditComponent implements OnInit {
 	}
 
 	close() {
-		this.router.navigate(['/movies/view']);
+		/* this.router.navigate(['/library/view']); */
+		this.navigationService.goBack();
 	}
 }

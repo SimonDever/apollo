@@ -1,0 +1,13 @@
+<div class="search-view">
+	<div class="icon-button-box">
+		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
+	</div>
+	<div class="movie-list">
+		<div *ngFor="let movie of movies$ | async as movies" class="movie-box"
+			(click)="movieClicked(movie)">
+			<div class="movie-box-2">
+				<img class="movie-poster" src="{{movie.poster}}" />
+			</div>
+		</div>
+	</div>
+</div>

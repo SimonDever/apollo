@@ -8,7 +8,7 @@
 	<div class="movie-list">
 		<div *ngIf="movie$ | async as movie">
 			<div class="movie-box" data-id="{{movie.id}}">
-				<img class="movie-poster" src="./assets/images/{{movie.poster}}" />
+				<img class="movie-poster" src="{{movie.poster}}" />
 				<span class="movie-box-title">{{ movie.title }}</span>
 			</div>
 		</div>

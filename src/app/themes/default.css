@@ -1,12 +1,14 @@
 :root {
 	--foreground: #ccc;
-	--border: #333;
+	--border: #444;
 	--background: #222;
+	--input-background: #333;
 	--input-placeholders: #aaa;
+	--input-foreground: #ddd;
 }
 
 .movie-box {
-	border: 1px solid var(--border);
+	border-color: var(--border);
 }
 
 .movie-list {
@@ -17,9 +19,21 @@
 	color: var(--foreground);
 }
 
+.edit-view,
 .movie-view,
 .search-results {
 	background: var(--background);
+	color: white;
+}
+
+.edit-view label {
+
+}
+
+.edit-view input {
+	background: var(--input-background);
+	border-color: var(--border);
+	color: var(--input-foreground)
 }
 
 .settings-icon {
@@ -34,7 +48,7 @@
 	color: var(--foreground);
 }
 
-
+.save-button svg,
 .edit-button svg,
 .close-button svg,
 .search-metadata-provider-button svg

@@ -1,5 +1,5 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
-import { Movie } from "../movie";
+import { Movie } from "./movie";
 import * as LibraryActions from './library.actions';
 
 export interface State extends EntityState<Movie> { }

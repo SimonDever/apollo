@@ -1,9 +1,0 @@
-<main class="movie-list" role="main">
-	<div *ngFor="let movie of movies$ | async as movies"
-		class="movie-box"
-		(click)="movieClicked(movie)">
-		<div class="movie-box-2">
-			<img class="movie-poster" src="./assets/images/{{movie.poster}}" />
-		</div>
-	</div>
-</main>

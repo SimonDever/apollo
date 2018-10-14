@@ -1,5 +1,5 @@
 import * as LibraryActions from "./library.actions";
-import { Movie } from "../movie";
+import { Movie } from "./movie";
 
 export interface State {
 	needMovies: boolean;
@@ -19,7 +19,12 @@ export function reducer(state: State = initialState, action: LibraryActions.Libr
 	switch (action.type) {
 		case LibraryActions.SHOW_RESULTS: {
 			return Object.assign({}, state, {
-				searchResults: action.payload.searchTerms ? action.payload.results : [],
+				searchResults: action.payload.results
+			});
+		}
+
+		case LibraryActions.SEARCH_MOVIES: {
+			return Object.assign({}, state, {
 				searchTerms: action.payload.searchTerms
 			});
 		}
@@ -27,6 +32,12 @@ export function reducer(state: State = initialState, action: LibraryActions.Libr
 		case LibraryActions.LOADED: {
 			return Object.assign({}, state, {
 				needMovies: false
+			});
+		}
+
+		case LibraryActions.UPDATE_MOVIE: {
+			return Object.assign({}, state, {
+				selectedMovie: action.payload.movie.changes
 			});
 		}
 
@@ -42,12 +53,6 @@ export function reducer(state: State = initialState, action: LibraryActions.Libr
 			});
 		}
 
-		case LibraryActions.CLOSE_MOVIE_VIEW: {
-			return Object.assign({}, state, {
-				selectedMovie: null
-			})
-		}
-
 		case LibraryActions.UPDATE_RESULTS: {
 			let searchResults = state.searchResults;
 			if (state.searchResults != null) {
@@ -56,16 +61,7 @@ export function reducer(state: State = initialState, action: LibraryActions.Libr
 				searchResults.splice(searchResultsIndex, 1, action.movie);
 			}
 			return Object.assign({}, state, {
-				searchResults: searchResults,
-				selectedMovie: action.movie
-			});
-		}
-
-		case LibraryActions.CLOSE_SEARCH_VIEW: {
-			return Object.assign({}, state, {
-				searchResults: null,
-				searchTerms: '',
-				selectedMovie: null
+				searchResults: searchResults
 			});
 		}
 

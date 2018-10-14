@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Movie } from '../movie';
-import * as fromLibrary from '../redux';
-import * as LibraryActions from '../redux/library.actions';
+import { Store, select } from '@ngrx/store';
+import { Movie } from '../store/movie';
+import * as fromLibrary from '../store';
+import * as LibraryActions from '../store/library.actions';
+import { NavigationService } from '../../shared/services/navigation.service';
 
 @Component({
 	selector: 'app-add-movie',
@@ -15,7 +16,8 @@ export class AddMovieComponent implements OnInit {
 
 	public movieForm: FormGroup;
 
-	constructor(private formBuilder: FormBuilder,
+	constructor(private navigationService: NavigationService,
+		private formBuilder: FormBuilder,
 		private store: Store<fromLibrary.LibraryState>,
 		private router: Router,
 		private route: ActivatedRoute) { }
@@ -28,13 +30,13 @@ export class AddMovieComponent implements OnInit {
 		});
 	}
 
-	submit() {
+	save() {
 		const form = this.movieForm.value;
-		const movie = new Movie(form.id, form.title, form.poster);
-		this.store.dispatch(new LibraryActions.AddMovie({ movie: movie }));
+		const movie: Movie = { id: form.id, title: form.title, poster: form.poster };
+		this.store.dispatch(new LibraryActions.AddMovie({	movie: movie }));
 	}
 
 	close() {
-		this.router.navigate(['/movies/view']);
+		this.navigationService.goBack();
 	}
 }

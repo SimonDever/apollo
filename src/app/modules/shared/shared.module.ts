@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BackButtonComponent } from './back-button/back-button.component';
 import { MenuComponent } from './menu/menu.component';
-import { OcticonDirective } from './octicon.directive';
+import { OcticonDirective } from './directives/octicon.directive';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { NavigationService } from './services/navigation.service';
 import { SearchService } from './services/search.service';
@@ -15,6 +15,7 @@ import { StorageService } from './services/storage.service';
 		BackButtonComponent,
 		MenuComponent,
 		PageNotFoundComponent,
+		
 		OcticonDirective
 	],
 	imports: [
@@ -27,8 +28,10 @@ import { StorageService } from './services/storage.service';
 		BackButtonComponent,
 		MenuComponent,
 		PageNotFoundComponent,
+
 		FormsModule,
 		ReactiveFormsModule,
+
 		OcticonDirective
 	]
 })

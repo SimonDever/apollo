@@ -1,11 +1,10 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromRoot from '../../../app.reducer';
-import * as fromMovies from './movies.reducer';
+import * as fromLibrary from './library.reducer';
 import * as fromSearch from './search.reducer';
 
-
 export interface LibraryState {
-	movies: fromMovies.State;
+	movies: fromLibrary.State;
 	search: fromSearch.State;
 }
 
@@ -14,7 +13,7 @@ export interface State extends fromRoot.State {
 }
 
 export const reducers = {
-	movies: fromMovies.reducer,
+	movies: fromLibrary.reducer,
 	search: fromSearch.reducer
 };
 
@@ -58,4 +57,4 @@ export const {
 	selectEntities: getMovieEntities,
 	selectAll: getAllMovies,
 	selectTotal: getTotalMovies
-} = fromMovies.adapter.getSelectors(getMoviesState);
+} = fromLibrary.adapter.getSelectors(getMoviesState);

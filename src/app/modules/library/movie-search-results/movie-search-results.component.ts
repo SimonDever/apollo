@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { StorageService } from '../../shared/services/storage.service';
-import { Movie } from '../movie';
-import * as fromLibrary from '../redux/index';
-import * as LibraryActions from '../redux/library.actions';
+import { Movie } from '../store/movie';
+import * as fromLibrary from '../store/index';
+import * as LibraryActions from '../store/library.actions';
+import { Router, ActivatedRoute } from '@angular/router';
+import { NavigationService } from '../../shared/services/navigation.service';
 
 @Component({
 	selector: 'app-movie-search-results',
@@ -15,15 +16,19 @@ export class MovieSearchResultsComponent implements OnInit {
 
 	movies$: Observable<Movie[]>;
 
-	constructor(private storageService: StorageService,
-		private store: Store<fromLibrary.LibraryState>) { }
+	constructor(private navigationService: NavigationService,
+		private router: Router,
+		private route: ActivatedRoute,
+		private store: Store<fromLibrary.LibraryState>) {
+	}
 
 	ngOnInit() {
 		this.movies$ = this.store.pipe(select(fromLibrary.getSearchResults));
 	}
 
 	close() {
-		this.store.dispatch(new LibraryActions.CloseSearchView());
+		/* this.router.navigate(['/library']); */
+		this.navigationService.goBack();
 	}
 
 	movieClicked(movie: Movie) {

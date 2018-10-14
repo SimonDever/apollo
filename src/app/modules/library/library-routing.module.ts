@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AddMovieComponent } from './add-movie/add-movie.component';
-import { MovieEditComponent } from './movie-edit/movie-edit.component';
+import { EditMovieComponent } from './edit-movie/edit-movie.component';
 import { MovieLibraryComponent } from './movie-library/movie-library.component';
 import { MovieListComponent } from './movie-list/movie-list.component';
 import { MovieSearchResultsComponent } from './movie-search-results/movie-search-results.component';
-import { MovieComponent } from './movie/movie.component';
+import { ViewMovieComponent } from './view-movie/view-movie.component';
 
 
 const routes: Routes = [{
@@ -19,11 +19,11 @@ const routes: Routes = [{
 	}, {
 		path: 'view',
 		data: { title: 'Movies' },
-		component: MovieComponent
+		component: ViewMovieComponent
 	}, {
 		path: 'edit',
 		data: { title: 'Edit Movie' },
-		component: MovieEditComponent
+		component: EditMovieComponent
 	}, {
 		path: 'search',
 		data: { title: 'Search Results' },
@@ -39,5 +39,5 @@ const routes: Routes = [{
 	imports: [RouterModule.forChild(routes)],
 	exports: [RouterModule]
 })
-export class MoviesRoutingModule { }
+export class LibraryRoutingModule { }
 

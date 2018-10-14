@@ -42,16 +42,43 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	display: none;
 }
 
+.edit-form {
+	display: block;
+	padding-top: 15px;
+	padding-left: 15px;
+}
+
+.edit-view label {
+	width: 50px;
+}
+
+.edit-view input {
+	border-width: 1px;
+	border-style: solid;
+	width: 235px;
+}
+
+.input-group {
+	display: inline-block;
+}
+
+.list-view,
+.edit-view,
+.movie-view,
+.search-view {
+	height: 100%;
+	position: relative;
+}
+
 .movie-list {
 	display: grid;
-	/* grid-template-columns: 1fr 1fr 1fr 1fr 1fr; */
-	/* grid-auto-rows: 400px; */
-	/*grid-auto-columns: 290px;*/
 	grid-gap: 15px;
 	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
 	padding-top: 15px;
+	padding-bottom: 15px;
 	padding-right: 70px;
 	padding-left: 15px;
+	min-height: 100%;
 }
 
 .movie-poster {
@@ -70,6 +97,7 @@ input[type=search]:not(:valid) ~ .clear-icon {
 .movie-box {
 	height: var(--grid-item-height);
 	width: var(--grid-item-width);
+	border: none;
 }
 
 .movie-box-2 {
@@ -87,16 +115,10 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	top: 15px;
 }
 
-.edit-view,
-.movie-view,
-.search-view {
-	height: 100%;
-	position: relative;
-}
-
 .icon-button-box {
 	right: 0;
 	position: absolute;
+	z-index: 1;
 }
 
 .icon-button {
@@ -125,6 +147,3 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	vertical-align: middle;
 	margin-right: 5px;
 }
-
-
-

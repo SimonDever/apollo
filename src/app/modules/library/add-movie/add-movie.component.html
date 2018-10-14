@@ -1,0 +1,21 @@
+<div class="edit-view">
+	<div class="icon-button-box">
+		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
+		<button octicon="check" class="icon-button save-button" (click)="save()">Save</button>
+	</div>
+	<div class="edit-form">
+		<form [formGroup]="movieForm">
+			<div class="input-group">
+				<label for="title">Title</label>
+				<input type="text" id="title" formControlName="title">
+			</div>
+			
+			<div class="input-group">
+				<label for="poster">Poster</label>
+				<input #poster type="text" id="poster" formControlName="poster" />
+				
+			</div>
+			<img class="poster-preview" src="{{poster.value}}" />
+		</form>
+	</div>
+</div>

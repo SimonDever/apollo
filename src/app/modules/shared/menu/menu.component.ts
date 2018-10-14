@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Movie } from '../../movies/movie';
-import * as LibraryActions from '../../movies/redux/movie.actions';
-import { StorageService } from '../services/storage.service';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import * as fromLibrary from '../../library/store/index';
+import * as LibraryActions from '../../library/store/library.actions';
+import { Store } from '@ngrx/store';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
 	selector: 'app-menu',
@@ -12,30 +13,30 @@ import { StorageService } from '../services/storage.service';
 })
 export class MenuComponent implements OnInit {
 
-	@Input('title')
 	title: string;
 
 	searchForm: FormGroup;
 
-	constructor(private formBuilder: FormBuilder,
+	constructor(private activatedRoute: ActivatedRoute,
+		private formBuilder: FormBuilder,
+		private navigationService: NavigationService,
 		private router: Router,
-		private route: ActivatedRoute,
-		private storageService: StorageService) { }
+		private store: Store<fromLibrary.LibraryState>) {
+			this.title = '';
+		}
 
 	ngOnInit() {
 		this.searchForm = this.formBuilder.group({ title: '' });
 	}
 
-	search(movies: Movie[], searchTerms: string) {
-		this.storageService.searchMovie(this.searchForm.value.title)
-			.map(movies => new LibraryActions.ShowResults({
-				results: movies,
-				searchTerms: searchTerms
-			}));
+	search() {
+		this.store.dispatch(new LibraryActions.SearchMovies({
+			searchTerms: this.searchForm.value.title
+		}));
 	}
 
 	showMovieList() {
-		this.router.navigate(['/movies']);
+		this.router.navigate(['/library']);
 	}
 
 	showSettings() {
@@ -43,6 +44,6 @@ export class MenuComponent implements OnInit {
 	}
 
 	addMovie() {
-		this.router.navigate(['/movies/add']);
+		this.router.navigate(['/library/add']);
 	}
 }

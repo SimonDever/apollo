@@ -1,6 +1,6 @@
 import { Update } from '@ngrx/entity';
 import { Action } from '@ngrx/store';
-import { Movie } from '../movie';
+import { Movie } from './movie';
 
 export const LOAD = '[Movie] Load';
 export class Load implements Action {
@@ -14,75 +14,48 @@ export class Loaded implements Action {
 	constructor(public payload: { movies: Movie[] }) { }
 }
 
+export const SEARCH_MOVIES = '[Movie] Search Movies';
+export class SearchMovies implements Action {
+	readonly type = SEARCH_MOVIES;
+	constructor(public payload: { searchTerms: string }) { }
+}
+
 export const UPDATE_MOVIE = '[Movie] Update Movie';
 export class UpdateMovie implements Action {
 	readonly type = UPDATE_MOVIE;
 	constructor(public payload: { movie: Update<Movie> }) { }
 }
 
-export const CLOSE_MOVIE_VIEW = '[Movie] Close Movie View';
-export class CloseMovieView implements Action {
-	readonly type = CLOSE_MOVIE_VIEW;
-	constructor(public payload: { previousUrl: string }) {
-	}
-}
-
 export const ADD_MOVIE = '[Movie] Add Movie';
 export class AddMovie implements Action {
 	readonly type = ADD_MOVIE;
-	constructor(public payload: { movie: Movie }) {
-	}
-}
-
-export const CLOSE_SEARCH_VIEW = '[Movie] Close Search View';
-export class CloseSearchView implements Action {
-	readonly type = CLOSE_SEARCH_VIEW;
-	constructor() {
-	}
+	constructor(public payload: { movie: Movie }) { }
 }
 
 export const SELECT_MOVIE = '[Movie] Select';
 export class SelectMovie implements Action {
 	readonly type = SELECT_MOVIE;
-	constructor(public payload: { movie: Movie }) {
-	}
+	constructor(public payload: { movie: Movie }) { }
 }
 
 export const SHOW_RESULTS = '[Movie] Show Results';
 export class ShowResults implements Action {
 	readonly type = SHOW_RESULTS;
-	constructor(public payload: {
-		results: Movie[],
-		searchTerms: string
-	}) { }
+	constructor(public payload: { results: Movie[] }) { }
 }
 
 export const UPDATE_RESULTS = '[Movie] Update Results';
 export class UpdateResults implements Action {
-	readonly type = LibraryActionTypes.UpdateResults;
-	constructor(public movie: Movie) {
-	}
-}
-
-export const LibraryActionTypes = {
-	UpdateResults: UPDATE_RESULTS,
-	ShowResults: SHOW_RESULTS,
-	SelectMovie: SELECT_MOVIE,
-	CloseSearchView: CLOSE_SEARCH_VIEW,
-	AddMovie: ADD_MOVIE,
-	CloseMovieView: CLOSE_MOVIE_VIEW,
-	UpdateMovie: UPDATE_MOVIE,
-	Loaded: LOADED,
-	Load: LOAD
+	readonly type = UPDATE_RESULTS;
+	constructor(public movie: Movie) { }
 }
 
 export type LibraryActions =
-	CloseMovieView |
 	SelectMovie |
+	SearchMovies |
 	UpdateMovie |
 	AddMovie |
 	ShowResults |
-	CloseSearchView |
 	Load |
 	Loaded |
 	UpdateResults;
