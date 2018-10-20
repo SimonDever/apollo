@@ -1,31 +1,30 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Movie } from '../../library/store/movie';
-//import *  as sqlite3  from 'sqlite3';
+import { Entry } from '../../library/store/entry.model';
 
 @Injectable()
 export class StorageService {
 
 	constructor(private http: HttpClient) { }
 
-	getMovies(): Observable<Movie[]> {
-		return this.http.get<Movie[]>('/api/movies');
+	getEntries(): Observable<Entry[]> {
+		return this.http.get<Entry[]>('/api/entries');
 	}
 
-	getMovie(id: number): Observable<Movie> {
-		return this.http.get<Movie>('/api/movies/' + id);
+	getEntry(id: number): Observable<Entry> {
+		return this.http.get<Entry>('/api/entries/' + id);
 	}
 
-	updateMovie(movie: Movie): Observable<Movie> {
-		return this.http.put<Movie>('/api/movies/' + movie.id, movie);
+	updateEntry(entry: Entry): Observable<Entry> {
+		return this.http.put<Entry>('/api/entries/' + entry.id, entry);
 	}
 
-	searchMovie(title: string): Observable<Movie[]> {
-		return this.http.get<Movie[]>('/api/movies/?title=' + title);
+	searchEntry(title: string): Observable<Entry[]> {
+		return this.http.get<Entry[]>('/api/entries/?title=' + title);
 	}
 
-	addMovie(movie: Movie): Observable<Movie> {
-		return this.http.put<Movie>('/api/movies/' + movie.id, movie);
+	addEntry(entry: Entry): Observable<Entry> {
+		return this.http.put<Entry>('/api/entries/' + entry.id, entry);
 	}
 }

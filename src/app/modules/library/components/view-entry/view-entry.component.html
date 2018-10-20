@@ -1,15 +1,15 @@
-<div class="movie-view">
+<div class="entry-view">
 	<div class="icon-button-box">
 		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
 		<button octicon="pencil" class="icon-button edit-button" (click)="edit()"></button>
 		<button octicon="search" class="icon-button search-metadata-provider-button"
 			(click)="searchMetadataProvider()"></button>
 	</div>
-	<div class="movie-list">
-		<div *ngIf="movie$ | async as movie">
-			<div class="movie-box" data-id="{{movie.id}}">
-				<img class="movie-poster" src="{{movie.poster}}" />
-				<span class="movie-box-title">{{ movie.title }}</span>
+	<div class="entry-list">
+		<div *ngIf="entry$ | async as entry">
+			<div class="entry-box" data-id="{{entry.id}}">
+				<img class="entry-poster" src="{{entry.poster}}" />
+				<span class="entry-box-title">{{entry.title}}</span>
 			</div>
 		</div>
 	</div>

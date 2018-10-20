@@ -1,0 +1,12 @@
+<div class="search-view" [@simpleFadeAnimation]="'in'">
+	<div class="icon-button-box">
+		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
+	</div>
+	<div class="search-view-title">Search Results</div>
+	<div class="entry-list">
+		<div *ngFor="let entry of entries$ | async as entries" class="entry-box"
+			(click)="entryClicked(entry)">
+			<img class="entry-poster" src="{{entry.poster}}" />
+		</div>
+	</div>
+</div>

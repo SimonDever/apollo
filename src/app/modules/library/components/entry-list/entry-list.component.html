@@ -1,0 +1,9 @@
+<div class="list-view">
+	<div class="entry-list">
+		<div *ngFor="let entry of entries$ | async as entries"
+			class="entry-box"
+			(click)="entryClicked(entry)">
+			<img class="entry-poster" src="{{entry.poster}}" />
+		</div>
+	</div>
+</div>

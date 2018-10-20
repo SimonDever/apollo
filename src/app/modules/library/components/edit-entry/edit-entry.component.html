@@ -1,0 +1,20 @@
+<div class="edit-view">
+	<div class="icon-button-box">
+		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
+		<button octicon="check" class="icon-button save-button" (click)="save()">Save</button>
+	</div>
+	<div class="entry-list">
+		<form [formGroup]="entryForm">
+			<input formControlName="id" type="hidden" #entryId />
+			<div class="edit-box" data-id="{{entryId.value}}">
+
+				<div class="poster-group">
+					<img class="entry-poster" src="{{poster.value}}" />
+					<input #poster type="text" id="poster" formControlName="poster" />
+				</div>
+
+				<input class="entry-box-title" formControlName="title" />
+			</div>
+		</form>
+	</div>
+</div>

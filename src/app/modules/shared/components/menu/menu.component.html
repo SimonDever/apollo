@@ -1,13 +1,13 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
 
-	<a class="navbar-brand" routerLink="/library">Movies</a>
+	<a class="navbar-brand" (click)="showEntryList()">Library</a>
 
 	<p class="context-title m-auto d-xs-block d-md-none">
 		{{ title }}
 	</p>
 
 	<div class="button-group">
-		<button class="btn btn-outline-success" (click)="addMovie()">Add Movie</button>
+		<button class="btn btn-outline-success" (click)="addEntry()">Add Entry</button>
 	</div>
 
 	<button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse"
@@ -20,7 +20,7 @@
 
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
-				<a class="nav-link" routerLink="/settings">Settings</a>
+				<a class="nav-link" (click)="showSettings()">Settings</a>
 			</li>
 		</ul>
 

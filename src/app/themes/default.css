@@ -1,4 +1,5 @@
 :root {
+	--bright-foreground: #fff;
 	--foreground: #ccc;
 	--border: #444;
 	--background: #222;
@@ -7,27 +8,31 @@
 	--input-foreground: #ddd;
 }
 
-.movie-box {
+body {
+	background-color: var(--background);
+}
+
+.entry-box {
 	border-color: var(--border);
 }
 
-.movie-list {
+.entry-list {
 	background: var(--background);
 }
 
-.movie-box-title {
+.entry-box-title {
+	color: var(--foreground);
+}
+
+.search-view-title {
 	color: var(--foreground);
 }
 
 .edit-view,
-.movie-view,
-.search-results {
+.entry-view,
+.search-view {
 	background: var(--background);
-	color: white;
-}
-
-.edit-view label {
-
+	color: var(--bright-foreground);
 }
 
 .edit-view input {

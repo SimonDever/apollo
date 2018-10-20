@@ -1,37 +1,36 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AddMovieComponent } from './add-movie/add-movie.component';
-import { EditMovieComponent } from './edit-movie/edit-movie.component';
-import { MovieLibraryComponent } from './movie-library/movie-library.component';
-import { MovieListComponent } from './movie-list/movie-list.component';
-import { MovieSearchResultsComponent } from './movie-search-results/movie-search-results.component';
-import { ViewMovieComponent } from './view-movie/view-movie.component';
-
+import { AddEntryComponent } from './components/add-entry/add-entry.component';
+import { EditEntryComponent } from './components/edit-entry/edit-entry.component';
+import { EntryListComponent } from './components/entry-list/entry-list.component';
+import { SearchResultsComponent } from './components/search-results/search-results.component';
+import { ViewEntryComponent } from './components/view-entry/view-entry.component';
+import { LibraryComponent } from './components/library/library.component';
 
 const routes: Routes = [{
 	path: '',
-	data: { title: 'Movie Library' },
-	component: MovieLibraryComponent,
+	data: { title: 'Library' },
+	component: LibraryComponent,
 	children: [{
 		path: '',
-		data: { title: 'Movie List' },
-		component: MovieListComponent
+		data: { title: 'Entry List' },
+		component: EntryListComponent
 	}, {
 		path: 'view',
-		data: { title: 'Movies' },
-		component: ViewMovieComponent
+		data: { title: 'View Entry' },
+		component: ViewEntryComponent
 	}, {
 		path: 'edit',
-		data: { title: 'Edit Movie' },
-		component: EditMovieComponent
+		data: { title: 'Edit Entry' },
+		component: EditEntryComponent
 	}, {
 		path: 'search',
 		data: { title: 'Search Results' },
-		component: MovieSearchResultsComponent
+		component: SearchResultsComponent
 	}, {
 		path: 'add',
-		data: { title: 'Add Movie' },
-		component: AddMovieComponent
+		data: { title: 'Add Entry' },
+		component: AddEntryComponent
 	}]
 }];
 

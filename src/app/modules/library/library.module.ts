@@ -3,15 +3,15 @@ import { NgModule } from '@angular/core';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { SharedModule } from '../shared/shared.module';
-import { AddMovieComponent } from './add-movie/add-movie.component';
-import { EditMovieComponent } from './edit-movie/edit-movie.component';
-import { MovieLibraryComponent } from './movie-library/movie-library.component';
-import { MovieListComponent } from './movie-list/movie-list.component';
-import { MovieSearchResultsComponent } from './movie-search-results/movie-search-results.component';
-import { ViewMovieComponent } from './view-movie/view-movie.component';
+import { AddEntryComponent } from './components/add-entry/add-entry.component';
+import { EditEntryComponent } from './components/edit-entry/edit-entry.component';
+import { EntryListComponent } from './components/entry-list/entry-list.component';
 import { LibraryRoutingModule } from './library-routing.module';
+import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { reducers } from './store';
 import { LibraryEffects } from './store/library.effects';
+import { ViewEntryComponent } from './components/view-entry/view-entry.component';
+import { LibraryComponent } from './components/library/library.component';
 
 
 @NgModule({
@@ -23,22 +23,19 @@ import { LibraryEffects } from './store/library.effects';
 		EffectsModule.forFeature([LibraryEffects])
 	],
 	exports: [
-		MovieLibraryComponent,
-		/*
-		AddMovieComponent,
-		ViewMovieComponent,
-		EditMovieComponent,
-		MovieListComponent,
-		MovieSearchResultsComponent
-		*/
+		LibraryComponent,
+		ViewEntryComponent,
+		EditEntryComponent,
+		EntryListComponent,
+		SearchResultsComponent
 	],
 	declarations: [
-		AddMovieComponent,
-		ViewMovieComponent,
-		MovieLibraryComponent,
-		EditMovieComponent,
-		MovieListComponent,
-		MovieSearchResultsComponent
+		AddEntryComponent,
+		ViewEntryComponent,
+		EditEntryComponent,
+		EntryListComponent,
+		SearchResultsComponent,
+		LibraryComponent
 	]
 })
 export class LibraryModule { }

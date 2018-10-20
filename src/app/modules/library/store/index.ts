@@ -3,58 +3,53 @@ import * as fromRoot from '../../../app.reducer';
 import * as fromLibrary from './library.reducer';
 import * as fromSearch from './search.reducer';
 
-export interface LibraryState {
-	movies: fromLibrary.State;
-	search: fromSearch.State;
-}
-
 export interface State extends fromRoot.State {
 	library: LibraryState;
-}
+};
+
+export interface LibraryState {
+	collection: fromLibrary.State;
+	search: fromSearch.State;
+};
 
 export const reducers = {
-	movies: fromLibrary.reducer,
+	collection: fromLibrary.reducer,
 	search: fromSearch.reducer
 };
 
 export const selectLibraryState = createFeatureSelector<LibraryState>('library');
 
-export const getMoviesState = createSelector(
-	selectLibraryState, (library: LibraryState) => library.movies
-)
+export const getCollectionState = createSelector(
+	selectLibraryState, (library: LibraryState) => library.collection
+);
 
 export const selectSearchState = createSelector(
 	selectLibraryState, (library: LibraryState) => library.search
 );
 
-export const getMovies = createSelector(
-	selectLibraryState,
-	state => state.movies.entities
-);
-
-export const getNeedMovies = createSelector(
+export const getNeedEntries = createSelector(
 	selectSearchState,
-	state => state.needMovies
+	state => state.needEntries
 );
 
 export const getSearchTerms = createSelector(
 	selectSearchState,
 	state => state.searchTerms
-)
+);
 
 export const getSearchResults = createSelector(
 	selectSearchState,
 	state => state.searchResults
-)
+);
 
-export const getSelectedMovie = createSelector(
+export const getSelectedEntry = createSelector(
 	selectSearchState,
-	state => state.selectedMovie
-)
+	state => state.selectedEntry
+);
 
 export const {
-	selectIds: getMovieIds,
-	selectEntities: getMovieEntities,
-	selectAll: getAllMovies,
-	selectTotal: getTotalMovies
-} = fromLibrary.adapter.getSelectors(getMoviesState);
+	selectIds: getEntryIds,
+	selectEntities: getEntryEntities,
+	selectAll: getAllEntries,
+	selectTotal: getTotalEntries
+} = fromLibrary.adapter.getSelectors(getCollectionState);

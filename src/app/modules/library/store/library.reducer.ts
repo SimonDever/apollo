@@ -1,26 +1,26 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
-import { Movie } from "./movie";
+import { Entry } from "./entry.model";
 import * as LibraryActions from './library.actions';
 
-export interface State extends EntityState<Movie> { }
+export interface State extends EntityState<Entry> { }
 
-export const adapter: EntityAdapter<Movie> = createEntityAdapter<Movie>()
+export const adapter: EntityAdapter<Entry> = createEntityAdapter<Entry>()
 
 export const initialState: State = adapter.getInitialState({});
 
-export function reducer(state = initialState, action: LibraryActions.LibraryActions): State {
+export function reducer(state = initialState, action: LibraryActions.All): State {
 	switch (action.type) {
 
 		case LibraryActions.LOADED: {
-			return adapter.addAll(action.payload.movies, state);
+			return adapter.addAll(action.payload.entries, state);
 		}
 
-		case LibraryActions.UPDATE_MOVIE: {
-			return adapter.updateOne(action.payload.movie, state);
+		case LibraryActions.UPDATE_ENTRY: {
+			return adapter.updateOne(action.payload.entry, state);
 		}
 
-		case LibraryActions.ADD_MOVIE: {
-			return adapter.addOne(action.payload.movie, state);
+		case LibraryActions.ADD_ENTRY: {
+			return adapter.addOne(action.payload.entry, state);
 		}
 
 		default: {

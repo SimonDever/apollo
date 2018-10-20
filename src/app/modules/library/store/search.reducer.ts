@@ -1,21 +1,21 @@
 import * as LibraryActions from "./library.actions";
-import { Movie } from "./movie";
+import { Entry } from "./entry.model";
 
 export interface State {
-	needMovies: boolean;
-	selectedMovie: Movie;
-	searchResults: Movie[];
+	needEntries: boolean;
+	selectedEntry: Entry;
+	searchResults: Entry[];
 	searchTerms: string;
 }
 
 export const initialState: State = {
-	needMovies: true,
-	selectedMovie: null,
+	needEntries: true,
+	selectedEntry: null,
 	searchResults: [],
 	searchTerms: ''
 };
 
-export function reducer(state: State = initialState, action: LibraryActions.LibraryActions): State {
+export function reducer(state: State = initialState, action: LibraryActions.All): State {
 	switch (action.type) {
 		case LibraryActions.SHOW_RESULTS: {
 			return Object.assign({}, state, {
@@ -23,7 +23,7 @@ export function reducer(state: State = initialState, action: LibraryActions.Libr
 			});
 		}
 
-		case LibraryActions.SEARCH_MOVIES: {
+		case LibraryActions.SEARCH_ENTRIES: {
 			return Object.assign({}, state, {
 				searchTerms: action.payload.searchTerms
 			});
@@ -31,34 +31,34 @@ export function reducer(state: State = initialState, action: LibraryActions.Libr
 
 		case LibraryActions.LOADED: {
 			return Object.assign({}, state, {
-				needMovies: false
+				needEntries: false
 			});
 		}
 
-		case LibraryActions.UPDATE_MOVIE: {
+		case LibraryActions.UPDATE_ENTRY: {
 			return Object.assign({}, state, {
-				selectedMovie: action.payload.movie.changes
+				selectedEntry: action.payload.entry.changes
 			});
 		}
 
-		case LibraryActions.SELECT_MOVIE: {
+		case LibraryActions.SELECT_ENTRY: {
 			return Object.assign({}, state, {
-				selectedMovie: action.payload.movie
+				selectedEntry: action.payload.entry
 			});
 		}
 
-		case LibraryActions.ADD_MOVIE: {
+		case LibraryActions.ADD_ENTRY: {
 			return Object.assign({}, state, {
-				selectedMovie: action.payload.movie
+				selectedEntry: action.payload.entry
 			});
 		}
 
 		case LibraryActions.UPDATE_RESULTS: {
 			let searchResults = state.searchResults;
 			if (state.searchResults != null) {
-				let searchResultsIndex = state.searchResults.findIndex(movie => movie.id == action.movie.id);
+				let searchResultsIndex = state.searchResults.findIndex(entry => entry.id == action.entry.id);
 				searchResults = [...state.searchResults];
-				searchResults.splice(searchResultsIndex, 1, action.movie);
+				searchResults.splice(searchResultsIndex, 1, action.entry);
 			}
 			return Object.assign({}, state, {
 				searchResults: searchResults

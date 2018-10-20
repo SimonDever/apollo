@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreModule } from '@ngrx/store';
@@ -20,6 +21,7 @@ import { SharedModule } from './modules/shared/shared.module';
 	imports: [
 		CommonModule,
 		BrowserModule,
+		BrowserAnimationsModule,
 		HttpClientModule,
 		HttpClientInMemoryWebApiModule.forRoot(InMemoryApi, { dataEncapsulation: false }),
 		SharedModule.forRoot(),

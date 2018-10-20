@@ -28,6 +28,13 @@ body {
 	outline: 0;
 }
 
+.search-view-title {
+	display: block;
+	font-size: 25px;
+	width: 100%;
+	text-align: center;
+}
+
 .clear-icon:after {
 	content: '\02A2F';
 	display: block;
@@ -42,35 +49,16 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	display: none;
 }
 
-.edit-form {
-	display: block;
-	padding-top: 15px;
-	padding-left: 15px;
-}
-
-.edit-view label {
-	width: 50px;
-}
-
-.edit-view input {
-	border-width: 1px;
-	border-style: solid;
-	width: 235px;
-}
-
-.input-group {
-	display: inline-block;
-}
 
 .list-view,
 .edit-view,
-.movie-view,
+.entry-view,
 .search-view {
 	height: 100%;
 	position: relative;
 }
 
-.movie-list {
+.entry-list {
 	display: grid;
 	grid-gap: 15px;
 	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
@@ -81,11 +69,12 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	min-height: 100%;
 }
 
-.movie-poster {
+.entry-poster {
 	height: var(--grid-item-height);
 	width: var(--grid-item-width);
-	z-index: 1;
+	/*z-index: 1;
 	position: absolute;
+	*/
 }
 
 .poster-preview {
@@ -94,25 +83,51 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	display: block;
 }
 
-.movie-box {
+.edit-box {
+	width: var(--grid-item-width);
+	border: none;
+}
+
+.entry-box {
 	height: var(--grid-item-height);
 	width: var(--grid-item-width);
 	border: none;
 }
 
-.movie-box-2 {
-	position: relative;
-}
-
-.movie-box-title {
+.entry-box-title {
 	font-weight: bold;
-	font-size: 18px;
+	font-size: 25px; /*18*/
 	text-align: center;
 	width: calc(100% - var(--grid-item-width) - 30px - 40px - 15px - 15px); /* screen width - poster width - poster padding - icon button width - icon button padding */
 	z-index: 2;
 	position: absolute;
 	left: calc(var(--grid-item-width) + 15px + 15px); /* poster width + poster padding */
 	top: 15px;
+	height: 40px;
+	padding-top: 1px;
+}
+
+input.entry-box-title {
+	padding-top: 0;
+	height: 38px;
+}
+
+.edit-view label {
+	width: 50px;
+}
+
+.edit-view input {
+	padding: 0;
+	border-style: dashed;
+	border-width: 1px;
+}
+
+.poster-group .entry-poster {
+	margin-bottom: 15px;
+}
+
+.poster-group input {
+	width: 100%;
 }
 
 .icon-button-box {
