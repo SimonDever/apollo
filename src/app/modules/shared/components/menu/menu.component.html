@@ -1,38 +1,32 @@
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+<nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-dark">
 
-	<a class="navbar-brand" (click)="showEntryList()">Library</a>
-
-	<p class="context-title m-auto d-xs-block d-md-none">
-		{{ title }}
-	</p>
-
-	<div class="button-group">
-		<button class="btn btn-outline-success" (click)="addEntry()">Add Entry</button>
+	<div class="navbar-brand">
+		<img src="./assets/images/logo.png" width="38" height="38" alt="">
+		<div class="app-title d-none">{{ appTitle }}</div>
 	</div>
 
-	<button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse"
-		data-target="#navbar" aria-controls="navbar"
+	<ul class="navbar-nav flex-row flex-nowrap">
+		<li class="nav-item">
+			<a class="nav-link" (click)="showEntryList()">Collection</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" (click)="showSettings()">Settings</a>
+		</li>
+	</ul>
+
+	<button class="navbar-toggler navbar-toggler-right" type="button"
+		(click)="navbarCollapsed= !navbarCollapsed"
+		[attr.aria-expanded]="!navbarCollapsed" aria-controls="navbar"
 		aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
 
-	<div class="collapse navbar-collapse" id="navbar">
-
-		<ul class="navbar-nav mr-auto">
-			<li class="nav-item">
-				<a class="nav-link" (click)="showSettings()">Settings</a>
-			</li>
-		</ul>
-
-		<p class="context-title m-auto d-none d-md-block">
-			{{ title }}
-		</p>
-
-		<form [formGroup]="searchForm" (submit)="search()" class="form-inline">
-			<input required id="title" formControlName="title" class="form-control mr-2"
+	<div [ngbCollapse]="navbarCollapsed" class="navbar-nav collapse navbar-collapse"	id="navbar">
+		<form [formGroup]="searchForm" (submit)="search()" class="search-form form-inline mt-2 mt-sm-0 ml-0 ml-sm-auto">
+			<input required formControlName="title" class="search-input form-control mr-2"
 				type="search" placeholder="Search" aria-label="Search">
 			<button class="clear-icon" type="reset"></button>
-			<button [disabled]="!searchForm.valid" class="btn btn-outline-success"
+			<button [disabled]="!searchForm.valid" class="btn btn-outline-light"
 				type="submit">Search</button>
 		</form>
 	</div>

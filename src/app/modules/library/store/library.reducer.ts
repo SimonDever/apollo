@@ -23,6 +23,10 @@ export function reducer(state = initialState, action: LibraryActions.All): State
 			return adapter.addOne(action.payload.entry, state);
 		}
 
+		case LibraryActions.REMOVE_ENTRY: {
+			return adapter.removeOne(action.payload.id, state);
+		}
+
 		default: {
 			return state;
 		}

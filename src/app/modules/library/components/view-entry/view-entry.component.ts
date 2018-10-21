@@ -5,7 +5,10 @@ import "rxjs/add/operator/publishReplay";
 import { Observable } from 'rxjs/Observable';
 import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
+import * as LibraryAction from '../../store/library.actions';
 import { Entry } from '../../store/entry.model';
+
+// todo: guard to ensure selected entry or route to /library
 
 @Component({
 	selector: 'app-view-entry',
@@ -31,6 +34,11 @@ export class ViewEntryComponent implements OnInit {
 
 	close() {
 		this.navigationService.closeViewEntry();
+	}
+
+	trash(id: string) {
+		console.log(`trash(id): ${id}`);
+		this.store.dispatch(new LibraryAction.RemoveEntry({id: id}))
 	}
 
 	searchMetadataProvider() {

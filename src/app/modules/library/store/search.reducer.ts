@@ -53,6 +53,20 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 			});
 		}
 
+		case LibraryActions.REMOVE_ENTRY: {
+			let searchResults = state.searchResults;
+			if (state.searchResults != null) {
+				let searchResultsIndex = state.searchResults.findIndex(entry => entry.id == action.payload.id);
+				searchResults = [...state.searchResults];
+				searchResults.splice(searchResultsIndex, 1);
+			}
+
+			return Object.assign({}, state, {
+				selectedEntry: null,
+				searchResults: searchResults
+			});
+		}
+
 		case LibraryActions.UPDATE_RESULTS: {
 			let searchResults = state.searchResults;
 			if (state.searchResults != null) {

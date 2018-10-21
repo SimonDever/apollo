@@ -32,6 +32,12 @@ export class AddEntry implements Action {
 	constructor(public payload: { entry: Entry }) { }
 }
 
+export const REMOVE_ENTRY = '[Entry] Remove Entry';
+export class RemoveEntry implements Action {
+	readonly type = REMOVE_ENTRY;
+	constructor(public payload: { id: string }) { }
+}
+
 export const SELECT_ENTRY = '[Entry] Select';
 export class SelectEntry implements Action {
 	readonly type = SELECT_ENTRY;
@@ -54,6 +60,7 @@ export type All =
 	SelectEntry |
 	SearchEntries |
 	UpdateEntry |
+	RemoveEntry |
 	AddEntry |
 	ShowResults |
 	Load |

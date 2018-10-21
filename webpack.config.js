@@ -165,6 +165,9 @@ module.exports = {
 		"chunkFilename": "[id].chunk.js",
 		"crossOriginLoading": false
 	},
+	"externals": {
+		knex: 'commonjs knex'
+	},
 	"module": {
 		"rules": [
 			{
@@ -407,9 +410,6 @@ module.exports = {
 			"sourceMap": true,
 			"filename": "scripts.bundle.js",
 			"scripts": [
-				"node_modules/jquery/dist/jquery.min.js",
-				"node_modules/popper.js/dist/umd/popper.min.js",
-				"node_modules/bootstrap/dist/js/bootstrap.min.js"
 			],
 			"basePath": ""
 		}),

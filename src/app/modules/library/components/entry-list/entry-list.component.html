@@ -1,4 +1,7 @@
 <div class="list-view">
+	<div class="icon-button-box">
+		<button octicon="plus" class="icon-button add-button" (click)="addEntry()"></button>
+	</div>
 	<div class="entry-list">
 		<div *ngFor="let entry of entries$ | async as entries"
 			class="entry-box"

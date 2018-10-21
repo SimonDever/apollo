@@ -41,23 +41,34 @@ body {
 	color: var(--input-foreground)
 }
 
-.settings-icon {
+.icon-button {
+	border-color: var(--foreground);
+	background-color: var(--background);
+}
+
+.icon-button svg {
 	fill: var(--foreground);
+}
+
+.icon-button:hover {
+	border-color: var(--background);
+	background-color: var(--foreground);
+}
+
+.icon-button:hover svg {
+	fill: var(--background);
+}
+
+.search-form .search-input {
+	background-color: var(--input-background);
+	color: var(--input-foreground);
 }
 
 .clear-icon:after {
 	color: var(--input-placeholders);
 }
 
+.navbar-dark .navbar-nav .nav-link,
 .context-title {
 	color: var(--foreground);
-}
-
-.save-button svg,
-.edit-button svg,
-.close-button svg,
-.search-metadata-provider-button svg
-/* button:not([type="submit"]) svg */
-{
-	fill: var(--foreground);
 }

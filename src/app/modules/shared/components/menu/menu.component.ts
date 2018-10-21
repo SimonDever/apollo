@@ -13,6 +13,8 @@ import { NavigationService } from '../../services/navigation.service';
 })
 export class MenuComponent implements OnInit {
 
+	appTitle: string;
+	navbarCollapsed: boolean;
 	routerState: RouterStateSnapshot;
 	title: string;
 	searchForm: FormGroup;
@@ -22,7 +24,9 @@ export class MenuComponent implements OnInit {
 		private navigationService: NavigationService,
 		private router: Router,
 		private store: Store<fromLibrary.LibraryState>) {
-			this.routerState = router.routerState.snapshot;
+			this.appTitle = "Apollo";
+			this.routerState = this.router.routerState.snapshot;
+			this.navbarCollapsed = true;
 			this.title = '';
 		}
 
@@ -31,6 +35,7 @@ export class MenuComponent implements OnInit {
 	}
 
 	search() {
+		this.navbarCollapsed = true;
 		this.navigationService.setSearchResultsParent(this.routerState.url);
 		this.store.dispatch(new LibraryActions.SearchEntries({
 			searchTerms: this.searchForm.value.title
@@ -38,18 +43,22 @@ export class MenuComponent implements OnInit {
 	}
 
 	showEntryList() {
+		this.navbarCollapsed = true;
 		this.navigationService.setSearchResultsParent(undefined);
 		this.navigationService.setViewEntryParent(undefined);
 		this.router.navigate(['/library']);
 	}
 
 	showSettings() {
+		this.navbarCollapsed = true;
 		this.navigationService.setSearchResultsParent(undefined);
 		this.navigationService.setViewEntryParent(undefined);
 		this.router.navigate(['/settings']);
 	}
 
+	
 	addEntry() {
+		this.navbarCollapsed = true;
 		let currentLocation = this.routerState.url;
 		this.navigationService.setAddEntryParent(currentLocation);
 		if(currentLocation === '/settings') {

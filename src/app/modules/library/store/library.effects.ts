@@ -22,24 +22,37 @@ export class LibraryEffects {
 		private store: Store<fromLibrary.LibraryState>) {
 	}
 
-	@Effect({ dispatch: false })
-	updateEntry$ = this.actions$.ofType(LibraryActions.UPDATE_ENTRY)
+	@Effect()
+	updateEntry$: Observable<Action> = this.actions$.ofType(LibraryActions.UPDATE_ENTRY)
 		.map(action => (action as LibraryActions.UpdateEntry).payload.entry.changes)
-		.mergeMap(changes => this.storageService.updateEntry({
-			id: changes.id, title: changes.title, poster: changes.poster
-		}).do(() => this.router.navigate(['/library/view'])));
+		.mergeMap(changes =>
+			this.storageService.updateEntry({
+				id: changes.id, title: changes.title, poster: changes.poster
+			})
+			.do(() => this.router.navigate(['/library/view']))
+			.map(entry => new LibraryActions.UpdateResults(entry)));
 
 	@Effect()
 	load$: Observable<Action> = this.actions$.ofType(LibraryActions.LOAD)
 		.map(action => (action as LibraryActions.Load))
-		.mergeMap(() => this.storageService.getEntries()
-			.map(entries => new LibraryActions.Loaded({ entries: entries })));
+		.mergeMap(() => this.storageService.load())
+		.map(entries => new LibraryActions.Loaded({ entries: entries }));
 
-	@Effect({ dispatch: false })
-	addEntry$ = this.actions$.ofType(LibraryActions.ADD_ENTRY)
+	@Effect()
+	addEntry$: Observable<Action> = this.actions$.ofType(LibraryActions.ADD_ENTRY)
 		.map(action => (action as LibraryActions.AddEntry).payload.entry)
 		.mergeMap(entry => this.storageService.addEntry(entry)
-			.do(() => this.router.navigate(['/library/view'])));
+			.do(() => this.router.navigate(['/library/view']))
+			.map(entry => new LibraryActions.UpdateResults(entry)));
+
+	@Effect({ dispatch: false })
+	removeEntry$ = this.actions$.ofType(LibraryActions.REMOVE_ENTRY)
+		.map(action => (action as LibraryActions.RemoveEntry).payload.id)
+		.mergeMap(id => this.storageService.removeEntry(id)
+			.do(numRemoved => {
+				console.log(`Removed ${numRemoved}`);
+				this.router.navigate(['/library'])
+			}));
 
 	@Effect()
 	searchEntries$ = this.actions$.ofType(LibraryActions.SEARCH_ENTRIES)
@@ -50,10 +63,10 @@ export class LibraryEffects {
 	@Effect({ dispatch: false })
 	selectEntry = this.actions$.ofType(LibraryActions.SELECT_ENTRY)
 		.map(action => (action as LibraryActions.SelectEntry))
-		.map(() => this.router.navigate(['/library/view']));
+		.do(() => this.router.navigate(['/library/view']));
 
 	@Effect({ dispatch: false })
 	showResults$ = this.actions$.ofType(LibraryActions.SHOW_RESULTS)
 		.map(action => (action as LibraryActions.ShowResults))
-		.mergeMap(() => this.router.navigate(['/library/search']));
+		.do(() => this.router.navigate(['/library/search']));
 }

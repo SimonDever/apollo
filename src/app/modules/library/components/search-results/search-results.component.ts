@@ -54,4 +54,11 @@ export class SearchResultsComponent implements OnInit {
 		this.navigationService.setViewEntryParent(this.routerState.url);
 		this.store.dispatch(new LibraryActions.SelectEntry({ entry: entry }));
 	}
+
+	addEntry() {
+		let currentLocation = this.routerState.url;
+		this.navigationService.setAddEntryParent(currentLocation);
+		this.navigationService.setViewEntryParent(currentLocation);
+		this.router.navigate(['/library/add']);
+	}
 }
