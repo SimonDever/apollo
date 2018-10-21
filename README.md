@@ -2,10 +2,10 @@
 
 Cross platform open source desktop application to manage a local video collection.
 
-Features:
-	- Searching and loading metadata from [MovieDB](https://themoviedb.org)
-	- Sort and filter entries by metadata fields
-	- JavaScript only embedded persistent database
+Features:  
+	- Searching and loading metadata from [MovieDB](https://themoviedb.org)  
+	- Sort and filter entries by metadata fields  
+	- JavaScript only embedded persistent database  
 
 ## Dependencies
 
