@@ -4,6 +4,7 @@
 
 # personal config
 .moviedb-api-key
+library-database.json
 
 # unlicenced and unable to distribute
 /src/assets/images/poster-*
