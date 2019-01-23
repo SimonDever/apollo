@@ -6,10 +6,12 @@
 	--input-background: #333;
 	--input-placeholders: #aaa;
 	--input-foreground: #ddd;
+	--menu-background: #343a40;
 }
 
 body {
 	background-color: var(--background);
+	color: var(--foreground);
 }
 
 .entry-box {
@@ -35,6 +37,17 @@ body {
 	color: var(--bright-foreground);
 }
 
+.metadata-search-results-view {
+	border-top: 2px solid var(--border);
+}
+
+
+.metadata-entry {
+	border-top: 2px solid var(--border); 
+	border-bottom: 2px solid var(--border); 
+}
+
+.edit-view .poster-preview,
 .edit-view input {
 	background: var(--input-background);
 	border-color: var(--border);
@@ -50,11 +63,11 @@ body {
 	fill: var(--foreground);
 }
 
-.icon-button:hover {
+.icon-button:hover, .icon-button.selected {
 	background-color: var(--foreground);
 }
 
-.icon-button:hover svg {
+.icon-button:hover svg, .icon-button.selected svg {
 	fill: var(--background);
 }
 
@@ -76,4 +89,23 @@ a:not([href]):not([tabindex]),
 a:not([href]):not([tabindex]):hover,
 .nav-link:hover {
 	color: var(--bright-foreground);
+}
+
+.details-button {
+	background: var(--background);
+	border: 1px solid var(--foreground);
+}
+
+.sticky-icon-box {
+	background-color: var(--menu-background);
+}
+
+.btn:not([disabled]):hover {
+	color: var(--menu-background);
+}
+.btn:not([disabled]):focus {
+	color: unset;
+}
+.btn:not([disabled]):focus:hover {
+	color: var(--menu-background);
 }

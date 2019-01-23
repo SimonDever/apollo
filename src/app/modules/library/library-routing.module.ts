@@ -6,6 +6,7 @@ import { EntryListComponent } from './components/entry-list/entry-list.component
 import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { ViewEntryComponent } from './components/view-entry/view-entry.component';
 import { LibraryComponent } from './components/library/library.component';
+import { MetadataComponent } from './components/metadata/metadata.component';
 
 const routes: Routes = [{
 	path: '',
@@ -18,7 +19,12 @@ const routes: Routes = [{
 	}, {
 		path: 'view',
 		data: { title: 'View Entry' },
-		component: ViewEntryComponent
+		component: ViewEntryComponent,
+		children: [{
+			path: 'metadata',
+			data: { title: 'Metadata Search Results' },
+			component: MetadataComponent
+		}]
 	}, {
 		path: 'edit',
 		data: { title: 'Edit Entry' },

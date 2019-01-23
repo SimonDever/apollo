@@ -14,6 +14,24 @@ export class Loaded implements Action {
 	constructor(public payload: { entries: Entry[] }) { }
 }
 
+export const SEARCH_FOR_METADATA = '[Entry] Search For Metadata';
+export class SearchForMetadata implements Action {
+	readonly type = SEARCH_FOR_METADATA;
+	constructor(public payload: { keywords: string, page?: number }) { }
+}
+
+export const SEARCH_FOR_METADATA_DETAILS = '[Entry] Search For Metadata Details';
+export class SearchForMetadataDetails implements Action {
+	readonly type = SEARCH_FOR_METADATA_DETAILS;
+	constructor(public payload: { id: string, media_type: string }) { }
+}
+
+export const SHOW_METADATA_DETAILS_RESULTS = '[Entry] Show Metadata Details Rsults';
+export class ShowMetadataDetailsResults implements Action {
+	readonly type = SHOW_METADATA_DETAILS_RESULTS;
+	constructor(public payload: { details: any }) { }
+}
+
 export const SEARCH_ENTRIES = '[Entry] Search Entries';
 export class SearchEntries implements Action {
 	readonly type = SEARCH_ENTRIES;
@@ -50,6 +68,12 @@ export class ShowResults implements Action {
 	constructor(public payload: { results: Entry[] }) { }
 }
 
+export const SHOW_METADATA_RESULTS = '[Entry] Show Metadata Results';
+export class ShowMetadataResults implements Action {
+	readonly type = SHOW_METADATA_RESULTS;
+	constructor(public payload: { results: any }) { }
+}
+
 export const UPDATE_RESULTS = '[Entry] Update Results';
 export class UpdateResults implements Action {
 	readonly type = UPDATE_RESULTS;
@@ -60,7 +84,12 @@ export type All =
 	SelectEntry |
 	SearchEntries |
 	UpdateEntry |
+	SearchForMetadata |
+	ShowMetadataResults |
+	SearchForMetadata |
 	RemoveEntry |
+	SearchForMetadataDetails |
+	ShowMetadataDetailsResults |
 	AddEntry |
 	ShowResults |
 	Load |

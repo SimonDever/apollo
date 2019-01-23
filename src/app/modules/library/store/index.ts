@@ -42,6 +42,16 @@ export const getSearchResults = createSelector(
 	state => state.searchResults
 );
 
+export const getMetadataSearchResults = createSelector(
+	selectSearchState,
+	state => state.metadataSearchResults
+);
+
+export const getMetadataDetailsResults = createSelector(
+	selectSearchState,
+	state => state.metadataDetailsResults
+);
+
 export const getSelectedEntry = createSelector(
 	selectSearchState,
 	state => state.selectedEntry

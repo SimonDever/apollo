@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterStateSnapshot } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -19,9 +19,11 @@ export class EntryListComponent implements OnInit {
 	entries$: Observable<Entry[]>;
 	needEntries$: Observable<boolean>;
 	needEntriesSub: Subscription;
+	entriesSub: Subscription;
 
 	constructor(private store: Store<fromLibrary.LibraryState>,
 		private navigationService: NavigationService,
+		private zone: NgZone,
 		private router: Router) {
 			this.routerState = router.routerState.snapshot;
 	}
@@ -53,6 +55,6 @@ export class EntryListComponent implements OnInit {
 		let currentLocation = this.routerState.url;
 		this.navigationService.setAddEntryParent(currentLocation);
 		this.navigationService.setViewEntryParent(currentLocation);
-		this.router.navigate(['/library/add']);
+		this.zone.run(() => this.router.navigate(['/library/add']));
 	}
 }

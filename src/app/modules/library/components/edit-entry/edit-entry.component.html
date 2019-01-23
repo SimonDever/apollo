@@ -3,17 +3,25 @@
 		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
 		<button octicon="check" class="icon-button save-button" (click)="save()">Save</button>
 	</div>
-	<div class="entry-list">
+	<div class="edit-box-container">
 		<form [formGroup]="entryForm">
 			<input formControlName="id" type="hidden" #entryId />
 			<div class="edit-box" data-id="{{entryId.value}}">
 
-				<div class="poster-group">
-					<img class="entry-poster" src="{{poster.value}}" />
-					<input #poster type="text" id="poster" formControlName="poster" />
+				<input (change)="posterChange($event)" type="file" #posterInput />
+				<div class="poster-preview" (click)="posterInput.click()">
+					<div *ngIf="!poster_path" class="poster-placeholder">Select Poster</div>
+					<img *ngIf="poster_path" [src]="poster_path" />
 				</div>
 
+				<input (change)="fileChange($event)" type="file" #file />
+				<button (click)="file.click()">Select Video File</button>
+
 				<input class="entry-box-title" formControlName="title" />
+
+				<input class="entry-box-overview" formControlName="overview" />
+
+				<input class="entry-box-cast" formControlName="cast" />
 			</div>
 		</form>
 	</div>

@@ -13,6 +13,7 @@ import { AppComponent } from './app.component';
 import { metaReducers, reducers } from './app.reducer';
 import { InMemoryApi } from './in-memory-api';
 import { SharedModule } from './modules/shared/shared.module';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 @NgModule({
 	declarations: [
@@ -23,12 +24,16 @@ import { SharedModule } from './modules/shared/shared.module';
 		BrowserModule,
 		BrowserAnimationsModule,
 		HttpClientModule,
-		HttpClientInMemoryWebApiModule.forRoot(InMemoryApi, { dataEncapsulation: false }),
+		//HttpClientInMemoryWebApiModule.forRoot(InMemoryApi, { dataEncapsulation: false }),
 		SharedModule.forRoot(),
 		AppRoutingModule,
-		StoreModule.forRoot(reducers, { metaReducers }),
+		//StoreModule.forRoot(reducers, { metaReducers }),
+		StoreModule.forRoot({}),
 		EffectsModule.forRoot([]),
-		StoreRouterConnectingModule.forRoot({ stateKey: 'router' }),
+		//StoreRouterConnectingModule.forRoot({ stateKey: 'router' }),
+		StoreDevtoolsModule.instrument({
+			maxAge: 50
+    })
 	],
 	providers: [
 		{ provide: 'MOVIEDB_API_KEY', useValue: environment.MOVIEDB_API_KEY }

@@ -1,3 +1,16 @@
+/* eslint-disable no-else-return */
+/* eslint-disable prefer-const */
+/* eslint-disable func-names */
+/* eslint-disable func-name-matching */
+/* eslint-disable object-curly-newline */
+/* eslint-disable no-param-reassign */
+/* eslint-disable multiline-ternary */
+/* eslint-disable no-shadow */
+/* eslint-disable no-ternary */
+/* eslint-disable object-property-newline */
+/* eslint-disable no-sync */
+/* eslint-disable quotes */
+/* eslint-disable func-style */
 const fs = require('fs');
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -121,6 +134,7 @@ const postcssPlugins = function (loader) {
 
 
 module.exports = {
+	target: "electron-renderer",
 	"resolve": {
 		"extensions": [
 			".ts",
@@ -156,6 +170,9 @@ module.exports = {
 		],
 		"styles": [
 			"./node_modules/bootstrap/dist/css/bootstrap.min.css",
+			"./node_modules/gridstack/dist/gridstack.min.css",
+			"./node_modules/gridstack/dist/gridstack-extra.min.css",
+			"./node_modules/jqueryui/jquery-ui.min.css",
 			"./src/styles.css"
 		]
 	},
@@ -166,10 +183,22 @@ module.exports = {
 		"crossOriginLoading": false
 	},
 	"externals": {
-		knex: 'commonjs knex'
 	},
 	"module": {
 		"rules": [
+
+			{
+        // Exposes jQuery for use outside Webpack build
+        test: require.resolve('jquery'),
+        use: [{
+          loader: 'expose-loader',
+          options: 'jQuery'
+        }, {
+					loader: 'expose-loader',
+          options: '$'
+        }]
+			},
+
 			{
 				"test": /\.html$/,
 				"loader": "raw-loader"
@@ -193,6 +222,9 @@ module.exports = {
 			{
 				"exclude": [
 					path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.min.css"),
+					path.join(process.cwd(), "node_modules/jqueryui/jquery-ui.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack-extra.min.css"),
 					path.join(process.cwd(), "src/styles.css")
 				],
 				"test": /\.css$/,
@@ -213,6 +245,9 @@ module.exports = {
 			{
 				"exclude": [
 					path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.min.css"),
+					path.join(process.cwd(), "node_modules/jqueryui/jquery-ui.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack-extra.min.css"),
 					path.join(process.cwd(), "src/styles.css")
 				],
 				"test": /\.scss$|\.sass$/,
@@ -241,6 +276,9 @@ module.exports = {
 			{
 				"exclude": [
 					path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.min.css"),
+					path.join(process.cwd(), "node_modules/jqueryui/jquery-ui.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack-extra.min.css"),
 					path.join(process.cwd(), "src/styles.css")
 				],
 				"test": /\.less$/,
@@ -267,6 +305,9 @@ module.exports = {
 			{
 				"exclude": [
 					path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.min.css"),
+					path.join(process.cwd(), "node_modules/jqueryui/jquery-ui.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack-extra.min.css"),
 					path.join(process.cwd(), "src/styles.css")
 				],
 				"test": /\.styl$/,
@@ -294,6 +335,9 @@ module.exports = {
 			{
 				"include": [
 					path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.min.css"),
+					path.join(process.cwd(), "node_modules/jqueryui/jquery-ui.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack-extra.min.css"),
 					path.join(process.cwd(), "src/styles.css")
 				],
 				"test": /\.css$/,
@@ -315,6 +359,9 @@ module.exports = {
 			{
 				"include": [
 					path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.min.css"),
+					path.join(process.cwd(), "node_modules/jqueryui/jquery-ui.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack-extra.min.css"),
 					path.join(process.cwd(), "src/styles.css")
 				],
 				"test": /\.scss$|\.sass$/,
@@ -344,6 +391,9 @@ module.exports = {
 			{
 				"include": [
 					path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.min.css"),
+					path.join(process.cwd(), "node_modules/jqueryui/jquery-ui.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack-extra.min.css"),
 					path.join(process.cwd(), "src/styles.css")
 				],
 				"test": /\.less$/,
@@ -371,6 +421,9 @@ module.exports = {
 			{
 				"include": [
 					path.join(process.cwd(), "node_modules/bootstrap/dist/css/bootstrap.min.css"),
+					path.join(process.cwd(), "node_modules/jqueryui/jquery-ui.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack.min.css"),
+					path.join(process.cwd(), "node_modules/gridstack/dist/gridstack-extra.min.css"),
 					path.join(process.cwd(), "src/styles.css")
 				],
 				"test": /\.styl$/,

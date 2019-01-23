@@ -21,7 +21,7 @@ export class OcticonDirective implements OnInit {
 			this.renderer.setStyle(icon, 'fill', this.color)
 		}
 		if (this.width) {
-			this.renderer.setStyle(icon, 'width', this.width);
+			this.renderer.setStyle(icon, 'width', this.width + 'px');
 			this.renderer.setStyle(icon, 'height', '100%');
 		}
 	}

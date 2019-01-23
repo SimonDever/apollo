@@ -24,7 +24,7 @@
 	<div [ngbCollapse]="navbarCollapsed" class="navbar-nav collapse navbar-collapse"	id="navbar">
 		<form [formGroup]="searchForm" (submit)="search()" class="search-form form-inline mt-2 mt-sm-0 ml-0 ml-sm-auto">
 			<input required formControlName="title" class="search-input form-control mr-2"
-				type="search" placeholder="Search" aria-label="Search">
+				type="search" placeholder="title, keyword, actor, genre" aria-label="Search">
 			<button class="clear-icon" type="reset"></button>
 			<button [disabled]="!searchForm.valid" class="btn btn-outline-light"
 				type="submit">Search</button>

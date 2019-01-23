@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Injectable()
@@ -11,6 +11,7 @@ export class NavigationService {
 
 	constructor(private router: Router,
 		private location: Location,
+		private zone: NgZone,
 		private activatedRoute: ActivatedRoute) {
 	}
 
@@ -28,31 +29,31 @@ export class NavigationService {
 
 	closeViewEntry() {
 		if(this.viewEntryParent != null) {
-			this.router.navigate([this.viewEntryParent]);
+			this.zone.run(() => this.router.navigate([this.viewEntryParent]));
 			// clear viewEntryParent?
 		} else {
 			console.error('closeViewEntry() - viewEntryParent is null. Rerouting to /library');
-			this.router.navigate(['/library']);
+			this.zone.run(() => this.router.navigate(['/library']));
 		}
 	}
 
 	closeSearchResults() {
 		if(this.searchResultsParent != null) {
-			this.router.navigate([this.searchResultsParent]);
+			this.zone.run(() => this.router.navigate([this.searchResultsParent]));
 			// clear searchResultsParent?
 		} else {
 			console.error('closeSearchResults() - searchResultsParent is null. Rerouting to /library');
-			this.router.navigate(['/library']);
+			this.zone.run(() => this.router.navigate(['/library']));
 		}
 	}
 
 	closeAddEntry() {
 		if(this.addEntryParent != null) {
-			this.router.navigate([this.addEntryParent]);
+			this.zone.run(() => this.router.navigate([this.addEntryParent]));
 			// clear addEntryParent?
 		} else {
 			console.error('closeAddEntry() - addEntryParent is null. Rerouting to /library');
-			this.router.navigate(['/library']);
+			this.zone.run(() => this.router.navigate(['/library']));
 		}
 	}
 

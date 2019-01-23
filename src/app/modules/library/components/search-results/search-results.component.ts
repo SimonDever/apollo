@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, NgZone } from '@angular/core'
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router, RouterStateSnapshot } from '@angular/router';
 import { select, Store } from '@ngrx/store';
@@ -38,6 +38,7 @@ export class SearchResultsComponent implements OnInit {
 
 	constructor(private navigationService: NavigationService,
 		private store: Store<fromLibrary.LibraryState>,
+		private zone: NgZone,
 		private router: Router) {
 			this.routerState = router.routerState.snapshot;
 	}
@@ -59,6 +60,6 @@ export class SearchResultsComponent implements OnInit {
 		let currentLocation = this.routerState.url;
 		this.navigationService.setAddEntryParent(currentLocation);
 		this.navigationService.setViewEntryParent(currentLocation);
-		this.router.navigate(['/library/add']);
+		this.zone.run(() => this.router.navigate(['/library/add']));
 	}
 }

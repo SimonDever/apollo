@@ -5,6 +5,10 @@
 	--grid-item-height: 400px;
 }
 
+input[type="file"] {
+	display: none;
+}
+
 html {
 	height: 100%;
 }
@@ -56,7 +60,8 @@ body {
 
 .icon-button svg {
 	width: 100%;
-	height: 38px;
+	/* height: 38px; */
+	height: inherit;
 }
 
 .clear-icon {
@@ -88,9 +93,19 @@ input[type=search]:not(:valid) ~ .clear-icon {
 
 .list-view,
 .edit-view,
-.entry-view,
+.metadata-search-results-view,
 .search-view {
 	height: 100%;
+	position: relative;
+}
+
+.metadata-search-results-view {
+	overflow: visible;
+	padding-bottom: 85px;
+	height: unset;
+}
+
+.entry-view {
 	position: relative;
 }
 
@@ -105,9 +120,17 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	min-height: 100%;
 }
 
-.entry-poster {
-	height: var(--grid-item-height);
+.entry-list img,
+.metadata-search-results-view .poster-preview {
 	width: var(--grid-item-width);
+	height: var(--grid-item-height);
+}
+
+.edit-box-container {
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-right: 70px;
+	padding-left: 15px;
 }
 
 .navbar-brand {
@@ -149,39 +172,97 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	padding-bottom: 2px;
 }
 
-.poster-preview {
-	height: var(--grid-item-height);
-	width: var(--grid-item-width);
-	display: block;
+.poster-placeholder {
+	text-align: center;
+	display: inline-block;
+	width: 100%;
+	line-height: var(--grid-item-height);
+}
+
+img.poster-preview {
+	width: 100%;
+	height: 100%;
 }
 
 .edit-box {
-	width: var(--grid-item-width);
+	width: 100%;
 	border: none;
 }
-
 .entry-box {
 	height: var(--grid-item-height);
 	width: var(--grid-item-width);
-	border: none;
+	border-width: 1px;
+	border-style: solid;
 }
 
+.entry-box-file {
+	text-align: left;
+}
+
+.metadata-box {
+	width: 100%;
+	border: none;
+	display: flex;
+	flex-direction: row;
+}
+
+.metadata-details {
+	display: flex;
+	position: relative;
+	flex-direction: column;
+	min-width: calc(100% - var(--grid-item-width));
+}
+
+.metadata-details .entry-box-generic,
+.metadata-details .entry-box-overview,
+.metadata-details .entry-box-title {
+	padding-left: 15px;
+}
+.metadata-details .entry-box-score {
+	margin-top: 15px;
+	padding-left: 63px;
+}
+.metadata-details .entry-box-media-type {
+	position: absolute;
+	right: 0;
+}
+
+.entry-box-genre-text:not(:last-child)::after {
+	content: ', ';
+}
+
+.entry-box-overview {
+	text-align: left;
+}
+
+.entry-box-cast {
+	text-align: left;
+}
+
+/* screen width - poster width - poster padding - icon button width - icon button padding */
+/* poster width + poster padding */
 .entry-box-title {
+	/* grid-area: title; */
+
+	/*
+	
 	font-weight: bold;
 	font-size: 25px;
 	text-align: center;
-	width: calc(100% - var(--grid-item-width) - 30px - 40px - 15px - 15px); /* screen width - poster width - poster padding - icon button width - icon button padding */
+	height: 40px;
+	width: calc(100% - var(--grid-item-width) - 30px - 40px - 15px - 15px);
 	z-index: 2;
 	position: absolute;
-	left: calc(var(--grid-item-width) + 15px + 15px); /* poster width + poster padding */
+	left: calc(var(--grid-item-width) + 15px + 15px); 
 	top: 15px;
-	height: 40px;
 	padding-top: 1px;
-}
-
-input.entry-box-title {
 	padding-top: 0;
 	height: 38px;
+	*/
+}
+
+.metadata-results-count {
+	text-align: center;
 }
 
 .edit-view label {
@@ -198,6 +279,68 @@ input.entry-box-title {
 	margin-bottom: 15px;
 }
 
-.poster-group input {
+.poster-preview .icon-button {
+	position: absolute;
+	left: 30px;
+	display: none;
+}
+
+#poster-button,
+.poster-preview .icon-button.selected,
+.poster-preview:hover .icon-button {
+	display: block;
+	width: 28px;
+	height: 28px;
+}
+
+.metadata-details .icon-button {
+	display: inline-block;
+	width: 28px;
+	height: 28px;
+}
+
+.details-button {
+	width: 50%;
+	border-radius: 8px;
+	height: 45px;
+	font-size: 23px;
+	color: var(--foreground);
+	padding-top: 0px;
+	padding-bottom: 5px;
+	margin: 30px auto;
+	cursor: pointer;
+}
+
+.prev-button,
+.next-button {
+	margin: 15px auto 0;
+	display: flex;
+}
+
+.finish-button {
+	margin: 15px auto 15px 7px;
+}
+
+.cancel-button {
+	margin: 15px 7px 15px auto;
+}
+
+.sticky-icon-box {
+	position: fixed;
+	bottom: 0;
 	width: 100%;
+	text-align: center;
+	z-index: 2;
+}
+
+.sticky-icon-box button {
+	width: 150px;
+}
+
+.metadata-entry:last-child {
+	padding-bottom: 70px;
+}
+
+#poster-button ~ .popover {
+	z-index: 0;
 }

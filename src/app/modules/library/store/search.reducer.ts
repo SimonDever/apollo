@@ -6,13 +6,17 @@ export interface State {
 	selectedEntry: Entry;
 	searchResults: Entry[];
 	searchTerms: string;
+	metadataSearchResults: any;
+	metadataDetailsResults: Map<any, any>;
 }
 
 export const initialState: State = {
 	needEntries: true,
 	selectedEntry: null,
 	searchResults: [],
-	searchTerms: ''
+	searchTerms: '',
+	metadataSearchResults: null,
+	metadataDetailsResults: new Map()
 };
 
 export function reducer(state: State = initialState, action: LibraryActions.All): State {
@@ -20,6 +24,22 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 		case LibraryActions.SHOW_RESULTS: {
 			return Object.assign({}, state, {
 				searchResults: action.payload.results
+			});
+		}
+
+		case LibraryActions.SHOW_METADATA_RESULTS: {
+			return Object.assign({}, state, {
+				metadataSearchResults: action.payload.results
+			});
+		}
+
+		case LibraryActions.SHOW_METADATA_DETAILS_RESULTS: {
+			console.log('reducer:');
+			console.log(action.payload.details);
+			const newResults = new Map(state.metadataDetailsResults);
+			newResults.set(action.payload.details.id, action.payload.details);
+			return Object.assign({}, state, {
+				metadataDetailsResults: newResults
 			});
 		}
 

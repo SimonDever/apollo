@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -23,6 +23,7 @@ export class MenuComponent implements OnInit {
 		private formBuilder: FormBuilder,
 		private navigationService: NavigationService,
 		private router: Router,
+		private zone: NgZone,
 		private store: Store<fromLibrary.LibraryState>) {
 			this.appTitle = "Apollo";
 			this.routerState = this.router.routerState.snapshot;
@@ -46,14 +47,14 @@ export class MenuComponent implements OnInit {
 		this.navbarCollapsed = true;
 		this.navigationService.setSearchResultsParent(undefined);
 		this.navigationService.setViewEntryParent(undefined);
-		this.router.navigate(['/library']);
+		this.zone.run(() => this.router.navigate(['/library']));
 	}
 
 	showSettings() {
 		this.navbarCollapsed = true;
 		this.navigationService.setSearchResultsParent(undefined);
 		this.navigationService.setViewEntryParent(undefined);
-		this.router.navigate(['/settings']);
+		this.zone.run(() => this.router.navigate(['/settings']));
 	}
 
 	
@@ -66,6 +67,6 @@ export class MenuComponent implements OnInit {
 		}
 		this.navigationService.setViewEntryParent(currentLocation);
 		
-		this.router.navigate(['/library/add']);
+		this.zone.run(() => this.router.navigate(['/library/add']));
 	}
 }

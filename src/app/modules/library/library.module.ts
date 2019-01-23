@@ -6,13 +6,13 @@ import { SharedModule } from '../shared/shared.module';
 import { AddEntryComponent } from './components/add-entry/add-entry.component';
 import { EditEntryComponent } from './components/edit-entry/edit-entry.component';
 import { EntryListComponent } from './components/entry-list/entry-list.component';
-import { LibraryRoutingModule } from './library-routing.module';
+import { LibraryComponent } from './components/library/library.component';
+import { MetadataComponent } from './components/metadata/metadata.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
+import { ViewEntryComponent } from './components/view-entry/view-entry.component';
+import { LibraryRoutingModule } from './library-routing.module';
 import { reducers } from './store';
 import { LibraryEffects } from './store/library.effects';
-import { ViewEntryComponent } from './components/view-entry/view-entry.component';
-import { LibraryComponent } from './components/library/library.component';
-
 
 @NgModule({
 	imports: [
@@ -24,18 +24,21 @@ import { LibraryComponent } from './components/library/library.component';
 	],
 	exports: [
 		LibraryComponent,
-		ViewEntryComponent,
-		EditEntryComponent,
-		EntryListComponent,
-		SearchResultsComponent
-	],
-	declarations: [
 		AddEntryComponent,
 		ViewEntryComponent,
 		EditEntryComponent,
 		EntryListComponent,
 		SearchResultsComponent,
-		LibraryComponent
+		MetadataComponent,
+	],
+	declarations: [
+		LibraryComponent,
+		AddEntryComponent,
+		ViewEntryComponent,
+		EditEntryComponent,
+		EntryListComponent,
+		SearchResultsComponent,
+		MetadataComponent
 	]
 })
 export class LibraryModule { }

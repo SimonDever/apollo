@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { PageNotFoundComponent } from './modules/shared/components/page-not-found/page-not-found.component';
+import { LocationStrategy } from '@angular/common';
 
 const routes: Routes = [{
 	path: 'library',
@@ -19,6 +20,7 @@ const routes: Routes = [{
 
 @NgModule({
 	imports: [RouterModule.forRoot(routes, {
+		useHash: true,
 		preloadingStrategy: PreloadAllModules
 	})],
 	exports: [RouterModule]

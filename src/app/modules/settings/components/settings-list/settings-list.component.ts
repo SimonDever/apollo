@@ -12,4 +12,8 @@ export class SettingsListComponent implements OnInit {
 	ngOnInit() {
 	}
 
+	exportDatastore() {
+		
+	}
+
 }
