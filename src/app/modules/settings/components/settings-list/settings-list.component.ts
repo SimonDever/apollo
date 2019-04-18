@@ -10,10 +10,20 @@ export class SettingsListComponent implements OnInit {
 	constructor() { }
 
 	ngOnInit() {
+
 	}
 
-	exportDatastore() {
+	export() {
 		
+	}
+
+	import(event) {
+		const path = event.target.files[0].path || event.target.files[0].path;
+		if(path == null) {
+			console.warn(`Could not get full path to database`);
+		} else {
+			console.log(`Importing file: ${path}`);
+		}
 	}
 
 }

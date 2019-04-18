@@ -1,1 +1,8 @@
-<button (click)="exportDatastore($event)">Export Datastore</button>
+<button (click)="export($event)">Export</button>
+
+<input (change)="import($event)" type="file" #importFileInput />
+<div class="input-text">Import file</div>
+<div *ngIf="file" class="file-info" [attr.data-file]="file">
+	<div class="file-path">{{file}}</div>
+</div>
+<button class="btn btn-outline-light" (click)="importFileInput.click()">Import</button>

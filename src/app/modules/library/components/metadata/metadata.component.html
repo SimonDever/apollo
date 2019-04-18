@@ -44,7 +44,7 @@
 				<div class="metadata-details">
 					
 					<div class="entry-box-title">
-						<ng-container *ngIf="entry.title; else entryName">
+						<ng-container *ngIf="entry.title else entryName">
 							<button title="Keep this title" octicon="check"
 								class="icon-button save-button"
 								[class.selected]="isFieldSelected(entry, 'title')"

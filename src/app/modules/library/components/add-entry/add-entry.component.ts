@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, Renderer2, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
@@ -18,6 +18,9 @@ export class AddEntryComponent implements OnInit {
 	entryForm: FormGroup;
 	file: string;
 	poster_path: string;
+	routerState: RouterStateSnapshot;
+	searchTerms: string;
+	selectedEntryId: string;
 
 	constructor(private navigationService: NavigationService,
 		private formBuilder: FormBuilder,
@@ -25,7 +28,9 @@ export class AddEntryComponent implements OnInit {
 		private router: Router,
 		private route: ActivatedRoute,
 		private el: ElementRef,
-		private renderer: Renderer2) { }
+		private renderer: Renderer2) {
+			this.routerState = router.routerState.snapshot;
+		}
 
 	ngOnInit() {
 		this.entryForm = this.formBuilder.group({
@@ -52,7 +57,13 @@ export class AddEntryComponent implements OnInit {
 	fileChange(event) {
 		this.file = event.target.files[0].path || event.target.files[0].name;
 		if(this.entryForm.value.title === '') {
-			const title = this.file.substring(0, this.file.lastIndexOf('.'));
+			const forwardSlash = this.file.lastIndexOf('/');
+			const backwardSlash = this.file.lastIndexOf('\\');
+			let separator = forwardSlash;
+			if(forwardSlash === -1) {
+				separator = backwardSlash;
+			}
+			const title = this.file.substring(separator + 1, this.file.lastIndexOf('.'));
 			this.entryForm.get('title').setValue(title);
 		}
 	}
@@ -60,8 +71,12 @@ export class AddEntryComponent implements OnInit {
 	save() {
 		const form = this.entryForm.value;
 		const entry: Entry = {};
-		if(form.id) entry.id = form.id;
-		if(form.title) entry.title = form.title;
+		if(form.id) {
+			entry.id = form.id;
+		}
+		if(form.title) {
+			entry.title = form.title;
+		}
 		if(this.poster_path) entry.poster_path = this.poster_path;
 		if(this.file) entry.file = this.file;
 		if(form.overview) entry.overview = form.overview;

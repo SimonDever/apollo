@@ -9,6 +9,14 @@
 	--menu-background: #343a40;
 }
 
+.file-info {
+	border-color: var(--border);
+}
+
+.file-preview {
+	background-color: var(--input-background);
+}
+
 body {
 	background-color: var(--background);
 	color: var(--foreground);
@@ -48,10 +56,15 @@ body {
 }
 
 .edit-view .poster-preview,
-.edit-view input {
+.edit-view .input {
 	background: var(--input-background);
 	border-color: var(--border);
 	color: var(--input-foreground)
+}
+
+.edit-view .input input {
+	background-color: var(--input-background);
+	color: var(--input-foreground);
 }
 
 .icon-button {

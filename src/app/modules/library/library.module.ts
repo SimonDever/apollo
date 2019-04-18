@@ -13,6 +13,7 @@ import { ViewEntryComponent } from './components/view-entry/view-entry.component
 import { LibraryRoutingModule } from './library-routing.module';
 import { reducers } from './store';
 import { LibraryEffects } from './store/library.effects';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
 	imports: [
@@ -39,6 +40,9 @@ import { LibraryEffects } from './store/library.effects';
 		EntryListComponent,
 		SearchResultsComponent,
 		MetadataComponent
+	],
+	providers: [
+		NgbModal
 	]
 })
 export class LibraryModule { }

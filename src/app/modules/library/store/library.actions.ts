@@ -62,10 +62,22 @@ export class SelectEntry implements Action {
 	constructor(public payload: { entry: Entry }) { }
 }
 
+export const SELECT_AND_VIEW_ENTRY = '[Entry] Select and View Entry';
+export class SelectAndViewEntry implements Action {
+	readonly type = SELECT_AND_VIEW_ENTRY;
+	constructor(public payload: { entry: Entry }) { }
+}
+
 export const SHOW_RESULTS = '[Entry] Show Results';
 export class ShowResults implements Action {
 	readonly type = SHOW_RESULTS;
 	constructor(public payload: { results: Entry[] }) { }
+}
+
+export const DESELECT_ENTRY = '[Entry] Deselect Entry';
+export class DeselectEntry implements Action {
+	readonly type = DESELECT_ENTRY;
+	constructor(public payload: { entry: Entry }) { }
 }
 
 export const SHOW_METADATA_RESULTS = '[Entry] Show Metadata Results';
@@ -82,6 +94,7 @@ export class UpdateResults implements Action {
 
 export type All =
 	SelectEntry |
+	SelectAndViewEntry |
 	SearchEntries |
 	UpdateEntry |
 	SearchForMetadata |
@@ -92,6 +105,7 @@ export type All =
 	ShowMetadataDetailsResults |
 	AddEntry |
 	ShowResults |
+	DeselectEntry |
 	Load |
 	Loaded |
 	UpdateResults;

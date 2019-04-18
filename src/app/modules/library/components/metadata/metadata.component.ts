@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, ElementRef,
 	KeyValueChanges, KeyValueDiffer, KeyValueDiffers,
-	OnInit, Renderer2, ViewChild, NgZone } from '@angular/core';
+	OnInit, Renderer2, ViewChild, NgZone, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbPopover, NgbPopoverConfig } from '@ng-bootstrap/ng-bootstrap';
 import { select, Store } from '@ngrx/store';
@@ -11,6 +11,8 @@ import { SearchService } from '../../../shared/services/search.service';
 import * as fromLibrary from '../../store';
 import { Entry } from '../../store/entry.model';
 import * as LibraryActions from '../../store/library.actions';
+import { NavigationService } from '../../../shared/services/navigation.service';
+import { EventEmitter } from 'electron';
 
 @Component({
 	selector: 'app-metadata',
@@ -22,11 +24,9 @@ export class MetadataComponent implements OnInit {
 	
 	selectedEntry: Entry;
 	selectedEntry$: Observable<any>;
-	selectedEntrySub: Subscription;
+	subs: Subscription;
 	metadataSearchResponse$: Observable<any>;
-	responseSubscription: Subscription;
 	metadataDetails$: Observable<any>;
-	metadataDetailsSubscription: Subscription;
 	keepers: Map<string, any>;
 	savedEntry: any;
 	page: number;
@@ -48,7 +48,8 @@ export class MetadataComponent implements OnInit {
 		private cdRef:ChangeDetectorRef,
 		private http: HttpClient,
 		private searchService: SearchService,
-		private differs: KeyValueDiffers
+		private differs: KeyValueDiffers,
+		private navigationService: NavigationService
 	) { }
 
 	ngOnInit() {
@@ -58,14 +59,14 @@ export class MetadataComponent implements OnInit {
 		this.keepersDiffer = this.differs.find(this.keepers).create();
 		this.savedEntry = {};
 		this.selectedEntry$ = this.store.pipe(select(fromLibrary.getSelectedEntry));
-		this.selectedEntrySub = this.selectedEntry$.subscribe(selectedEntry => this.selectedEntry = selectedEntry);
+		this.subs = this.selectedEntry$.subscribe(selectedEntry => this.selectedEntry = selectedEntry);
 		this.metadataDetails$ = this.store.pipe(select(fromLibrary.getMetadataDetailsResults));
-		this.metadataDetailsSubscription = this.metadataDetails$.subscribe((details:Map<any, any>) => {
+		this.subs.add(this.metadataDetails$.subscribe((details:Map<any, any>) => {
 			this.details = details;
 			this.cdRef.detectChanges();
-		});
+		}));
 		this.metadataSearchResponse$ = this.store.pipe(select(fromLibrary.getMetadataSearchResults));
-		this.responseSubscription = this.metadataSearchResponse$.subscribe(response => {
+		this.subs.add(this.metadataSearchResponse$.subscribe(response => {
 			this.cdRef.detectChanges();
 			if (this.entryPopup != null) {
 				//this.entryPopup.open();
@@ -76,13 +77,13 @@ export class MetadataComponent implements OnInit {
 			if (this.savePopup != null) {
 				//this.savePopup.open();
 			}
-		});
+		}));
 	}
 
 	ngOnDestroy() {
-		this.responseSubscription.unsubscribe();
-		this.metadataDetailsSubscription.unsubscribe();
-		this.selectedEntrySub.unsubscribe();
+		if (this.subs) {
+			this.subs.unsubscribe();
+		}
 		this.cdRef.detach();
 	}
 
@@ -149,9 +150,8 @@ export class MetadataComponent implements OnInit {
 	}
 
 	cancel() {
-		this.zone.run(() => this.router.navigate(['/library/view']));
+		this.navigationService.closeMetadata();
 	}
-
 
 	finish(entryId: string) {
 		if(this.savedEntry != null) {
@@ -161,7 +161,7 @@ export class MetadataComponent implements OnInit {
 
 				reader.addEventListener("load", (function () {
 					this.selectedEntry.poster_path = reader.result;
-					this.selectedEntry.title = this.savedEntry.title;
+					this.selectedEntry.title = this.savedEntry.title || this.savedEntry.name;
 					this.selectedEntry.overview = this.savedEntry.overview;
 					this.store.dispatch(new LibraryActions.UpdateEntry({
 						entry: {
@@ -169,6 +169,7 @@ export class MetadataComponent implements OnInit {
 							changes: this.selectedEntry
 						}
 					}));
+					this.navigationService.closeMetadata(true);
 				}).bind(this), false);
 
 				if (value) {
@@ -207,6 +208,8 @@ export class MetadataComponent implements OnInit {
 					changes: this.selectedEntry
 				}
 			}));
+			
+			this.navigationService.closeMetadata();
 		}
 	}
 

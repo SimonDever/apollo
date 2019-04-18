@@ -14,8 +14,12 @@ export class GetValuesPipe implements PipeTransform {
 	transform(map: Map<any, any>): any[] {
 		const ret = [];
 
+		// ret = map.map(this.cleanAndConvert)
+
 		if(map.entries) {
-			Array.from(map.entries()).forEach(entry => this.cleanAndConvert(entry, ret));
+			Array.from(map.entries()).forEach(
+				entry => this.cleanAndConvert(entry, ret)
+			);
 		} else {
 			for (let entry of Array.from(Object.entries(map))) {
 				this.cleanAndConvert(entry, ret)

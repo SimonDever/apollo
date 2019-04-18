@@ -3,8 +3,18 @@
 		<button octicon="plus" class="icon-button add-button" (click)="addEntry()"></button>
 	</div>
 	<div class="entry-list">
-		<div *ngFor="let entry of entries$ | async as entries" class="entry-box" (click)="entryClicked(entry)">
-			<img class="entry-poster" src="{{entry.poster_path}}" />
+		<div *ngFor="let entry of entries$ | async as entries" class="entry-box" (click)="toggleActions(entry)"
+			[ngStyle]="{'background-color': entry.id !== selectedEntry?.id ? 'transparent' : '#333' }">
+			<img class="poster-preview entry-poster" src="{{entry.poster_path}}"
+				[ngStyle]="{'opacity': entry.id !== selectedEntry?.id ? 1 : 0.2 }" />
+			<div class="entry-actions" [hidden]="entry.id !== selectedEntry?.id">
+				<div class="entry-title">{{entry.title}}</div>
+				<div class="entry-blurb">{{entry.overview}}</div>
+				<div class="icon-button-box-horizontal">
+					<button octicon="trashcan" class="icon-button trash-button" (click)="trash(entry.id)"></button>
+					<button octicon="pencil" class="icon-button edit-button" (click)="edit(entry.id)"></button>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

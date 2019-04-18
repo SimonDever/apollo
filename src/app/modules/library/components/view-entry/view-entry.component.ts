@@ -1,5 +1,5 @@
-import { Component, OnInit, NgZone, ViewChildren, QueryList, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, NgZone, ViewChildren, QueryList, ViewChild, AfterViewInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Router, RouterStateSnapshot } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import "rxjs/add/operator/publishReplay";
 import { Observable } from 'rxjs/Observable';
@@ -13,26 +13,31 @@ import * as _ from 'lodash';
 require('jqueryui');
 
 import "../../../../../assets/scripts/gridstack.all";
+import { Subscription } from 'rxjs/Subscription';
 
 // todo: guard to ensure selected entry or route to /library
 
 @Component({
 	selector: 'app-view-entry',
 	templateUrl: './view-entry.component.html',
-	styleUrls: ['./view-entry.component.css']
+	styleUrls: ['../add-entry/add-entry.component.css']
 })
-export class ViewEntryComponent implements OnInit, AfterViewInit {
+export class ViewEntryComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	entry$: Observable<Entry>;
 	entry: Entry;
 	serializedData: any;
 	grid: any;
+	subs: Subscription;
+	routerState: RouterStateSnapshot;
 	
 	constructor(private store: Store<fromLibrary.LibraryState>,
 		private router: Router,
 		private zone: NgZone,
 		private cdRef: ChangeDetectorRef,
-		private navigationService: NavigationService) { }
+		private navigationService: NavigationService) {
+			this.routerState = router.routerState.snapshot;
+		}
 
 	ngAfterViewInit() {
 		jQuery('.grid-stack').gridstack({
@@ -94,10 +99,17 @@ export class ViewEntryComponent implements OnInit, AfterViewInit {
 	ngOnInit() {
 		console.debug('ViewEntryComponent Init');
 		this.entry$ = this.store.pipe(select(fromLibrary.getSelectedEntry));
-		this.entry$.subscribe(entry => this.entry = entry);
+		this.subs = this.entry$.subscribe(entry => this.entry = entry);
+	}
+
+	ngOnDestroy() {
+		if(this.subs){
+			this.subs.unsubscribe();
+		}
 	}
 
 	edit() {
+		this.navigationService.setEditEntryParent(this.routerState.url)
 		this.zone.run(() => this.router.navigate(['/library/edit']));
 	}
 
@@ -112,6 +124,7 @@ export class ViewEntryComponent implements OnInit, AfterViewInit {
 
 	searchMetadataProvider(title) {
 		console.debug('searchMetadataProvider() entry');
+		this.navigationService.setMetadataParent(this.routerState.url);
 		console.debug(`searchMetadataProvider() searching metadata providers with terms ${title}`);
 		this.store.dispatch(new LibraryAction.SearchForMetadata({keywords: title}));
 	}

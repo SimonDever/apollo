@@ -14,15 +14,33 @@
 					<img *ngIf="poster_path" [src]="poster_path" />
 				</div>
 
-				<input (change)="fileChange($event)" type="file" #file />
-				<button (click)="file.click()">Select Video File</button>
+				<input (change)="fileChange($event)" type="file" #fileInput />
 
-				<input class="entry-box-title" formControlName="title" />
-
-				<input class="entry-box-overview" formControlName="overview" />
-
-				<input class="entry-box-cast" formControlName="cast" />
+				<div class="right">
+					<div class="input static" >
+						<div class="input-text">Video file</div>
+						<div *ngIf="file" class="file-info" [attr.data-file]="file">
+							<div class="file-path">{{file}}</div>
+						</div>
+						<button class="btn btn-outline-light"
+							(click)="fileInput.click()">Browse</button>
+					</div>
+					<span class="input static">
+						<div class="input-text">Title</div>
+						<input formControlName="title" #titleInput />
+					</span>
+					<span class="input dynamic">
+						<div class="input-text">Cast</div>
+						<textarea formControlName="cast"></textarea>
+					</span>
+					<span class="input dynamic">
+						<div class="input-text">Overview</div>
+						<textarea formControlName="overview"></textarea>
+					</span>
+				</div>
 			</div>
 		</form>
 	</div>
 </div>
+
+<router-outlet></router-outlet>

@@ -28,7 +28,12 @@ const routes: Routes = [{
 	}, {
 		path: 'edit',
 		data: { title: 'Edit Entry' },
-		component: EditEntryComponent
+		component: EditEntryComponent,
+		children: [{
+			path: 'metadata',
+			data: { title: 'Metadata Search Results' },
+			component: MetadataComponent
+		}]
 	}, {
 		path: 'search',
 		data: { title: 'Search Results' },
@@ -36,7 +41,12 @@ const routes: Routes = [{
 	}, {
 		path: 'add',
 		data: { title: 'Add Entry' },
-		component: AddEntryComponent
+		component: AddEntryComponent,
+		children: [{
+			path: 'metadata',
+			data: { title: 'Metadata Search Results' },
+			component: MetadataComponent
+		}]
 	}]
 }];
 

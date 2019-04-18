@@ -67,6 +67,18 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 			});
 		}
 
+		case LibraryActions.SELECT_AND_VIEW_ENTRY: {
+			return Object.assign({}, state, {
+				selectedEntry: action.payload.entry
+			});
+		}
+
+		case LibraryActions.DESELECT_ENTRY: {
+			return Object.assign({}, state, {
+				selectedEntry: null
+			});
+		}
+
 		case LibraryActions.ADD_ENTRY: {
 			return Object.assign({}, state, {
 				selectedEntry: action.payload.entry

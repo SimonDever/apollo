@@ -32,7 +32,7 @@ export class LibraryEffects {
 		.map(action => (action as LibraryActions.UpdateEntry).payload.entry.changes)
 		.mergeMap(changes =>
 			this.storageService.updateEntry(changes)
-				.do(() => this.zone.run(() => this.router.navigate(['/library/view'])))
+				//.do(() => this.zone.run(() => this.router.navigate(['/library/view'])))
 				.map(entry => new LibraryActions.UpdateResults(entry)));
 
 	@Effect({ dispatch: false })
@@ -83,9 +83,19 @@ export class LibraryEffects {
 		.do(payload => this.searchService.details(payload.id, payload.media_type));
 
 	@Effect({ dispatch: false })
-	selectEntry = this.actions$.ofType(LibraryActions.SELECT_ENTRY)
-		.map(action => (action as LibraryActions.SelectEntry))
+	selectAndViewEntry$ = this.actions$.ofType(LibraryActions.SELECT_AND_VIEW_ENTRY)
+		.map(action => (action as LibraryActions.SelectAndViewEntry))
 		.do(() => this.zone.run(() => this.router.navigate(['/library/view'])));
+
+	@Effect({ dispatch: false })
+	selectEntry$ = this.actions$.ofType(LibraryActions.SELECT_ENTRY)
+		.map(action => (action as LibraryActions.SelectEntry).payload)
+		.do(payload => {});
+
+	@Effect({ dispatch: false })
+	deselectEntry$ = this.actions$.ofType(LibraryActions.DESELECT_ENTRY)
+		.map(action => (action as LibraryActions.DeselectEntry).payload)
+		.do(payload => {});
 
 	@Effect({ dispatch: false })
 	showResults$ = this.actions$.ofType(LibraryActions.SHOW_RESULTS)
@@ -96,7 +106,8 @@ export class LibraryEffects {
 	showMetadataResults$ = this.actions$.ofType(LibraryActions.SHOW_METADATA_RESULTS)
 		.map(action => (action as LibraryActions.ShowMetadataResults).payload.results)
 		.do(results => {
-			this.zone.run(() => this.router.navigate(['/library/view/metadata']));
+			console.log(`${this.navigationService.metadataParent}/metadata`);
+			this.zone.run(() => this.router.navigate([`${this.navigationService.metadataParent}/metadata`]));
 		});
 
 	@Effect({ dispatch: false })
