@@ -1,20 +1,27 @@
 /* eslint-disable quotes */
 /* eslint-disable no-unused-vars */
 const electron = require('electron');
-const { default: installExtension, REDUX_DEVTOOLS } = require('electron-devtools-installer');
 const path = require('path');
 const fs = require('fs');
+
+const {
+	default: installExtension,
+	REDUX_DEVTOOLS
+} = require('electron-devtools-installer');
+
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 let mainWindow = null;
 
-app.on('window-all-closed', function() {
-    app.quit();
+app.on('window-all-closed', () => {
+	app.quit();
 });
 
-app.on('ready', function() {
+app.on('ready', () => {
 
-	mainWindow = new BrowserWindow({ show: false });
+	mainWindow = new BrowserWindow({
+		show: false
+	});
 
 	installExtension(REDUX_DEVTOOLS)
 		.then((name) => console.log(`Added Extension:  ${name}`))
@@ -29,8 +36,8 @@ app.on('ready', function() {
 
 	mainWindow.maximize();
 
-	fs.exists("C:\\Users\\Ambrosia\\code\\Apollo\\library-database.json", function (exists) {
-		if(exists) {
+	fs.exists("./library-database.json", (exists) => {
+		if (exists) {
 			console.log('Save file exists.');
 		} else {
 			console.log('Save file does not exist, creating.');
@@ -44,7 +51,7 @@ app.on('ready', function() {
 		mainWindow.focus();
 	});
 
-  mainWindow.on('closed', function() {
-    mainWindow = null;
+	mainWindow.on('closed', () => {
+		mainWindow = null;
 	});
 });

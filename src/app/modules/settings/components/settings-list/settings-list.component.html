@@ -1,8 +1,4 @@
-<button (click)="export($event)">Export</button>
-
-<input (change)="import($event)" type="file" #importFileInput />
-<div class="input-text">Import file</div>
-<div *ngIf="file" class="file-info" [attr.data-file]="file">
-	<div class="file-path">{{file}}</div>
+<div class="settings-list">
+	<label>Import old save</label>
+	<input type="file" (change)="onChange($event);" />
 </div>
-<button class="btn btn-outline-light" (click)="importFileInput.click()">Import</button>

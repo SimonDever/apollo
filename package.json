@@ -31,7 +31,9 @@
 		"start": "webpack-dev-server --port=4200",
 		"electron": "pwd && electron .",
 		"debug": "pwd && electron . --inspect --debug",
-		"pree2e": "webdriver-manager update --standalone false --gecko false --quiet"
+		"pree2e": "webdriver-manager update --standalone false --gecko false --quiet",
+		"pack": "electron-builder --dir",
+		"dist": "electron-builder"
 	},
 	"dependencies": {
 		"@angular/animations": "^5.2.9",
@@ -64,9 +66,11 @@
 		"ngx-electron": "^2.0.0",
 		"ngx-grid-stack": "^0.4.1",
 		"octicons": "^7.2.0",
+		"popper.js": "^1.15.0",
 		"rxjs": "^5.5.7",
 		"themoviedb-javascript-library": "^3.0.3",
-		"zone.js": "^0.8.14"
+		"zone.js": "^0.8.14",
+		"electron-devtools-installer": "^2.2.4"
 	},
 	"devDependencies": {
 		"@angular-devkit/core": "0.3.2",
@@ -84,8 +88,7 @@
 		"codelyzer": "^4.2.1",
 		"copy-webpack-plugin": "~4.4.1",
 		"electron": "^1.8.4",
-		"electron-builder": "^19.24.1",
-		"electron-devtools-installer": "^2.2.4",
+		"electron-builder": "^20.39.0",
 		"expose-loader": "^0.7.5",
 		"file-loader": "^1.1.5",
 		"get-stdin": "^5.0.1",

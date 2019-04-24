@@ -89,6 +89,15 @@ body {
 	color: var(--input-foreground);
 }
 
+.settings-list {
+	color: var(--foreground);
+}
+
+.settings-list input {
+	background-color: var(--input-background);
+	color: var(--input-foreground);
+}
+
 .clear-icon:after {
 	color: var(--input-placeholders);
 }

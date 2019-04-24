@@ -17,6 +17,7 @@ import { NgxElectronModule } from 'ngx-electron';
 import { GetValuesPipe } from './pipes/get-values.pipe';
 import { FilterHiddenPipe } from './pipes/filter-hidden.pipe';
 
+
 @NgModule({
 	declarations: [
 		MenuComponent,
