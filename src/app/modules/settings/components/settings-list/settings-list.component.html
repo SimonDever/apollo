@@ -1,4 +1,5 @@
 <div class="settings-list">
 	<label>Import old save</label>
-	<input type="file" (change)="onChange($event);" />
+	<input type="file" #fileInput (change)="onChange($event);" />
+	<button class="btn btn-outline-light" (click)="fileInput.click()">Browse</button>
 </div>

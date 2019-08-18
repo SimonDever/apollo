@@ -9,21 +9,20 @@
 			<div class="edit-box" data-id="{{entryId.value}}">
 
 				<input (change)="posterChange($event)" type="file" #posterInput />
-				<div class="poster-preview" (click)="posterInput.click()" >
+				<div class="poster-preview" (click)="posterInput.click()">
 					<div *ngIf="!poster_path" class="poster-placeholder">Select Poster</div>
 					<img *ngIf="poster_path" [src]="poster_path" />
 				</div>
 
-				<input (change)="fileChange($event)" type="file" #fileInput />
+				<input multiple (change)="fileChange($event)" type="file" #fileInput />
 
 				<div class="right">
-					<div class="input static" >
+					<div class="input static">
 						<div class="input-text">Video file</div>
 						<div *ngIf="file" class="file-info" [attr.data-file]="file">
 							<div class="file-path">{{file}}</div>
 						</div>
-						<button class="btn btn-outline-light"
-							(click)="fileInput.click()">Browse</button>
+						<button class="btn btn-outline-light" (click)="fileInput.click()">Browse</button>
 					</div>
 					<span class="input static">
 						<div class="input-text">Title</div>

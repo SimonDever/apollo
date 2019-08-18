@@ -6,6 +6,7 @@ import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
 import { Entry } from '../../store/entry.model';
 import * as LibraryActions from '../../store/library.actions';
+const uuid = require('uuid/v4');
 
 
 @Component({
@@ -16,6 +17,7 @@ import * as LibraryActions from '../../store/library.actions';
 export class AddEntryComponent implements OnInit {
 
 	entryForm: FormGroup;
+	files: File[];
 	file: string;
 	poster_path: string;
 	routerState: RouterStateSnapshot;
@@ -29,12 +31,12 @@ export class AddEntryComponent implements OnInit {
 		private route: ActivatedRoute,
 		private el: ElementRef,
 		private renderer: Renderer2) {
-			this.routerState = router.routerState.snapshot;
-		}
+		this.routerState = router.routerState.snapshot;
+	}
 
 	ngOnInit() {
 		this.entryForm = this.formBuilder.group({
-			id: [Date.now()],
+			id: [uuid()],
 			title: ['', Validators.required],
 			file: File,
 			posterInput: File,
@@ -45,43 +47,57 @@ export class AddEntryComponent implements OnInit {
 
 	posterChange(event) {
 		const reader = new FileReader();
-		const file = event.target.files[0];
+		const poster = event.target.files[0];
 		reader.addEventListener("load", (function () {
 			this.poster_path = reader.result;
 		}).bind(this), false);
-		if (file) {
-			reader.readAsDataURL(file);
+		if (poster) {
+			reader.readAsDataURL(poster);
 		}
 	}
 
 	fileChange(event) {
-		this.file = event.target.files[0].path || event.target.files[0].name;
-		if(this.entryForm.value.title === '') {
-			const forwardSlash = this.file.lastIndexOf('/');
-			const backwardSlash = this.file.lastIndexOf('\\');
-			let separator = forwardSlash;
-			if(forwardSlash === -1) {
-				separator = backwardSlash;
+		this.files = event.target.files;
+		if (this.files.length > 0) {
+			this.file = this.files[0].path;
+			if (this.entryForm.value.title === '') {
+				const label = this.files[0].path || this.files[0].name;
+				const forwardSlash = label.lastIndexOf('/');
+				const backwardSlash = label.lastIndexOf('\\');
+				let separator = forwardSlash;
+				if (forwardSlash === -1) {
+					separator = backwardSlash;
+				}
+				const title = label.substring(separator + 1, label.lastIndexOf('.'));
+				this.entryForm.get('title').setValue(title);
 			}
-			const title = this.file.substring(separator + 1, this.file.lastIndexOf('.'));
-			this.entryForm.get('title').setValue(title);
 		}
 	}
 
 	save() {
 		const form = this.entryForm.value;
 		const entry: Entry = {};
-		if(form.id) {
+		if (form.id) {
 			entry.id = form.id;
 		}
-		if(form.title) {
+		if (form.title) {
 			entry.title = form.title;
 		}
-		if(this.poster_path) entry.poster_path = this.poster_path;
-		if(this.file) entry.file = this.file;
-		if(form.overview) entry.overview = form.overview;
-		if(form.cast) entry.cast = form.cast;
-		this.store.dispatch(new LibraryActions.AddEntry({	entry: entry }));
+		if (this.poster_path) {
+			entry.poster_path = this.poster_path;
+		}
+		/*
+		if (this.files) {
+			this.files.forEach(file => {
+				if (file.path !== '') {
+					entry.files.push(file.path);
+				}
+			}, this);
+		}
+		*/
+		if (form.overview) entry.overview = form.overview;
+		if (form.cast) entry.cast = form.cast;
+		this.store.dispatch(new LibraryActions.AddEntry({ entry: entry }));
 	}
 
 	close() {

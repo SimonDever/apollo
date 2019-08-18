@@ -50,6 +50,12 @@ export class AddEntry implements Action {
 	constructor(public payload: { entry: Entry }) { }
 }
 
+export const IMPORT_ENTRY = '[Entry] Import Entry';
+export class ImportEntry implements Action {
+	readonly type = IMPORT_ENTRY;
+	constructor(public payload: { entry: Entry }) { }
+}
+
 export const REMOVE_ENTRY = '[Entry] Remove Entry';
 export class RemoveEntry implements Action {
 	readonly type = REMOVE_ENTRY;
@@ -104,6 +110,7 @@ export type All =
 	SearchForMetadataDetails |
 	ShowMetadataDetailsResults |
 	AddEntry |
+	ImportEntry |
 	ShowResults |
 	DeselectEntry |
 	Load |

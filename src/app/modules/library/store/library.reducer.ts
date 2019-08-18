@@ -19,6 +19,7 @@ export function reducer(state = initialState, action: LibraryActions.All): State
 			return adapter.updateOne(action.payload.entry, state);
 		}
 
+		case LibraryActions.IMPORT_ENTRY:
 		case LibraryActions.ADD_ENTRY: {
 			return adapter.addOne(action.payload.entry, state);
 		}

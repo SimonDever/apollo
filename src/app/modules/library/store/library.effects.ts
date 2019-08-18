@@ -55,12 +55,19 @@ export class LibraryEffects {
 			.do(() => this.zone.run(() => this.router.navigate(['/library/view'])))
 			.map(entry => new LibraryActions.UpdateResults(entry)));
 
+	@Effect()
+	importEntry$: Observable<Action> = this.actions$.ofType(LibraryActions.IMPORT_ENTRY)
+		.map(action => (action as LibraryActions.ImportEntry).payload.entry)
+		.mergeMap(entry => this.storageService.addEntry(entry)
+			.do(() => this.zone.run(() => this.router.navigate(['/library'])))
+			.map(entry => new LibraryActions.UpdateResults(entry)));
+
 	@Effect({ dispatch: false })
 	removeEntry$ = this.actions$.ofType(LibraryActions.REMOVE_ENTRY)
 		.map(action => (action as LibraryActions.RemoveEntry).payload.id)
 		.mergeMap(id => this.storageService.removeEntry(id)
 			.do((numRemoved) => {
-				if(numRemoved !== 1) {
+				if (numRemoved !== 1) {
 					console.error('Issue with removing entry with id: ' + id + '. numRemoved: ' + numRemoved);
 				}
 				this.zone.run(() => this.router.navigate(['/library']));
@@ -90,12 +97,12 @@ export class LibraryEffects {
 	@Effect({ dispatch: false })
 	selectEntry$ = this.actions$.ofType(LibraryActions.SELECT_ENTRY)
 		.map(action => (action as LibraryActions.SelectEntry).payload)
-		.do(payload => {});
+		.do(payload => { });
 
 	@Effect({ dispatch: false })
 	deselectEntry$ = this.actions$.ofType(LibraryActions.DESELECT_ENTRY)
 		.map(action => (action as LibraryActions.DeselectEntry).payload)
-		.do(payload => {});
+		.do(payload => { });
 
 	@Effect({ dispatch: false })
 	showResults$ = this.actions$.ofType(LibraryActions.SHOW_RESULTS)

@@ -55,6 +55,7 @@
 		"angular-in-memory-web-api": "~0.5.4",
 		"bootstrap": "^4.1.2",
 		"core-js": "^2.4.1",
+		"electron-devtools-installer": "^2.2.4",
 		"gridstack": "^0.4.0",
 		"jqueryui": "^1.11.1",
 		"lodash": "^4.17.11",
@@ -69,8 +70,8 @@
 		"popper.js": "^1.15.0",
 		"rxjs": "^5.5.7",
 		"themoviedb-javascript-library": "^3.0.3",
-		"zone.js": "^0.8.14",
-		"electron-devtools-installer": "^2.2.4"
+		"uuid": "^3.3.2",
+		"zone.js": "^0.8.14"
 	},
 	"devDependencies": {
 		"@angular-devkit/core": "0.3.2",
