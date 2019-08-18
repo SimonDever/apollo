@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
-import 'rxjs/add/observable/of';
+
 import theMovieDb from 'themoviedb-javascript-library';
 import * as fromLibrary from '../../library/store';
 import * as LibraryActions from '../../library/store/library.actions';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class SearchService {
@@ -18,8 +18,8 @@ export class SearchService {
 		@Inject('MOVIEDB_API_KEY') movieDbApiKey) {
 			this.movieDb = theMovieDb;
 			this.movieDb.common.api_key = movieDbApiKey;
-			this.movieDb.commonbase_uri = "https://api.themoviedb.org/3/";
-			this.movieDb.commonimages_uri = "https://image.tmdb.org/t/p/";
+			this.movieDb.commonbase_uri = 'https://api.themoviedb.org/3/';
+			this.movieDb.commonimages_uri = 'https://image.tmdb.org/t/p/';
 			this.movieDb.commontimeout = 10000;
 	}
 
@@ -28,12 +28,12 @@ export class SearchService {
 		let response = await fetch(url);
 		let data = await response.blob();
 		let blob;
-		return new File([data], "test.png", {	type: 'image/png'	});
+		return new File([data], 'test.png', {	type: 'image/png'	});
 	}
 
 	search(keywords: string, page: number = 1): any {
 		console.debug(`SearchService.search(${keywords},${page}) entry`);
-		this.movieDb.search.getMulti({"query": keywords, page: page},
+		this.movieDb.search.getMulti({'query': keywords, page: page},
 			(function(data) {
 				let response = {
 					page: 1,
@@ -66,13 +66,14 @@ export class SearchService {
 		);
 	}
 
+	// TODO: move these actions back to effects and just return observable from here
 	details(id: string, media_type: string): any {
 		console.debug(`SearchService.details(${id}) entry`);
 		let resource = this.movieDb.movies;
 		if(media_type === 'tv') {
 			resource = this.movieDb.tv;
 		}
-		resource.getById({"id": id},
+		resource.getById({'id': id},
 			(function(data) {
 				this.store.dispatch(new LibraryActions.ShowMetadataDetailsResults({ details: JSON.parse(data) }))
 			}.bind(this)),

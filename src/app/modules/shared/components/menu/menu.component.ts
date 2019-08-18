@@ -25,7 +25,7 @@ export class MenuComponent implements OnInit {
 		private router: Router,
 		private zone: NgZone,
 		private store: Store<fromLibrary.LibraryState>) {
-			this.appTitle = "Apollo";
+			this.appTitle = 'Apollo';
 			this.routerState = this.router.routerState.snapshot;
 			this.navbarCollapsed = true;
 			this.title = '';
@@ -57,16 +57,16 @@ export class MenuComponent implements OnInit {
 		this.zone.run(() => this.router.navigate(['/settings']));
 	}
 
-	
+
 	addEntry() {
 		this.navbarCollapsed = true;
 		let currentLocation = this.routerState.url;
 		this.navigationService.setAddEntryParent(currentLocation);
-		if(currentLocation === '/settings') {
+		if (currentLocation === '/settings') {
 			currentLocation = '/library';
 		}
 		this.navigationService.setViewEntryParent(currentLocation);
-		
+
 		this.zone.run(() => this.router.navigate(['/library/add']));
 	}
 }

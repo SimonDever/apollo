@@ -3,13 +3,11 @@ import { Injectable, NgZone, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppComponent } from '../../../app.component';
 import { EditEntryComponent } from '../../library/components/edit-entry/edit-entry.component';
-import { take } from 'rxjs/operator/take';
+
 import * as fromLibrary from '../../library/store';
 import { select, Store } from '@ngrx/store';
 import { FormBuilder } from '@angular/forms';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Subscription ,  Observable ,  of } from 'rxjs';
 import { EventEmitter } from 'electron';
 
 @Injectable()
@@ -49,7 +47,7 @@ export class NavigationService {
 	}
 
 	closeEditEntry() {
-		if(this.editEntryParent != null) {
+		if (this.editEntryParent != null) {
 			this.zone.run(() => this.router.navigate([this.editEntryParent]));
 		} else {
 			console.error('closeViewEntry() - editEntryParent is null. Rerouting to /library');
@@ -58,7 +56,7 @@ export class NavigationService {
 	}
 
 	closeMetadata() {
-		if(this.metadataParent != null) {
+		if (this.metadataParent != null) {
 			this.zone.run(() => this.router.navigate([this.metadataParent]));
 		} else {
 			console.error('closeViewEntry() - editEntryParent is null. Rerouting to /library');
@@ -67,7 +65,7 @@ export class NavigationService {
 	}
 
 	closeViewEntry() {
-		if(this.viewEntryParent != null) {
+		if (this.viewEntryParent != null) {
 			this.zone.run(() => this.router.navigate([this.viewEntryParent]));
 			// clear viewEntryParent?
 		} else {
@@ -77,7 +75,7 @@ export class NavigationService {
 	}
 
 	closeSearchResults() {
-		if(this.searchResultsParent != null) {
+		if (this.searchResultsParent != null) {
 			this.zone.run(() => this.router.navigate([this.searchResultsParent]));
 			// clear searchResultsParent?
 		} else {
@@ -87,7 +85,7 @@ export class NavigationService {
 	}
 
 	closeAddEntry() {
-		if(this.addEntryParent != null) {
+		if (this.addEntryParent != null) {
 			this.zone.run(() => this.router.navigate([this.addEntryParent]));
 			// clear addEntryParent?
 		} else {

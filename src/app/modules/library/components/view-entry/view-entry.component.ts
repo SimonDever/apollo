@@ -1,19 +1,12 @@
 import { Component, OnInit, NgZone, ViewChildren, QueryList, ViewChild, AfterViewInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { Router, RouterStateSnapshot } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import "rxjs/add/operator/publishReplay";
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  Subscription } from 'rxjs';
 import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
 import * as LibraryAction from '../../store/library.actions';
 import { Entry } from '../../store/entry.model';
 
-import * as jQuery from 'jquery';
-import * as _ from 'lodash';
-require('jqueryui');
-
-import "../../../../../assets/scripts/gridstack.all";
-import { Subscription } from 'rxjs/Subscription';
 
 // todo: guard to ensure selected entry or route to /library
 
@@ -30,7 +23,7 @@ export class ViewEntryComponent implements OnInit, AfterViewInit, OnDestroy {
 	grid: any;
 	subs: Subscription;
 	routerState: RouterStateSnapshot;
-	
+
 	constructor(private store: Store<fromLibrary.LibraryState>,
 		private router: Router,
 		private zone: NgZone,
@@ -40,60 +33,7 @@ export class ViewEntryComponent implements OnInit, AfterViewInit, OnDestroy {
 		}
 
 	ngAfterViewInit() {
-		jQuery('.grid-stack').gridstack({
-			cellHeight: 80,
-			verticalMargin: 0,
-			draggable: true,
-			resizable: {
-        handles: 'e, se, s, sw, w'
-    	}
-		});
-
-		/*
-		this.serializedData = [
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 5, y: 0, width: 7, height: 1},
-			{x: 0, y: 0, width: 5, height: 5}
-		];
-
-		const items = GridStackUI.Utils.sort(this.serializedData);
-
-		$('.grid-stack').data('gridstack').removeAll();
-
-		_.each(items, function (node) {
-			$('.grid-stack').data('gridstack').addWidget(
-				$('<div><div class="grid-stack-item-content" /><div/>'),
-				node.x, node.y, node.width, node.height
-			);
-		});
-		*/
-
-		$('.grid-stack-item').on('dragstop, resizestop', this.onGridChange);
-
 		this.zone.run(() => this.cdRef.detectChanges());
-	}
-
-	onGridChange(event, ui) {
-		this.serializedData = _.map($('.grid-stack > .grid-stack-item:visible'), function (el) {
-			el = jQuery(el);
-			return {
-				x: el.data('gs-x'),
-				y: el.data('gs-y'),
-				width: el.data('gs-width'),
-				height: el.data('gs-height')
-			};
-		}, this);
-
-		console.log(JSON.stringify(this.serializedData));
-		
-		// todo: save dimensions and position against Entry
 	}
 
 	ngOnInit() {
@@ -103,7 +43,7 @@ export class ViewEntryComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
-		if(this.subs){
+		if (this.subs) {
 			this.subs.unsubscribe();
 		}
 	}

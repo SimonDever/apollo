@@ -5,12 +5,12 @@ import * as fromSearch from './search.reducer';
 
 export interface State extends fromRoot.State {
 	library: LibraryState;
-};
+}
 
 export interface LibraryState {
 	collection: fromLibrary.State;
 	search: fromSearch.State;
-};
+}
 
 export const reducers = {
 	collection: fromLibrary.reducer,
@@ -25,6 +25,17 @@ export const getCollectionState = createSelector(
 
 export const selectSearchState = createSelector(
 	selectLibraryState, (library: LibraryState) => library.search
+);
+
+export const getSelectedEntryId = createSelector(
+	selectSearchState,
+	state => state.selectedEntryId
+);
+
+export const getSelectedEntry = createSelector(
+	getSelectedEntryId,
+	selectLibraryState,
+	(id, state) => state.collection.entities[id]
 );
 
 export const getNeedEntries = createSelector(
@@ -50,11 +61,6 @@ export const getMetadataSearchResults = createSelector(
 export const getMetadataDetailsResults = createSelector(
 	selectSearchState,
 	state => state.metadataDetailsResults
-);
-
-export const getSelectedEntry = createSelector(
-	selectSearchState,
-	state => state.selectedEntry
 );
 
 export const {

@@ -6,7 +6,7 @@
 	<div class="search-view-title">Search Results</div>
 	<div class="entry-list">
 		<div *ngFor="let entry of entries$ | async as entries" class="entry-box"
-			(click)="entryClicked(entry)">
+			(click)="entryClicked(entry.id)">
 			<img class="entry-poster" src="{{entry.poster_path}}" />
 		</div>
 	</div>

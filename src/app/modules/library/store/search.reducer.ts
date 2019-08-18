@@ -1,9 +1,9 @@
-import * as LibraryActions from "./library.actions";
-import { Entry } from "./entry.model";
+import * as LibraryActions from './library.actions';
+import { Entry } from './entry.model';
 
 export interface State {
 	needEntries: boolean;
-	selectedEntry: Entry;
+	selectedEntryId: any;
 	searchResults: Entry[];
 	searchTerms: string;
 	metadataSearchResults: any;
@@ -12,7 +12,7 @@ export interface State {
 
 export const initialState: State = {
 	needEntries: true,
-	selectedEntry: null,
+	selectedEntryId: null,
 	searchResults: [],
 	searchTerms: '',
 	metadataSearchResults: null,
@@ -34,8 +34,6 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 		}
 
 		case LibraryActions.SHOW_METADATA_DETAILS_RESULTS: {
-			console.log('reducer:');
-			console.log(action.payload.details);
 			const newResults = new Map(state.metadataDetailsResults);
 			newResults.set(action.payload.details.id, action.payload.details);
 			return Object.assign({}, state, {
@@ -55,46 +53,34 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 			});
 		}
 
-		case LibraryActions.UPDATE_ENTRY: {
-			return Object.assign({}, state, {
-				selectedEntry: action.payload.entry.changes
-			});
-		}
-
 		case LibraryActions.SELECT_ENTRY: {
 			return Object.assign({}, state, {
-				selectedEntry: action.payload.entry
-			});
-		}
-
-		case LibraryActions.SELECT_AND_VIEW_ENTRY: {
-			return Object.assign({}, state, {
-				selectedEntry: action.payload.entry
+				selectedEntryId: action.payload.id
 			});
 		}
 
 		case LibraryActions.DESELECT_ENTRY: {
 			return Object.assign({}, state, {
-				selectedEntry: null
+				selectedEntryId: null
 			});
 		}
 
 		case LibraryActions.ADD_ENTRY: {
 			return Object.assign({}, state, {
-				selectedEntry: action.payload.entry
+				selectedEntryId: action.payload.entry.id
 			});
 		}
 
 		case LibraryActions.REMOVE_ENTRY: {
 			let searchResults = state.searchResults;
 			if (state.searchResults != null) {
-				let searchResultsIndex = state.searchResults.findIndex(entry => entry.id == action.payload.id);
+				const searchResultsIndex = state.searchResults.findIndex(entry => entry.id === action.payload.id);
 				searchResults = [...state.searchResults];
 				searchResults.splice(searchResultsIndex, 1);
 			}
 
 			return Object.assign({}, state, {
-				selectedEntry: null,
+				selectedEntryId: null,
 				searchResults: searchResults
 			});
 		}
@@ -102,7 +88,7 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 		case LibraryActions.UPDATE_RESULTS: {
 			let searchResults = state.searchResults;
 			if (state.searchResults != null) {
-				let searchResultsIndex = state.searchResults.findIndex(entry => entry.id == action.entry.id);
+				const searchResultsIndex = state.searchResults.findIndex(entry => entry.id === action.entry.id);
 				searchResults = [...state.searchResults];
 				searchResults.splice(searchResultsIndex, 1, action.entry);
 			}
