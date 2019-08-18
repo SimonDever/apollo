@@ -35,7 +35,6 @@ pre {
 	height: 38px !important;
 }
 
-
 .search-view-title {
 	display: block;
 	font-size: 25px;
@@ -102,9 +101,12 @@ pre {
 }
 
 .icon-button svg {
+	height: 100%;
 	width: 100%;
-	/* height: 38px; */
-	height: inherit;
+}
+
+.icon-button[octicon='trashcan'] svg {
+	margin-left: -2px;
 }
 
 .clear-icon {
@@ -133,20 +135,19 @@ pre {
 input[type=search]:not(:valid) ~ .clear-icon {
 	display: none;
 }
-
+/*
 .list-view,
-.edit-view,
 .metadata-search-results-view,
 .search-view {
 	height: 100%;
 	position: relative;
-}
-
+} */
+/*
 .metadata-search-results-view {
 	overflow: visible;
 	padding-bottom: 85px;
 	height: unset;
-}
+} */
 
 .entry-view {
 	position: relative;
@@ -178,12 +179,6 @@ input[type=search]:not(:valid) ~ .clear-icon {
 }
 
 
-.edit-box-container {
-	padding-top: 15px;
-	padding-bottom: 15px;
-	padding-right: 70px;
-	padding-left: 15px;
-}
 
 .navbar-brand {
 	padding: 0;
@@ -242,10 +237,6 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	height: var(--grid-item-height);
 }
 
-.edit-box {
-	width: 100%;
-	border: none;
-}
 .entry-box {
 	position: relative;
 	height: var(--grid-item-height);
@@ -254,58 +245,16 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	border-style: solid;
 }
 
-.entry-box-file {
-	text-align: left;
-}
-
-.metadata-box {
-	width: 100%;
-	border: none;
-	display: flex;
-	flex-direction: row;
-}
-
-.metadata-details {
-	display: flex;
-	position: relative;
-	flex-direction: column;
-	min-width: calc(100% - var(--grid-item-width));
-}
-
-.metadata-details .entry-box-generic,
-.metadata-details .entry-box-overview,
-.metadata-details .entry-box-title {
+.right-fields {
+	display: inline-block;
+	width: calc(100% - var(--grid-item-width));
 	padding-left: 15px;
 }
-.metadata-details .entry-box-score {
-	margin-top: 15px;
-	padding-left: 63px;
-}
-.metadata-details .entry-box-media-type {
+
+.entry-box-media-type {
 	position: absolute;
 	right: 0;
 }
-
-.entry-box-genre-text:not(:last-child)::after {
-	content: ', ';
-}
-
-
-.metadata-results-count {
-	text-align: center;
-}
-
-.edit-view label {
-	width: 50px;
-}
-
-.right {
-	display: inline-block;
-	height: 100%;
-	width: calc(100% - var(--grid-item-width) - 20px);
-	margin-left: 15px;
-}
-
 
 .edit-view .input {
 	display: inline-block;
@@ -319,17 +268,18 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	border: none;
 	width: 79%;
 	text-align: center;
-	height: 38px;
+	height: 50px;
 }
 
-.input textarea {
+textarea {
 	border: none;
 	background: transparent;
 	color: #fff;
 	box-sizing: border-box;
-	width: 79% !important;
+	width: 100%;
 	resize: vertical;
-	min-height: 150px;
+	min-height: 50px;
+	overflow-y: auto;
 }
 
 .input .input-text {
@@ -338,8 +288,8 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	display: inline-block;
 	border-right: 1px solid grey;
 	vertical-align: middle;
-	height: 38px;
-	line-height: 38px;
+	height: 50px;
+	line-height: 50px;
 }
 
 .input.dynamic .input-text {
@@ -360,7 +310,7 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	height: 28px;
 }
 
-.metadata-details .icon-button {
+.metadata-search-result .icon-button {
 	display: inline-block;
 	width: 28px;
 	height: 28px;
@@ -404,10 +354,99 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	width: 150px;
 }
 
-.metadata-entry:last-child {
-	padding-bottom: 70px;
+.metadata-search-result:last-child {
+	padding-bottom: 70px; /* todo: what? */
 }
 
 #poster-button ~ .popover {
 	z-index: 0;
+}
+
+.modal-title {
+	color: #fff;
+}
+.modal-content {
+	background: #4a4a4a;
+}
+
+.modal-footer .btn {
+	margin: 0 auto !important;
+}
+
+.modal-header button.close {
+	color: #bbb;
+}
+
+.modal-header button.close:hover {
+	color: #fff;
+}
+
+.metadata-container {
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-right: 70px;
+	padding-left: 15px;
+}
+
+.field-grid {
+	display: grid;
+	border-bottom: 1px solid #555;
+	grid-column-gap: 11px;
+}
+
+.field-grid.three-column {
+	grid-template-columns: 50px 14% auto;
+}
+
+.field-grid.three-column-reverse {
+	grid-template-columns: 14% auto 226px;
+}
+
+.field-grid.two-column {
+	grid-template-columns: 14% auto;
+}
+
+.field-grid:first-of-type {
+	margin-top: -13px;
+}
+
+.field-grid button {
+	height: 38px;
+	margin: 13px !important;
+}
+
+.field-grid.three-column-reverse button {
+	width: 200px;
+}
+
+.metadata-field-key {
+	vertical-align: middle;
+	min-height: 38px;
+	padding-top: 13px;
+}
+
+.metadata-field-value {
+	padding: 13px 0 13px 13px;
+}
+
+.field-grid.three-column-reverse .metadata-field-value {
+	height: 38px;
+}
+
+.metadata-field-value div[contenteditable],
+.metadata-field-value input {
+	width: 100%;
+	background-color: transparent;
+	border: none;
+	color: #fff;
+	resize: vertical;
+	min-height: 38px;
+	overflow-y: auto;
+}
+
+.metadata-field-value .new-form-field input {
+	height: 38px;
+	background-color: transparent;
+	border: none;
+	color: #fff;
 }

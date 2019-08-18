@@ -1,9 +1,10 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "importHelpers": true,
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
-		"declaration": false,
+    "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -12,9 +13,11 @@
       "node_modules/@types"
     ],
     "lib": [
-			"es2015",
+      "es2015",
       "es2017",
       "dom"
-    ]
+    ],
+    "module": "es2015",
+    "baseUrl": "./"
   }
 }
