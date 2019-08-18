@@ -11,19 +11,16 @@ import { NavigationService } from './services/navigation.service';
 import { SearchService } from './services/search.service';
 import { StorageService } from './services/storage.service';
 import { NgbCollapseModule } from './modules/ngb-collapse/ngb-collapse.module';
-import { GridStackModule } from 'ngx-grid-stack';
 import { WindowRefService } from './services/window-ref.service';
 import { NgxElectronModule } from 'ngx-electron';
-import { GetValuesPipe } from './pipes/get-values.pipe';
-import { FilterHiddenPipe } from './pipes/filter-hidden.pipe';
-
+import { DivValueAccessorDirective } from './directives/div-value-accessor.directive';
 
 @NgModule({
 	declarations: [
 		MenuComponent,
 		PageNotFoundComponent,
-		OcticonDirective,
-		GetValuesPipe,
+		DivValueAccessorDirective,
+		OcticonDirective
 	],
 	imports: [
 		/* Third party */
@@ -31,23 +28,21 @@ import { FilterHiddenPipe } from './pipes/filter-hidden.pipe';
 		RouterModule,
 		FormsModule,
 		ReactiveFormsModule,
-		NgbModule.forRoot(),
-		GridStackModule,
+		NgbModule,
 		NgxElectronModule,
 		/* Custom */
-		NgbCollapseModule.forRoot()
+		NgbCollapseModule
 	],
 	exports: [
 		/* Third party */
 		FormsModule,
 		ReactiveFormsModule,
 		NgbModule,
-		GridStackModule,
 		NgxElectronModule,
 		/* Custom */
 		NgbCollapseModule,
+		DivValueAccessorDirective,
 		OcticonDirective,
-		GetValuesPipe,
 		MenuComponent,
 		PageNotFoundComponent,
 	]
@@ -62,6 +57,6 @@ export class SharedModule {
 				StorageService,
 				WindowRefService
 			]
-		}
+		};
 	}
 }

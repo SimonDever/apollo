@@ -4,7 +4,7 @@
 	<div *ngFor="let entry of response.results; index as index" class="metadata-search-result">
 		<div *ngIf="index != 0; else entryPopupTemplate" class="icon-button-box">
 			<button title="Keep" octicon="check" class="icon-button save-button" [class.selected]="isEntrySelected(entry)"
-				(click)="save($event, entry)">Save</button>
+				(click)="keepEntry(entry)">Save</button>
 		</div>
 		<ng-template #entryPopupTemplate>
 			<div class="icon-button-box" #entryPopover="ngbPopover" placement="left" triggers="manual"

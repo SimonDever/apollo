@@ -135,6 +135,12 @@ pre {
 input[type=search]:not(:valid) ~ .clear-icon {
 	display: none;
 }
+
+.metadata-search-result {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
 /*
 .list-view,
 .metadata-search-results-view,

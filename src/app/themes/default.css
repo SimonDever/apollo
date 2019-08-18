@@ -51,13 +51,13 @@ body {
 
 
 .metadata-entry {
-	border-top: 2px solid var(--border); 
-	border-bottom: 2px solid var(--border); 
+	border-top: 2px solid var(--border);
+	border-bottom: 2px solid var(--border);
 }
 
 .edit-view .poster-preview,
 .edit-view .input {
-	background: var(--input-background);
+	/* background: var(--input-background); */
 	border-color: var(--border);
 	color: var(--input-foreground)
 }

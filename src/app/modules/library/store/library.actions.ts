@@ -23,7 +23,7 @@ export class SearchForMetadata implements Action {
 export const SEARCH_FOR_METADATA_DETAILS = '[Entry] Search For Metadata Details';
 export class SearchForMetadataDetails implements Action {
 	readonly type = SEARCH_FOR_METADATA_DETAILS;
-	constructor(public payload: { id: string, media_type: string }) { }
+	constructor(public payload: { id: any, media_type: string }) { } // id string or numberm, confirm
 }
 
 export const SHOW_METADATA_DETAILS_RESULTS = '[Entry] Show Metadata Details Rsults';
@@ -50,28 +50,22 @@ export class AddEntry implements Action {
 	constructor(public payload: { entry: Entry }) { }
 }
 
-export const IMPORT_ENTRY = '[Entry] Import Entry';
-export class ImportEntry implements Action {
-	readonly type = IMPORT_ENTRY;
-	constructor(public payload: { entry: Entry }) { }
-}
-
 export const REMOVE_ENTRY = '[Entry] Remove Entry';
 export class RemoveEntry implements Action {
 	readonly type = REMOVE_ENTRY;
-	constructor(public payload: { id: string }) { }
+	constructor(public payload: { id: any }) { }
+}
+
+export const IMPORT_ENTRY = '[Entry] Import Entry';
+export class ImportEntry implements Action {
+	readonly type = IMPORT_ENTRY;
+	constructor(public payload: { entry: any }) { }
 }
 
 export const SELECT_ENTRY = '[Entry] Select';
 export class SelectEntry implements Action {
 	readonly type = SELECT_ENTRY;
-	constructor(public payload: { entry: Entry }) { }
-}
-
-export const SELECT_AND_VIEW_ENTRY = '[Entry] Select and View Entry';
-export class SelectAndViewEntry implements Action {
-	readonly type = SELECT_AND_VIEW_ENTRY;
-	constructor(public payload: { entry: Entry }) { }
+	constructor(public payload: { id: any }) { }
 }
 
 export const SHOW_RESULTS = '[Entry] Show Results';
@@ -83,7 +77,6 @@ export class ShowResults implements Action {
 export const DESELECT_ENTRY = '[Entry] Deselect Entry';
 export class DeselectEntry implements Action {
 	readonly type = DESELECT_ENTRY;
-	constructor(public payload: { entry: Entry }) { }
 }
 
 export const SHOW_METADATA_RESULTS = '[Entry] Show Metadata Results';
@@ -100,17 +93,16 @@ export class UpdateResults implements Action {
 
 export type All =
 	SelectEntry |
-	SelectAndViewEntry |
 	SearchEntries |
 	UpdateEntry |
 	SearchForMetadata |
 	ShowMetadataResults |
 	SearchForMetadata |
 	RemoveEntry |
+	ImportEntry |
 	SearchForMetadataDetails |
 	ShowMetadataDetailsResults |
 	AddEntry |
-	ImportEntry |
 	ShowResults |
 	DeselectEntry |
 	Load |

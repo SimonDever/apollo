@@ -1,5 +1,5 @@
 export interface Entry {
-	id?: string;
+	id?: number;
 	title?: string;
 	poster_path?: string;
 	type?: string;
@@ -22,4 +22,5 @@ export interface Entry {
 	imdbRating?: string;
 	imdbVotes?: string;
 	imdbID?: string;
+	[key: string]: any;
 }

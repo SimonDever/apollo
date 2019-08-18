@@ -21,8 +21,8 @@ import { EventEmitter } from 'electron';
 })
 export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 
-	//selectedEntry: Entry;
-	//selectedEntry$: Observable<any>;
+	searchTerms: any;
+	selectedEntryId: number;
 	subs: Subscription;
 	metadataSearchResponse$: Observable<any>;
 	metadataDetails$: Observable<any>;
@@ -38,14 +38,12 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 	@ViewChild('posterPopover', {static: false}) public posterPopup: NgbPopover;
 	@ViewChild('savePopover', {static: false}) public savePopup: NgbPopover;
 
-	selectedEntryId: number;
-
 	constructor(private store: Store<fromLibrary.LibraryState>,
 		private el: ElementRef,
 		private zone: NgZone,
 		private renderer: Renderer2,
 		private router: Router,
-		config: NgbPopoverConfig,
+		private config: NgbPopoverConfig,
 		private cdRef: ChangeDetectorRef,
 		private http: HttpClient,
 		private searchService: SearchService,
@@ -60,17 +58,14 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 		this.keepersDiffer = this.differs.find(this.keepers).create();
 		this.savedEntry = {};
 
-		/*
-		this.selectedEntry$ = this.store.pipe(select(fromLibrary.getSelectedEntry));
-		this.subs = this.selectedEntry$.subscribe(selectedEntry =>
-			this.selectedEntry = selectedEntry
-		);
-		*/
-
-		this.subs = this.store.pipe(select(fromLibrary.getSelectedEntryId))
-			.subscribe(id => this.selectedEntryId = id);
-
 		this.metadataDetails$ = this.store.pipe(select(fromLibrary.getMetadataDetailsResults));
+
+		this.subs = this.store.pipe(select(fromLibrary.getSearchTerms))
+			.subscribe(searchTerms =>	this.searchTerms = searchTerms);
+
+		this.subs.add(this.store.pipe(select(fromLibrary.getSelectedEntryId))
+			.subscribe(id => this.selectedEntryId = id));
+
 		this.subs.add(this.metadataDetails$.subscribe((details: Map<any, any>) => {
 			this.details = details;
 			this.cdRef.detectChanges();
@@ -190,17 +185,16 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 				const reader = new FileReader();
 
 				reader.addEventListener('load', (function () {
-					this.selectedEntry.poster_path = reader.result;
-
+					this.savedEntry.poster_path = reader.result;
 					// TODO: this should be fixed
-					this.selectedEntry.title = this.savedEntry.title || this.savedEntry.name;
-					this.selectedEntry.overview = this.savedEntry.overview;
+					// this.selectedEntry.title = this.savedEntry.title || this.savedEntry.name;
+					// this.selectedEntry.overview = this.savedEntry.overview;
 
-
+					const id = Number(this.selectedEntryId);
 					this.store.dispatch(new LibraryActions.UpdateEntry({
 						entry: {
-							id: this.selectedEntry.id,
-							changes: this.selectedEntry
+							id: id,
+							changes: this.savedEntry
 						}
 					}));
 					this.navigationService.closeMetadata(true);
@@ -215,32 +209,24 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 			console.log(`keepers:`);
 			console.log(this.keepers);
 
+			this.savedEntry = {};
+
 			Array.from(this.keepers.entries()).forEach(entry => {
 				console.log(`entry: ${entry[0]}: ${entry[1]}`);
 				if (entry[0] !== 'poster_path' && entry[0] !== 'id') {
-					this.selectedEntry[entry[0]] = entry[1];
+					this.savedEntry[entry[0]] = entry[1];
 				}
 			});
-
-			if (this.keepers.has('title'))	{
-				this.selectedEntry.title = this.keepers.get('title');
-			}
-
-			if (this.keepers.has('overview')) {
-				this.selectedEntry.overview = this.keepers.get('overview');
-			}
 
 			if (this.keepers.has('poster_path') && this.conversionStarted && !this.conversionFinished) {
 				console.error('Did not get poster data in time for save action');
 			} else if (this.convertedPoster != null) {
-				this.selectedEntry.poster_path = this.convertedPoster;
+				console.log('setting converted poster into poster_path');
+				this.savedEntry.poster_path = this.convertedPoster;
 			}
 
 			this.store.dispatch(new LibraryActions.UpdateEntry({
-				entry: {
-					id: this.selectedEntry.id,
-					changes: this.selectedEntry
-				}
+				entry: { id: this.selectedEntryId, changes: this.savedEntry }
 			}));
 
 			this.navigationService.closeMetadata();
@@ -261,16 +247,14 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 	}
 
 	getNextPage(event) {
-		console.debug('searchMetadataProvider() entry');
+		console.debug('getNextPage() entry');
 		this.page++;
-		console.debug(`searchMetadataProvider() searching metadata providers with terms ${this.selectedEntry.title}`);
-		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: this.selectedEntry.title, page: this.page}));
+		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: this.searchTerms, page: this.page}));
 	}
 
 	getPrevPage(event) {
-		console.debug('searchMetadataProvider() entry');
+		console.debug('getPrevPage() entry');
 		this.page--;
-		console.debug(`searchMetadataProvider() searching metadata providers with terms ${this.selectedEntry.title}`);
-		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: this.selectedEntry.title, page: this.page}));
+		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: this.searchTerms, page: this.page}));
 	}
 }

@@ -1,26 +1,24 @@
 <ng-template #content let-modal>
-	<div class="modal-header">
-		<h4 class="modal-title" id="modal-basic-title">Search Terms</h4>
-		<button type="button" class="close" data-dismiss="modal" (click)="closeSearchDialog()" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-		</button>
-	</div>
-	<div class="modal-body">
-		<form [formGroup]="searchForm">
-			<div class="form-group">
-				<div class="input-group">
-					<input formControlName="searchTerms" class="form-control" placeholder="title, genre, actor, etc." />
+		<div class="modal-header">
+			<h4 class="modal-title" id="modal-basic-title">Search Terms</h4>
+			<button type="button" class="close" data-dismiss="modal" (click)="closeSearchDialog()" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<form [formGroup]="searchForm">
+				<div class="form-group">
+					<div class="input-group">
+						<input formControlName="searchTerms" class="form-control" placeholder="title, genre, actor, etc." />
+					</div>
 				</div>
-			</div>
-		</form>
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-outline-dark" (click)="search()">Search Online</button>
-	</div>
-</ng-template>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-outline-light" (click)="search()">Search Online</button>
+		</div>
+	</ng-template>
 
-
-<div class="edit-view">
 	<div class="icon-button-box">
 		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
 		<button octicon="trashcan" class="icon-button trash-button" (click)="trash()"></button>
@@ -28,40 +26,45 @@
 		<button octicon="search" class="icon-button search-metadata-provider-button"
 			(click)="showSearchDialog(content)"></button>
 	</div>
-	<div class="edit-box-container">
-		<form [formGroup]="entryForm">
-			<input formControlName="id" type="hidden" #entryId />
-			<div class="edit-box" data-id="{{entryId.value}}">
-				<input (change)="posterChange($event)" type="file" #posterInput />
-				<div class="poster-preview" (click)="posterInput.click()">
-					<div *ngIf="!poster_path" class="poster-placeholder">Select Poster</div>
-					<img *ngIf="poster_path" [src]="poster_path" />
-				</div>
-				<input (change)="fileChange($event)" multiple type="file" #fileInput />
-				<div class="right">
-					<div class="input static">
-						<div class="input-text">Video file</div>
-						<div *ngIf="file" class="file-info" [attr.data-file]="file">
-							<div class="file-path">{{file}}</div>
-						</div>
-						<button class="btn btn-outline-light" (click)="fileInput.click()">Browse</button>
-					</div>
-					<span class="input static">
-						<div class="input-text">Title</div>
-						<input formControlName="title" #titleInput />
-					</span>
-					<span class="input dynamic">
-						<div class="input-text">Cast</div>
-						<textarea formControlName="cast"></textarea>
-					</span>
-					<span class="input dynamic">
-						<div class="input-text">Overview</div>
-						<textarea formControlName="overview"></textarea>
-					</span>
-				</div>
-			</div>
-		</form>
-	</div>
-</div>
 
-<router-outlet></router-outlet>
+	<div class="metadata-container">
+		<input (change)="posterChange($event)" type="file" #posterInput />
+		<div class="poster-preview" (click)="posterInput.click()">
+			<div *ngIf="!poster_path" class="poster-placeholder">Select Poster</div>
+			<img *ngIf="poster_path" [src]="poster_path" />
+		</div>
+		<input (change)="fileChange($event)" type="file" #fileInput />
+		<div class="right-fields">
+			<div class="field-grid three-column-reverse">
+				<span class="metadata-field-key">Video file</span>
+				<span class="metadata-field-value">{{file}}</span>
+				<button class="btn btn-outline-light" (click)="fileInput.click()">
+					Browse
+				</button>
+			</div>
+			<form [formGroup]="entryForm">
+				<ng-container *ngFor="let field of entry | keyvalue">
+					<div class="field-grid three-column-reverse" *ngIf="isKeyVisible(field.key)">
+						<span class="metadata-field-key">
+							{{ field.key.split('_').join(' ') | titlecase }}
+						</span>
+						<span class="metadata-field-value">
+							<div contenteditable="true" ngDefaultControl [formControlName]="field.key"></div>
+						</span>
+						<button class="btn btn-outline-light" (click)="removeField(field.key)">Remove</button>
+					</div>
+				</ng-container>
+			</form>
+
+			<div class="field-grid three-column-reverse">
+				<span class="metadata-field-key">New field</span>
+				<span class="metadata-field-value">
+					<form [formGroup]="newFieldForm" class="new-form-field">
+						<input type="text" formControlName="newFieldName" />
+					</form>
+				</span>
+				<button class="btn btn-outline-light" (click)="addNewField()">Add</button>
+			</div>
+		</div>
+		<router-outlet></router-outlet>
+	</div>

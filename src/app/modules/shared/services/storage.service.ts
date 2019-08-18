@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Entry } from '../../library/store/entry.model';
 import * as Datastore from 'nedb';
 import { ElectronService } from 'ngx-electron';
@@ -10,6 +10,8 @@ export class StorageService {
 
 	datastore;
 	datastorePath: string;
+	backupFile = `${this.electronService.remote.app.getAppPath()}/library-database-backup.json`;
+	databaseFile = `${this.electronService.remote.app.getAppPath()}/library-database.json`;
 
 	constructor(private http: HttpClient,
 		private electronService: ElectronService) {
@@ -17,35 +19,31 @@ export class StorageService {
 		console.log('StorageService constructor :: ');
 
 		this.datastore = new Datastore({
-			filename: `${this.electronService.remote.app.getAppPath()}/library-database.json`,
+			filename: this.databaseFile,
 		});
 
-		this.datastore.loadDatabase(function (err) {
-			if (err) console.error(err);
-		});
+		this.datastore.loadDatabase((err) => { if (err) {
+			console.error(err);
+		}});
 
-		//this.backup();
+		// this.backup();
 	}
 
 	backup() {
-
-		console.log(`trying to backup to: ${this.electronService.remote.app.getAppPath()}`);
-		this.datastore.find({}, (err, entries) => {
-			if (err) {
-				console.log(err)
-				return
+		this.datastore.find({}, (readError, entries) => {
+			if (readError) {
+				console.log(readError);
+				return;
 			}
 
 			this.electronService.remote.require('fs')
-				.writeFile(`${this.electronService.remote.app.getAppPath()}/library-database-backup.json`,
-					JSON.stringify(entries), 'utf8', (err) => {
-						if (err) {
-							console.log(err)
-							return
-						}
-
-						console.log('backup file written to disk');
-					});
+				.writeFile(this.backupFile, JSON.stringify(entries), 'utf8', writeError => {
+					if (writeError) {
+						console.log(writeError);
+						return;
+					}
+					console.log('backup file written to disk');
+				});
 		});
 	}
 
@@ -53,9 +51,10 @@ export class StorageService {
 		console.log(`StorageService :: load :: this.datastore.filename: ${this.datastore.filename}`);
 		return new Observable(subscriber => {
 			this.datastore.find({}, function (err, entries) {
-				if (err) subscriber.error(err);
-				console.log('load()');
-				console.log(entries);
+				if (err) {
+					subscriber.error(err);
+				}
+				console.log('load()', entries);
 				subscriber.next(entries);
 			});
 		});
@@ -64,32 +63,34 @@ export class StorageService {
 	getEntries(): Observable<Entry[]> {
 		return new Observable(subscriber => {
 			this.datastore.find({}, function (err, entries) {
-				if (err) subscriber.error(err);
-				console.log('getEntries()');
-				console.log(entries);
+				if (err) {
+					subscriber.error(err);
+				}
+				console.log('getEntries()', entries);
 				subscriber.next(entries);
 			});
-		})
+		});
 	}
 
 	getEntry(id: string): Observable<Entry> {
-		return new Observable(subscriber => {
-			this.datastore.find({ id: id }, function (err, entries) {
-				if (err) subscriber.error(err);
-				console.log('getEntry(id)');
-				console.log(entries);
-				subscriber.next(entries);
+			return new Observable(subscriber => {
+				this.datastore.find({id: id}, function (err, entry) {
+					if (err) {
+						subscriber.error(err);
+					}
+					console.log('getEntry(id)', entry);
+					subscriber.next(entry);
+				});
 			});
-		})
 	}
 
-	updateEntry(entry: Entry): Observable<Entry> {
+	updateEntry(id: number, entry: Entry): Observable<Entry> {
 		return new Observable(subscriber => {
-			this.datastore.update({ id: entry.id }, { $set: entry }, {}, function (err, numberOfUpdated) {
-				if (err) subscriber.error(err);
-				console.log('updateEntry number updated' + numberOfUpdated);
-				console.log('updateEntry(entry)');
-				console.log(entry);
+			this.datastore.update({id: entry.id}, {$set: entry.changes}, {}, function (err, numberOfUpdated) {
+				if (err) {
+					subscriber.error(err);
+				}
+				console.log(`updateEntry(entry) - entries updated: ${numberOfUpdated}, entry:`, entry);
 				subscriber.next(entry);
 			});
 		});
@@ -105,21 +106,23 @@ export class StorageService {
 					{ file: searchRegex },
 					{ cast: searchRegex }
 				],
-			},
-				function (err, entries) {
-					if (err) subscriber.error(err);
-					console.log('searchEntry(title)');
-					console.log(entries);
-					subscriber.next(entries);
+			}, function (err, entries) {
+				if (err) {
+					subscriber.error(err);
 				}
-			);
+				console.log('searchEntry(title)');
+				console.log(entries);
+				subscriber.next(entries);
+			});
 		});
 	}
 
-	addEntry(entry: Entry): Observable<Entry> {
+	addEntry(newEntry: Entry): Observable<Entry> {
 		return new Observable(subscriber => {
-			this.datastore.insert(entry, function (err, entry) {
-				if (err) subscriber.error(err);
+			this.datastore.insert(newEntry, function (err, entry) {
+				if (err) {
+					subscriber.error(err);
+				}
 				console.log('addEntry(entry)');
 				console.log(entry);
 				subscriber.next(entry);
@@ -128,12 +131,13 @@ export class StorageService {
 	}
 
 	removeEntry(id: string): Observable<number> {
-
 		console.log('attempting to removeEntry(id)');
 		console.log(id);
 		return new Observable(subscriber => {
-			this.datastore.remove({ id: id }, {}, function (err, numRemoved) {
-				if (err) subscriber.error(err);
+			this.datastore.remove({id: id}, {}, function (err, numRemoved) {
+				if (err) {
+					subscriber.error(err);
+				}
 				console.log('removeEntry(id)');
 				console.log(numRemoved);
 				subscriber.next(numRemoved);

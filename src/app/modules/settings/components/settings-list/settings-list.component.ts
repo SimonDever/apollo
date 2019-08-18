@@ -26,8 +26,8 @@ export class SettingsListComponent implements OnInit {
 
 	onChange(event) {
 		console.log('onChange :: entry');
-		console.log(event.target.files[0].name)
-		var reader = new FileReader();
+		console.log(event.target.files[0].name);
+		const reader = new FileReader();
 		reader.onload = (function (f) {
 			return function (e) {
 				// Here you can use `e.target.result` or `this.result`
@@ -39,16 +39,16 @@ export class SettingsListComponent implements OnInit {
 	}
 
 	onReaderLoad(event) {
-		var obj = JSON.parse(event.target.result);
+		const obj = JSON.parse(event.target.result);
 		console.log('onReaderLoad :: entry');
 
 		/* if (typeof obj === 'object') {
 			obj = [obj];
 		} */
 
-		//const allEntries: Entry[] = [];
+		// const allEntries: Entry[] = [];
 
-		console.log('obj: ', obj)
+		console.log('obj: ', obj);
 		for (const data of obj) {
 			console.log('data:', data);
 
@@ -59,7 +59,7 @@ export class SettingsListComponent implements OnInit {
 			if (data.files) {
 				out.files = [];
 				data.files.forEach((element, index) => {
-					if (index == 0) { out.file = element.path }
+					if (index === 0) { out.file = element.path; }
 					if (element.path !== '') {
 						out.files.push(element.path);
 					}
@@ -77,11 +77,11 @@ export class SettingsListComponent implements OnInit {
 				const poster: string = match.Poster;
 				if (poster.startsWith('data:image')) {
 					console.log('starts with base64 stuff');
-					const data = poster.replace(/^data:image\/[a-z]+;base64,/, "")
+					const matchData = poster.replace(/^data:image\/[a-z]+;base64,/, '');
 					const poster_path = `${this.electronService.remote.app.getAppPath()}/posters/${out.id}.png`;
 					console.log('attempting to write poster to ');
 					console.log(poster_path);
-					this.electronService.remote.require('fs').writeFile(poster_path, data, 'base64', (err) => {
+					this.electronService.remote.require('fs').writeFile(poster_path, matchData, 'base64', (err) => {
 						err ? console.log(err) : console.log('poster written to disk');
 					});
 					out.poster_path = poster_path;

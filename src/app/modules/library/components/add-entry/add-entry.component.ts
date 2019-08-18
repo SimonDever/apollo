@@ -86,6 +86,9 @@ export class AddEntryComponent implements OnInit {
 		if (this.poster_path) {
 			entry.poster_path = this.poster_path;
 		}
+		if (this.file) {
+			entry.file = this.file;
+		}
 		/*
 		if (this.files) {
 			this.files.forEach(file => {
