@@ -46,7 +46,7 @@ body {
 }
 
 .metadata-search-results-view {
-	border-top: 2px solid var(--border);
+	border-color: var(--border);
 }
 
 

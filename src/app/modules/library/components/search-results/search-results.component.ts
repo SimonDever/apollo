@@ -7,6 +7,7 @@ import { NavigationService } from '../../../shared/services/navigation.service';
 import { Entry } from '../../store/entry.model';
 import * as fromLibrary from '../../store/index';
 import * as LibraryActions from '../../store/library.actions';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
 	selector: 'app-search-results',
@@ -39,6 +40,7 @@ export class SearchResultsComponent implements OnInit {
 	constructor(private navigationService: NavigationService,
 		private store: Store<fromLibrary.LibraryState>,
 		private zone: NgZone,
+		private sanitizer: DomSanitizer,
 		private router: Router) {
 			this.routerState = router.routerState.snapshot;
 	}
@@ -54,6 +56,18 @@ export class SearchResultsComponent implements OnInit {
 	entryClicked(id: any) {
 		this.navigationService.setViewEntryParent(this.routerState.url);
 		this.store.dispatch(new LibraryActions.SelectEntry({ id: id }));
+	}
+
+	posterUrl(path: string) {
+		if (path) {
+			if (path.toLowerCase().startsWith('c:\\')) {
+				return this.sanitizer.bypassSecurityTrustResourceUrl('file://' + path);
+			} else if (path.startsWith('data:image')) {
+				return path;
+			}
+		} else {
+			return '';
+		}
 	}
 
 	addEntry() {

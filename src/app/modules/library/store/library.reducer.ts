@@ -1,4 +1,4 @@
-import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
+import { createEntityAdapter, EntityAdapter, EntityState, Update } from '@ngrx/entity';
 import { Entry } from './entry.model';
 import * as LibraryActions from './library.actions';
 
@@ -17,7 +17,13 @@ export function reducer(state = initialState, action: LibraryActions.All): State
 
 		case LibraryActions.IMPORT_ENTRY:
 		case LibraryActions.UPDATE_ENTRY: {
-			return adapter.updateOne(action.payload.entry, state);
+			console.log('item before update', state.entities[action.payload.entry.id]);
+			console.log('updated item: ', action.payload.entry);
+			const newState = adapter.removeOne(action.payload.entry.id, state);
+			console.log('new state', newState);
+			const newerState = adapter.addOne(action.payload.entry, newState);
+			console.log('newer state', newerState);
+			return newerState;
 		}
 
 		case LibraryActions.ADD_ENTRY: {

@@ -42,6 +42,25 @@ export class MenuComponent implements OnInit {
 			searchTerms: this.searchForm.value.title
 		}));
 	}
+/*
+	addEntry() {
+		const currentLocation = this.routerState.url;
+		this.navigationService.setAddEntryParent(currentLocation);
+		this.navigationService.setViewEntryParent(currentLocation);
+		this.zone.run(() => this.router.navigate(['/library/edit']));
+	}
+	 */
+	addEntry() {
+		this.store.dispatch(new LibraryActions.DeselectEntry());
+		this.navbarCollapsed = true;
+		let currentLocation = this.routerState.url;
+		this.navigationService.setAddEntryParent(currentLocation);
+		if (currentLocation === '/settings') {
+			currentLocation = '/library';
+		}
+		this.navigationService.setViewEntryParent(currentLocation);
+		this.zone.run(() => this.router.navigate(['/library/edit']));
+	}
 
 	showEntryList() {
 		this.navbarCollapsed = true;
@@ -58,15 +77,4 @@ export class MenuComponent implements OnInit {
 	}
 
 
-	addEntry() {
-		this.navbarCollapsed = true;
-		let currentLocation = this.routerState.url;
-		this.navigationService.setAddEntryParent(currentLocation);
-		if (currentLocation === '/settings') {
-			currentLocation = '/library';
-		}
-		this.navigationService.setViewEntryParent(currentLocation);
-
-		this.zone.run(() => this.router.navigate(['/library/add']));
-	}
 }

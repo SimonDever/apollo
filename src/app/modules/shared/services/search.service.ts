@@ -24,10 +24,9 @@ export class SearchService {
 	}
 
 
-	async convertPoster(url: string){
-		let response = await fetch(url);
-		let data = await response.blob();
-		let blob;
+	async convertPoster(url: string) {
+		const response = await fetch(url);
+		const data = await response.blob();
 		return new File([data], 'test.png', {	type: 'image/png'	});
 	}
 
@@ -47,10 +46,10 @@ export class SearchService {
 					response.results = response.results.filter(el => el.media_type === 'tv' || el.media_type === 'movie');
 					response.total_pages = Math.ceil(response.results.length / 20);
 					response.total_results = response.results.length;
-				} catch(e) {
+				} catch (e) {
 					console.error(e);
 				} finally {
-					this.store.dispatch(new LibraryActions.ShowMetadataResults({ results: response }))
+					this.store.dispatch(new LibraryActions.ShowMetadataResults({ results: response }));
 				}
 			}.bind(this)),
 			(function(data) {
@@ -70,12 +69,12 @@ export class SearchService {
 	details(id: string, media_type: string): any {
 		console.debug(`SearchService.details(${id}) entry`);
 		let resource = this.movieDb.movies;
-		if(media_type === 'tv') {
+		if (media_type === 'tv') {
 			resource = this.movieDb.tv;
 		}
 		resource.getById({'id': id},
 			(function(data) {
-				this.store.dispatch(new LibraryActions.ShowMetadataDetailsResults({ details: JSON.parse(data) }))
+				this.store.dispatch(new LibraryActions.ShowMetadataDetailsResults({ details: JSON.parse(data) }));
 			}.bind(this)),
 			(function(data) {
 				console.error('Error retrieving search details');

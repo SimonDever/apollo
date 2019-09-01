@@ -7,7 +7,7 @@
 	<div class="entry-list">
 		<div *ngFor="let entry of entries$ | async as entries" class="entry-box"
 			(click)="entryClicked(entry.id)">
-			<img class="entry-poster" src="{{entry.poster_path}}" />
+			<img class="entry-poster" [src]="posterUrl(entry.poster_path)" />
 		</div>
 	</div>
 </div>

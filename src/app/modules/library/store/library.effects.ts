@@ -24,57 +24,63 @@ export class LibraryEffects {
 		private store: Store<fromLibrary.LibraryState>) {
 	}
 
-	@Effect()
-	updateEntry$: Observable<Action> = this.actions$.pipe(
+	@Effect({ dispatch: false })
+	updateEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.UPDATE_ENTRY),
 		map(action => (action as LibraryActions.UpdateEntry).payload.entry),
-		mergeMap(entry => this.storageService.updateEntry(Number(entry.id), entry.changes)),
-		map(entry => new LibraryActions.UpdateResults(entry)));
+		mergeMap(entry => this.storageService.updateEntry(entry.id, entry)),
+		tap(response => console.log(`library.effects - storage response`, response)),
+	);
 
 	@Effect({ dispatch: false })
 	loaded$ = this.actions$.pipe(
 		ofType(LibraryActions.LOADED),
-		tap(() => this.zone.run(() =>
-			this.router.navigate(['/library']))
-		));
+		tap(() => this.zone.run(() =>	this.router.navigate(['/library'])))
+	);
 
 	@Effect()
 	load$: Observable<Action> = this.actions$.pipe(
 		ofType(LibraryActions.LOAD),
-		mergeMap(() => this.storageService.load()),
-		map(entries => new LibraryActions.Loaded({ entries: entries })));
+		mergeMap(() => this.storageService.getAllEntries()),
+		map(entries => new LibraryActions.Loaded({ entries: entries }))
+	);
 
-	@Effect()
-	addEntry$: Observable<Action> = this.actions$.pipe(
+	@Effect({ dispatch: false })
+	addEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.ADD_ENTRY),
 		map(action => (action as LibraryActions.AddEntry).payload.entry),
 		mergeMap(entry => this.storageService.addEntry(entry)),
-		map(entry => new LibraryActions.UpdateResults(entry)),
-		tap(() => this.zone.run(() => this.router.navigate(['/library/view']))));
+		tap(response => {
+			console.log(`library.effects - storage response`, response);
+			this.zone.run(() => this.router.navigate(['/library/view']));
+		})
+	);
 
-	@Effect()
-	importEntry$: Observable<Action> = this.actions$.pipe(
+	@Effect({ dispatch: false })
+	importEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.IMPORT_ENTRY),
 		map(action => (action as LibraryActions.ImportEntry).payload.entry),
 		mergeMap(entry => this.storageService.addEntry(entry)),
-		map(entry => new LibraryActions.UpdateResults(entry)));
+		tap(response => console.log(`library.effects - storage response`, response))
+	);
 
 	@Effect({ dispatch: false })
 	removeEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.REMOVE_ENTRY),
 		map(action => (action as LibraryActions.RemoveEntry).payload.id),
 		mergeMap(id => this.storageService.removeEntry(id)),
-		tap(count => {
-			if (count === 1) {
-				this.zone.run(() => this.router.navigate(['/library']));
-			}
-		}));
+		tap(response => {
+			console.log(`library.effects - storage response`, response);
+			this.zone.run(() => this.router.navigate(['/library']));
+		})
+	);
 
 	@Effect()
-	searchEntries$ = this.actions$.pipe(
+	searchEntries$: Observable<Action> = this.actions$.pipe(
 		ofType(LibraryActions.SEARCH_ENTRIES),
 		map(action => (action as LibraryActions.SearchEntries).payload.searchTerms),
 		mergeMap(searchTerms => this.storageService.searchEntry(searchTerms)),
+		tap(response => console.log(`library.effects - storage response`, response)),
 		map(entries => new LibraryActions.ShowResults({ results: entries })));
 
 	@Effect({ dispatch: false })

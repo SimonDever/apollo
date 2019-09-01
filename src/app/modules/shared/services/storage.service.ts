@@ -47,7 +47,11 @@ export class StorageService {
 		});
 	}
 
-	load(): Observable<Entry[]> {
+	load() {
+		return this.getAllEntries();
+	}
+
+	getAllEntries(): Observable<Entry[]> {
 		console.log(`StorageService :: load :: this.datastore.filename: ${this.datastore.filename}`);
 		return new Observable(subscriber => {
 			this.datastore.find({}, function (err, entries) {
@@ -84,15 +88,27 @@ export class StorageService {
 			});
 	}
 
-	updateEntry(id: number, entry: Entry): Observable<Entry> {
+	updateEntry(id: string, entry: Entry): Observable<Entry> {
+
+		const valuesToRemove = {};
+		Object.entries(entry).forEach(([k, v]) => {
+			if (v == null || v === 'null') {
+				delete entry[k];
+				valuesToRemove[k] = true;
+			}
+		});
+
 		return new Observable(subscriber => {
-			this.datastore.update({id: entry.id}, {$set: entry.changes}, {}, function (err, numberOfUpdated) {
+			this.datastore.update({id: id}, {
+				$set: {...entry},
+				$unset: {...valuesToRemove}
+			}, {}, (function (err, numberOfUpdated) {
 				if (err) {
 					subscriber.error(err);
 				}
-				console.log(`updateEntry(entry) - entries updated: ${numberOfUpdated}, entry:`, entry);
+				console.log('number of items updated: ', numberOfUpdated);
 				subscriber.next(entry);
-			});
+			}).bind(this));
 		});
 	}
 
@@ -143,5 +159,19 @@ export class StorageService {
 				subscriber.next(numRemoved);
 			});
 		});
+	}
+
+	base64MimeType(encoded) {
+		let result = null;
+		if (typeof encoded !== 'string') {
+			return result;
+		}
+		const parts = encoded.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.*)/);
+		if (parts && parts.length) {
+			result = { mime: parts[1], data: parts[2]};
+		} else {
+			console.log('no cigar');
+		}
+		return result;
 	}
 }

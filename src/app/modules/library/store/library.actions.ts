@@ -41,7 +41,7 @@ export class SearchEntries implements Action {
 export const UPDATE_ENTRY = '[Entry] Update Entry';
 export class UpdateEntry implements Action {
 	readonly type = UPDATE_ENTRY;
-	constructor(public payload: { entry: Update<Entry> }) { }
+	constructor(public payload: { entry: Entry }) { }
 }
 
 export const ADD_ENTRY = '[Entry] Add Entry';

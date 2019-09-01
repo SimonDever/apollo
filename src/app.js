@@ -19,9 +19,26 @@ app.on('window-all-closed', () => {
 
 app.on('ready', () => {
 
-	mainWindow = new BrowserWindow({
-		show: false
-	});
+	let displays = electron.screen.getAllDisplays()
+  let externalDisplay = displays.find(display => {
+    return display.bounds.x !== 0 || display.bounds.y !== 0
+  });
+
+	console.log(`externalDisplay:`, externalDisplay);
+
+  if (externalDisplay) {
+		mainWindow = new BrowserWindow({
+			show: false,
+			x: externalDisplay.bounds.x + 50,
+			y: externalDisplay.bounds.y + 50
+		});
+	} else {
+		mainWindow = new BrowserWindow({
+			show: false
+		});
+	}
+
+	mainWindow.webContents.session.clearCache(function(){})
 
 	installExtension(REDUX_DEVTOOLS)
 		.then((name) => console.log(`Added Extension:  ${name}`))

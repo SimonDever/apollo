@@ -41,9 +41,18 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 			});
 		}
 
+		case LibraryActions.UPDATE_ENTRY: {
+			return Object.assign({}, state, {
+				metadataSearchResults: null,
+				metadataDetailsResults: null
+			});
+		}
+
 		case LibraryActions.SEARCH_ENTRIES: {
 			return Object.assign({}, state, {
-				searchTerms: action.payload.searchTerms
+				searchTerms: action.payload.searchTerms,
+				metadataSearchResults: null,
+				metadataDetailsResults: null
 			});
 		}
 
@@ -61,7 +70,9 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 
 		case LibraryActions.DESELECT_ENTRY: {
 			return Object.assign({}, state, {
-				selectedEntryId: null
+				selectedEntryId: null,
+				metadataSearchResults: null,
+				metadataDetailsResults: null
 			});
 		}
 
@@ -81,20 +92,23 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 
 			return Object.assign({}, state, {
 				selectedEntryId: null,
+				metadataSearchResults: null,
+				metadataDetailsResults: null,
 				searchResults: searchResults
 			});
 		}
 
 		case LibraryActions.UPDATE_RESULTS: {
-			let searchResults = state.searchResults;
-			if (state.searchResults != null) {
-				const searchResultsIndex = state.searchResults.findIndex(entry => entry.id === action.entry.id);
-				searchResults = [...state.searchResults];
+			const searchResults = state.searchResults;
+			if (searchResults != null) {
+				const searchResultsIndex = searchResults.findIndex(entry => entry.id === action.entry.id);
+				/* searchResults = [...state.searchResults]; */
 				searchResults.splice(searchResultsIndex, 1, action.entry);
+				return Object.assign({}, state, {
+					searchResults: searchResults
+				});
 			}
-			return Object.assign({}, state, {
-				searchResults: searchResults
-			});
+			return state;
 		}
 
 		default: {

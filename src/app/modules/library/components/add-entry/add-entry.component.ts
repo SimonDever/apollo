@@ -48,7 +48,7 @@ export class AddEntryComponent implements OnInit {
 	posterChange(event) {
 		const reader = new FileReader();
 		const poster = event.target.files[0];
-		reader.addEventListener("load", (function () {
+		reader.addEventListener('load', (function () {
 			this.poster_path = reader.result;
 		}).bind(this), false);
 		if (poster) {
@@ -76,7 +76,7 @@ export class AddEntryComponent implements OnInit {
 
 	save() {
 		const form = this.entryForm.value;
-		const entry: Entry = {};
+		const entry: any = {};
 		if (form.id) {
 			entry.id = form.id;
 		}
@@ -98,8 +98,12 @@ export class AddEntryComponent implements OnInit {
 			}, this);
 		}
 		*/
-		if (form.overview) entry.overview = form.overview;
-		if (form.cast) entry.cast = form.cast;
+		if (form.overview) {
+			entry.overview = form.overview;
+		}
+		if (form.cast) {
+			entry.cast = form.cast;
+		}
 		this.store.dispatch(new LibraryActions.AddEntry({ entry: entry }));
 	}
 

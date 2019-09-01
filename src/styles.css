@@ -27,8 +27,9 @@ pre {
 }
 
 .search-form {
-	flex-flow: row nowrap;
-	justify-content: center;
+/* 	flex-flow: row nowrap;
+	justify-content: center; */
+	margin: 0 auto;
 }
 
 .navbar-toggler {
@@ -54,6 +55,8 @@ pre {
 
 .entry-actions {
 	position: absolute;
+	top: 0;
+	left: 0;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -159,17 +162,6 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	position: relative;
 }
 
-.entry-list {
-	display: grid;
-	grid-gap: 15px;
-	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
-	padding-top: 15px;
-	padding-bottom: 15px;
-	padding-right: 70px;
-	padding-left: 15px;
-	min-height: 100%;
-}
-
 .poster-preview-box,
 .poster-preview,
 .poster-preview img {
@@ -180,8 +172,7 @@ input[type=search]:not(:valid) ~ .clear-icon {
 }
 
 .poster-preview {
-	display: inline-flex;
-	align-items: center;
+	position: relative;
 }
 
 
@@ -304,8 +295,7 @@ textarea {
 
 .poster-preview .icon-button {
 	position: absolute;
-	left: 30px;
-	display: none;
+	right: 0;
 }
 
 #poster-button,
@@ -394,6 +384,10 @@ textarea {
 	padding-left: 15px;
 }
 
+.metadata-container form {
+	display: inline;
+}
+
 .field-grid {
 	display: grid;
 	border-bottom: 1px solid #555;
@@ -436,7 +430,7 @@ textarea {
 }
 
 .field-grid.three-column-reverse .metadata-field-value {
-	height: 38px;
+	min-height: 38px;
 }
 
 .metadata-field-value div[contenteditable],
@@ -447,7 +441,7 @@ textarea {
 	color: #fff;
 	resize: vertical;
 	min-height: 38px;
-	overflow-y: auto;
+	white-space: pre-line;
 }
 
 .metadata-field-value .new-form-field input {

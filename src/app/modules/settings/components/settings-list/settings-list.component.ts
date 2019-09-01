@@ -9,6 +9,8 @@ import * as LibraryActions from '../../../library/store/library.actions';
 
 const uuid = require('uuid/v4');
 
+// TODO: auto cull of posters previously downloaded but not in use
+
 @Component({
 	selector: 'app-settings-list',
 	templateUrl: './settings-list.component.html',

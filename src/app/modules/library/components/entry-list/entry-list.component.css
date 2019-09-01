@@ -1,0 +1,42 @@
+/*
+:host ::ng-deep .cdk-virtual-scroll-content-wrapper {
+	height: calc(100vh - 63px);
+}
+*/
+
+.entry-list {
+	height: calc(100vh - 56px);
+}
+
+.entry-list::-webkit-scrollbar {
+	margin-right: 15px;
+	margin-top: 15px;
+  width: 15px;
+	height: 15px;
+  background-color: transparent;
+}
+
+.entry-list::-webkit-scrollbar-thumb {
+	background-color: #aaa;
+	border-radius: 4px;
+}
+
+.candy {
+	display: grid;
+	grid-gap: 15px;
+	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-right: 70px;
+	padding-left: 15px;
+	min-width: 0;
+	width: calc(100vw - 17px);
+	overflow: hidden;
+}
+
+.missing-poster-icon {
+	height: 400px;
+	width: 290px;
+	margin-left: 15px;
+}
+

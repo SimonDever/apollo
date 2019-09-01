@@ -15,11 +15,12 @@ export class OcticonDirective implements OnInit {
 	ngOnInit(): void {
 		const el: HTMLElement = this.elementRef.nativeElement;
 		el.innerHTML = octicons[this.octicon].toSVG();
-
 		const icon: Node = el.firstChild;
+
 		if (this.color) {
 			this.renderer.setStyle(icon, 'fill', this.color);
 		}
+
 		if (this.width) {
 			this.renderer.setStyle(icon, 'width', this.width + 'px');
 			this.renderer.setStyle(icon, 'height', '100%');

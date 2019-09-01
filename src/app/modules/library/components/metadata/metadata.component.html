@@ -30,7 +30,7 @@
 			</button>
 			</ng-template>
 
-			<img src="http://image.tmdb.org/t/p/original/{{entry.poster_path}}" alt="No poster available" />
+			<img src="http://image.tmdb.org/t/p/original{{entry.poster_path}}" alt="No poster available" />
 		</div>
 
 		<div class="right-fields">
@@ -92,7 +92,7 @@
 
 <div class="sticky-icon-box">
 	<button class="btn btn-outline-light cancel-button" (click)="cancel($event)">Cancel</button>
-	<button #savePopover="ngbPopover" placement="top" ngbPopover="When you're finished selecting, save your changes."
+	<button [disabled]="converting" #savePopover="ngbPopover" placement="top" ngbPopover="When you're finished selecting, save your changes."
 		triggers="manual" class="btn btn-outline-light finish-button" (click)="finish($event)">
 		Save selected
 	</button>

@@ -1,5 +1,5 @@
 export interface Entry {
-	id?: number;
+	id?: string;
 	title?: string;
 	poster_path?: string;
 	type?: string;
