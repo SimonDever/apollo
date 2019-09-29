@@ -6,6 +6,7 @@ import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
 import * as LibraryAction from '../../store/library.actions';
 import { Entry } from '../../store/entry.model';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 
 // todo: guard to ensure selected entry or route to /library
@@ -13,7 +14,19 @@ import { Entry } from '../../store/entry.model';
 @Component({
 	selector: 'app-view-entry',
 	templateUrl: './view-entry.component.html',
-	styleUrls: ['../add-entry/add-entry.component.css']
+	styleUrls: ['../add-entry/add-entry.component.css'],
+	animations: [
+		trigger('fadeInOut', [
+			transition(':enter', [
+				style({opacity: 0}),
+				animate('.5s ease-out', style({opacity: 1}))
+			]),
+			transition(':leave', [
+				style({opacity: 1}),
+				animate('.5s ease-in', style({opacity: 0}))
+			])
+		])
+	]
 })
 export class ViewEntryComponent implements OnInit, AfterViewInit, OnDestroy {
 

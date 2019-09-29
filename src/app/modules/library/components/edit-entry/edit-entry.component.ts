@@ -2,7 +2,7 @@ import { reducers } from './../../../../app.reducer';
 import { StorageService } from './../../../shared/services/storage.service';
 import { Component, OnInit, NgZone, OnDestroy, DoCheck, KeyValueDiffers, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl, FormArray } from '@angular/forms';
-import { ActivatedRoute, Router, RouterStateSnapshot, RouterState } from '@angular/router';
+import { ActivatedRoute, Router, RouterStateSnapshot, RouterState, NavigationEnd } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Observable ,	Subscription } from 'rxjs';
 
@@ -15,6 +15,7 @@ import { NgbModal, ModalDismissReasons, NgbActiveModal, NgbModalRef } from '@ng-
 import { map, tap, take } from 'rxjs/operators';
 import { ElectronService } from 'ngx-electron';
 import { DomSanitizer } from '@angular/platform-browser';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 const uuid = require('uuid/v4');
 /**
  * TODO: enable field reordering and the saving of that order
@@ -22,7 +23,19 @@ const uuid = require('uuid/v4');
 @Component({
 	selector: 'app-edit-entry',
 	templateUrl: './edit-entry.component.html',
-	styleUrls: ['../add-entry/add-entry.component.css']
+	styleUrls: ['../add-entry/add-entry.component.css'],
+	animations: [
+		trigger('fadeInOut', [
+			transition(':enter', [
+				style({opacity: 0}),
+				animate('.5s ease-out', style({opacity: 1}))
+			]),
+			transition(':leave', [
+				style({opacity: 1}),
+				animate('.5s ease-in', style({opacity: 0}))
+			])
+		])
+	]
 })
 export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
@@ -64,7 +77,8 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 			this.differ = this.differs.find([]).create();
 			this.fieldsRemoved = [];
 			this.newFieldForm = this.formBuilder.group({
-				newFieldName: ['', Validators.required]
+				title: ['', Validators.required],
+				newFieldName: ['']
 			});
 			this.searchForm = this.formBuilder.group({searchTerms: ''});
 		}
@@ -91,7 +105,6 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	ngOnInit() {
 		console.log('EditEntryComponent Init');
-
 		this.entry$ = this.store.select(fromLibrary.getSelectedEntry);
 		this.subs = this.entry$.pipe(
 			take(1),
@@ -117,8 +130,8 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 				this.file = null;
 				this.entry = { id: uuid(), title: ''};
 				const group: any = {
-					id: new FormControl(this.entry.id),
-					title: new FormControl(this.entry.title)
+					id: new FormControl(this.entry.id)/*,
+					title: new FormControl(this.entry.title) */
 				};
 				Object.entries(this.entry).forEach(([key, value]) => {
 					if (this.isKeyEnumerable(key)) {
@@ -128,6 +141,8 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 				this.entryForm = new FormGroup(group);
 				this.cdRef.detectChanges();
 			}
+
+			window.scrollTo(0, 0);
 		});
 
 		this.store.select(fromLibrary.getSelectedEntryId)
@@ -136,11 +151,6 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 		this.metadataSearchResponse$ = this.store.pipe(select(fromLibrary.getMetadataSearchResults));
 		this.subs.add(this.metadataSearchResponse$.subscribe(response => this.metadataSearchResult = response));
-
-		/*
-		this.subs.add(this.entry$.subscribe(response => {
-			this.cdRef.detectChanges();
-		*/
 	}
 
 	isKeyHidden(key: string) {
@@ -262,12 +272,10 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	ngOnDestroy() {
 		this.cdRef.detach();
-		this.store.dispatch(new LibraryActions.DeselectEntry());
 		this.entry = null;
 		if (this.subs) {
 			this.subs.unsubscribe();
 		}
-		// this.cdRef.detach();
 	}
 
 	posterChange(event) {
@@ -275,7 +283,6 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		const poster = event.target.files[0];
 		reader.addEventListener('load', (function () {
 			this.poster_path = reader.result;
-			// console.log('posterChange base64', this.poster_path);
 		}).bind(this), false);
 		if (poster) {
 			reader.readAsDataURL(poster);
@@ -298,7 +305,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 			changes.poster_path = path;
 			console.debug('electronService remove writeFile - image updated');
 			this.sendUpdateAction(changes);
-			this.navigationService.closeEditEntry();
+			this.navigationService.closeEditEntry(this.selectedEntryId);
 			err ? console.log(err) : console.log('poster written to disk');
 		}).bind(this));
 	}
@@ -360,7 +367,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		} else if (this.poster_path.startsWith(this.electronService.remote.app.getAppPath())) {
 			changes.poster_path = this.poster_path;
 			this.sendUpdateAction(changes);
-			this.navigationService.closeEditEntry();
+			this.navigationService.closeEditEntry(this.selectedEntryId);
 		} else if (this.poster_path.startsWith('/')) {
 			const path = this.poster_path;
 			const url = `http://image.tmdb.org/t/p/original${path}`;
@@ -384,8 +391,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	}
 
 	close() {
-		this.navigationService.closeEditEntry();
-		this.store.dispatch(new LibraryActions.DeselectEntry());
+		this.navigationService.closeEditEntry(this.selectedEntryId);
 	}
 
 	trash() {

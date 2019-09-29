@@ -20,7 +20,7 @@ const uuid = require('uuid/v4');
 	selector: 'app-metadata',
 	templateUrl: './metadata.component.html',
 	styleUrls: ['./metadata.component.css'],
-	providers: [NgbPopoverConfig]
+	providers: [NgbPopoverConfig],
 })
 export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 

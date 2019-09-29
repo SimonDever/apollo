@@ -43,6 +43,11 @@ export const getNeedEntries = createSelector(
 	state => state.needEntries
 );
 
+export const getConfig = createSelector(
+	selectSearchState,
+	state => state.config
+);
+
 export const getSearchTerms = createSelector(
 	selectSearchState,
 	state => state.searchTerms

@@ -46,13 +46,8 @@ export class NavigationService {
 		this.metadataParent = metadataParent;
 	}
 
-	closeEditEntry() {
-		if (this.editEntryParent != null) {
-			this.zone.run(() => this.router.navigate([this.editEntryParent]));
-		} else {
-			console.error('closeViewEntry() - editEntryParent is null. Rerouting to /library');
-			this.zone.run(() => this.router.navigate(['/library']));
-		}
+	closeEditEntry(id) {
+		this.router.navigate(['/library']);
 	}
 
 	closeMetadata() {

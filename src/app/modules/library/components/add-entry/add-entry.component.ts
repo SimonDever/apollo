@@ -6,13 +6,26 @@ import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
 import { Entry } from '../../store/entry.model';
 import * as LibraryActions from '../../store/library.actions';
+import { trigger, style, transition, animate } from '@angular/animations';
 const uuid = require('uuid/v4');
 
 
 @Component({
 	selector: 'app-add-entry',
 	templateUrl: './add-entry.component.html',
-	styleUrls: ['./add-entry.component.css']
+	styleUrls: ['./add-entry.component.css'],
+	animations: [
+		trigger('fadeInOut', [
+			transition(':enter', [
+				style({opacity: 0}),
+				animate('.5s ease-out', style({opacity: 1}))
+			]),
+			transition(':leave', [
+				style({opacity: 1}),
+				animate('.5s ease-in', style({opacity: 0}))
+			])
+		])
+	]
 })
 export class AddEntryComponent implements OnInit {
 

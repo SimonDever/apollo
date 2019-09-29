@@ -14,6 +14,13 @@
  * Learn more in https://angular.io/docs/ts/latest/guide/browser-support.html
  */
 
+(window as any).process = {
+	env: { DEBUG: undefined },
+	nextTick: function() {
+		return null;
+	}
+};
+
 /***************************************************************************************************
  * BROWSER POLYFILLS
  */
@@ -38,7 +45,7 @@
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
 
 /** Evergreen browsers require these. **/
-import 'core-js/es6/reflect';
+// import 'core-js/es6/reflect';
 
 
 /**

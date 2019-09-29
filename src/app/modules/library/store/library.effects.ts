@@ -14,8 +14,7 @@ import { map, mergeMap, tap } from 'rxjs/operators';
 @Injectable()
 export class LibraryEffects {
 
-	constructor(
-		private router: Router,
+	constructor(private router: Router,
 		private storageService: StorageService,
 		private searchService: SearchService,
 		private actions$: Actions,
@@ -29,21 +28,18 @@ export class LibraryEffects {
 		ofType(LibraryActions.UPDATE_ENTRY),
 		map(action => (action as LibraryActions.UpdateEntry).payload.entry),
 		mergeMap(entry => this.storageService.updateEntry(entry.id, entry)),
-		tap(response => console.log(`library.effects - storage response`, response)),
-	);
+		tap(response => console.log(`library.effects - storage response`, response)));
 
 	@Effect({ dispatch: false })
 	loaded$ = this.actions$.pipe(
 		ofType(LibraryActions.LOADED),
-		tap(() => this.zone.run(() =>	this.router.navigate(['/library'])))
-	);
+		tap(() =>	this.router.navigate(['/library'])));
 
 	@Effect()
 	load$: Observable<Action> = this.actions$.pipe(
 		ofType(LibraryActions.LOAD),
 		mergeMap(() => this.storageService.getAllEntries()),
-		map(entries => new LibraryActions.Loaded({ entries: entries }))
-	);
+		map(entries => new LibraryActions.Loaded({ entries: entries })));
 
 	@Effect({ dispatch: false })
 	addEntry$ = this.actions$.pipe(
@@ -53,16 +49,17 @@ export class LibraryEffects {
 		tap(response => {
 			console.log(`library.effects - storage response`, response);
 			this.zone.run(() => this.router.navigate(['/library/view']));
-		})
-	);
+		}));
 
 	@Effect({ dispatch: false })
 	importEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.IMPORT_ENTRY),
 		map(action => (action as LibraryActions.ImportEntry).payload.entry),
 		mergeMap(entry => this.storageService.addEntry(entry)),
-		tap(response => console.log(`library.effects - storage response`, response))
-	);
+		tap(response => {
+			console.log(`library.effects - storage response`, response);
+			this.storageService.importStorageCount++;
+		}));
 
 	@Effect({ dispatch: false })
 	removeEntry$ = this.actions$.pipe(
@@ -72,8 +69,7 @@ export class LibraryEffects {
 		tap(response => {
 			console.log(`library.effects - storage response`, response);
 			this.zone.run(() => this.router.navigate(['/library']));
-		})
-	);
+		}));
 
 	@Effect()
 	searchEntries$: Observable<Action> = this.actions$.pipe(
@@ -93,7 +89,7 @@ export class LibraryEffects {
 	searchForMetadataDetails$ = this.actions$.pipe(
 		ofType(LibraryActions.SEARCH_FOR_METADATA_DETAILS),
 		map(action => (action as LibraryActions.SearchForMetadataDetails).payload),
-		tap(payload => this.searchService.details(payload.id, payload.media_type))); // shouldn't this be map, move actions back in here
+		tap(payload => this.searchService.details(payload.id, payload.media_type)));
 
 	@Effect({ dispatch: false })
 	showResults$ = this.actions$.pipe(
@@ -112,12 +108,27 @@ export class LibraryEffects {
 			this.zone.run(() => this.router.navigate([`${this.navigationService.metadataParent}/metadata`]));
 		}));
 
-/* 	@Effect({ dispatch: false })
-	showMetadataDetailsResults$ = this.actions$.ofType(LibraryActions.SHOW_METADATA_DETAILS_RESULTS)
-		.map(action => (action as LibraryActions.ShowMetadataDetailsResults).payload.details)
-		.do(details => {
-			//console.log('LibraryEffects :: showMetadataDetailsResults details:')
-			//console.log(details);
-			//this.zone.run(() => this.router.navigate(['/library/view/metadata']));
-		}); */
+	@Effect({ dispatch: false })
+	gotConfig$ = this.actions$.pipe(
+		ofType(LibraryActions.GOT_CONFIG),
+		map(action => (action as LibraryActions.GotConfig).payload.config),
+		tap(config => console.log('library.effects - gotConfig - config', config)),
+		mergeMap(config => this.storageService.setConfig(config)),
+		tap(response => console.log(`library.effects - gotConfig - storage response`, response)));
+
+	@Effect()
+	getConfig$: Observable<Action> = this.actions$.pipe(
+		ofType(LibraryActions.GET_CONFIG),
+		mergeMap(() => this.storageService.getConfig()),
+		map(config => {
+			if (config == null || (Array.isArray(config) && config.length === 0)) {
+				config = { // TODO: move to model file or store index, move from setting component too
+					boxHeight: '400px',
+					boxWidth: '290px',
+					virtualScrolling: true
+				};
+			}
+			console.log('effects - getConfig', config);
+			return new LibraryActions.GotConfig({ config: config });
+		}));
 }

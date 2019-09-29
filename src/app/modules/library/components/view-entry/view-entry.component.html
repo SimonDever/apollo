@@ -1,4 +1,4 @@
-<div class="edit-view" *ngIf="entry$ | async as entry">
+<div class="edit-view" *ngIf="entry$ | async as entry" @fadeInOut>
 	<div class="icon-button-box">
 		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
 		<button octicon="trashcan" class="icon-button trash-button" (click)="trash(entry.id)"></button>

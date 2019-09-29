@@ -14,11 +14,13 @@ import { LibraryRoutingModule } from './library-routing.module';
 import { reducers } from './store';
 import { LibraryEffects } from './store/library.effects';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { VirtualScrollerModule } from 'ngx-virtual-scroller';
 
 @NgModule({
 	imports: [
 		CommonModule,
 		SharedModule,
+		VirtualScrollerModule,
 		LibraryRoutingModule,
 		StoreModule.forFeature('library', reducers),
 		EffectsModule.forFeature([LibraryEffects])
@@ -30,7 +32,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 		EditEntryComponent,
 		EntryListComponent,
 		SearchResultsComponent,
-		MetadataComponent,
+		MetadataComponent
 	],
 	declarations: [
 		LibraryComponent,

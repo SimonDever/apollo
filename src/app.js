@@ -1,14 +1,9 @@
-/* eslint-disable quotes */
-/* eslint-disable no-unused-vars */
 const electron = require('electron');
+const { dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
-
-const {
-	default: installExtension,
-	REDUX_DEVTOOLS
-} = require('electron-devtools-installer');
-
+const updater = require('electron-simple-updater');
+/* const { default: installExtension, REDUX_DEVTOOLS } = require('electron-devtools-installer'); */
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 let mainWindow = null;
@@ -17,9 +12,14 @@ app.on('window-all-closed', () => {
 	app.quit();
 });
 
+app.requestSingleInstanceLock();
+app.on('second-instance', (event, argv, cwd) => {
+	console.log(`second-instance triggered`);
+})
+
 app.on('ready', () => {
 
-	let displays = electron.screen.getAllDisplays()
+	let displays = electron.screen.getAllDisplays();
   let externalDisplay = displays.find(display => {
     return display.bounds.x !== 0 || display.bounds.y !== 0
   });
@@ -28,6 +28,11 @@ app.on('ready', () => {
 
   if (externalDisplay) {
 		mainWindow = new BrowserWindow({
+			//autoHideMenuBar: true,
+			//titleBarStyle: 'hiddenInset',
+			webPreferences: {
+				nodeIntegration: true
+			},
 			show: false,
 			x: externalDisplay.bounds.x + 50,
 			y: externalDisplay.bounds.y + 50
@@ -40,11 +45,13 @@ app.on('ready', () => {
 
 	mainWindow.webContents.session.clearCache(function(){})
 
+	/*
 	installExtension(REDUX_DEVTOOLS)
 		.then((name) => console.log(`Added Extension:  ${name}`))
 		.catch((err) => console.log('An error occurred: ', err));
-
 	mainWindow.webContents.openDevTools();
+ */
+
 	mainWindow.webContents.on('devtools-opened', () => {
 		setImmediate(() => {
 			mainWindow.focus();
@@ -52,6 +59,8 @@ app.on('ready', () => {
 	});
 
 	mainWindow.maximize();
+
+	checkForUpdate();
 
 	fs.exists("./library-database.json", (exists) => {
 		if (exists) {
@@ -72,3 +81,57 @@ app.on('ready', () => {
 		mainWindow = null;
 	});
 });
+
+function checkForUpdate() {
+
+	console.log('checkForUpdate() running');
+
+	updater.init({
+		checkUpdateOnStart: true,
+		autoDownload: false,
+		disabled: false,
+		logger: {
+			info(text) { console.log('info', text) },
+			warn(text) { console.log('warn', text) },
+		}
+	});
+
+	updater.disabled = false;
+
+	updater.on('update-available', (meta) => {
+		console.log('onUpdateAvailable - meta', meta);
+
+		const options = {
+			type: 'question',
+			buttons: ['Quit', 'Skip update', 'Update'],
+			defaultId: 3,
+			title: 'Update available',
+			message: 'Would you like to update to the latest version? I might come with shiny new features and certainly less bugs. ' + meta,
+			detail: 'It does not really matter',
+			checkboxLabel: 'Remember my answer',
+			checkboxChecked: true,
+		};
+
+		dialog.showMessageBox(null, options, (response, checkboxChecked) => {
+			console.log(response);
+			console.log(checkboxChecked);
+			updater.setOptions('autoDownload', checkboxChecked);
+			// updater.checkForUpdates();
+			// updater.quitAndInstall();
+			// updater.downloadUpdate();
+		});
+	});
+
+	updater.on('update-downloading', () => {
+		console.log('onUpdateDownloading');
+	});
+
+	updater.on('update-downloaded', () => {
+		if (confirm('The app has been updated. Do you like to restart it now?')) {
+			updater.quitAndInstall();
+		}
+	});
+
+	// updater.checkForUpdates();
+
+}

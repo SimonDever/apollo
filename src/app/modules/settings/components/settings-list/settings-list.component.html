@@ -1,5 +1,40 @@
-<div class="settings-list">
-	<label>Import old save</label>
-	<input type="file" #fileInput (change)="onChange($event);" />
-	<button class="btn btn-outline-light" (click)="fileInput.click()">Browse</button>
+<div class="icon-button-box">
+	<button octicon="x" class="icon-button close-button" (click)="close()"></button>
+	<button octicon="check" class="icon-button save-button" (cslick)="save()">Save</button>
+</div>
+<div class="settings-list" @fadeInOut>
+	<form [formGroup]="configForm">
+		<input type="file" #fileInput (change)="onChange($event);" />
+		<button class="btn btn-outline-light" (click)="fileInput.click()">Import old save</button>
+
+		<p class="progress-percentage" [attr.data-value]="progressPercentage()">{{ getStatus() }}</p>
+		<progress *ngIf="getStatus()" max="100" [value]="progressPercentage()" class="html5"></progress>
+
+		<div class="field-grid two-column">
+			<span class="metadata-field-key">Virtual Scrolling</span>
+			<span class="metadata-field-value">
+				<input formControlName="virtualScrolling" type="checkbox">
+			</span>
+		</div>
+
+		<div class="field-grid two-column">
+			<span class="metadata-field-key">Box Dimensions</span>
+			<span class="metadata-field-value">
+				<label>Width</label>
+				<input placeholder="Width" formControlName="boxWidth" type="text" />
+				<label>Height</label>
+				<input placeholder="Height" formControlName="boxHeight" type="text" />
+			</span>
+		</div>
+	</form>
+
+	<div class="field-grid two-column">
+		<span class="metadata-field-key">Install updates automatically</span>
+		<span class="metadata-field-value">
+			<input (change)="toggleAutoDownload($event)" type="checkbox">
+		</span>
+	</div>
+	<button class="btn btn-outline-light" (click)="checkForUpdates()">Check for Updates</button>
+	<button class="btn btn-outline-light" [disabled]="!updateAvailable" (click)="installUpdate()">Install Update</button>
+
 </div>

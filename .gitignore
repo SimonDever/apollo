@@ -2,10 +2,12 @@
 
 /app
 /posters
+/saveFiles
 
 # personal config
 .moviedb-api-key
 library-database.json
+publisher.json
 
 # unlicenced and unable to distribute
 /src/assets/images/poster-*

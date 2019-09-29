@@ -14,7 +14,6 @@ import { NgbCollapseModule } from './modules/ngb-collapse/ngb-collapse.module';
 import { WindowRefService } from './services/window-ref.service';
 import { NgxElectronModule } from 'ngx-electron';
 import { DivValueAccessorDirective } from './directives/div-value-accessor.directive';
-import { ScrollingModule, ScrollDispatchModule } from '@angular/cdk/scrolling';
 
 @NgModule({
 	declarations: [
@@ -28,8 +27,6 @@ import { ScrollingModule, ScrollDispatchModule } from '@angular/cdk/scrolling';
 		CommonModule,
 		RouterModule,
 		FormsModule,
-		ScrollingModule,
-		ScrollDispatchModule,
 		ReactiveFormsModule,
 		NgbModule,
 		NgxElectronModule,
@@ -41,8 +38,6 @@ import { ScrollingModule, ScrollDispatchModule } from '@angular/cdk/scrolling';
 		FormsModule,
 		ReactiveFormsModule,
 		NgbModule,
-		ScrollingModule,
-		ScrollDispatchModule,
 		NgxElectronModule,
 		/* Custom */
 		NgbCollapseModule,

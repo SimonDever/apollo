@@ -1,20 +1,35 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { Router, RouterStateSnapshot } from '@angular/router';
+import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy, ViewChild, AfterViewInit, SimpleChanges, OnChanges, AfterContentInit, Input } from '@angular/core';
+import { Router, RouterStateSnapshot, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { Observable ,  Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
-import { Entry } from '../../store/entry.model';
 import * as LibraryActions from '../../store/library.actions';
+import { Entry } from '../../store/entry.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModalRef, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { map, publishReplay, refCount } from 'rxjs/operators';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { VirtualScrollerComponent } from 'ngx-virtual-scroller';
 
 @Component({
 	selector: 'app-entry-list',
 	templateUrl: './entry-list.component.html',
-	styleUrls: ['./entry-list.component.css']
+	styleUrls: ['./entry-list.component.css'],
+	animations: [
+		trigger('fadeInOut', [
+			transition(':enter', [
+				style({opacity: 0}),
+				animate('.5s ease-out', style({opacity: 1}))
+			]),
+			transition(':leave', [
+				style({opacity: 1}),
+				animate('.5s ease-in', style({opacity: 0}))
+			])
+		])
+	]
 })
-export class EntryListComponent implements OnInit, OnDestroy {
+export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	routerState: RouterStateSnapshot;
 	entries$: Observable<Entry[]>;
@@ -24,6 +39,13 @@ export class EntryListComponent implements OnInit, OnDestroy {
 	selectedEntryId: string;
 	subs: Subscription;
 	entriesSub: Subscription;
+	selected = [];
+	contentReady: boolean;
+	fragment: string;
+	selectedEntry: Entry;
+
+	@ViewChild(VirtualScrollerComponent, {static: false})
+	private virtualScroller: VirtualScrollerComponent;
 
 	constructor(private store: Store<fromLibrary.LibraryState>,
 		private navigationService: NavigationService,
@@ -31,26 +53,62 @@ export class EntryListComponent implements OnInit, OnDestroy {
 		private cdRef: ChangeDetectorRef,
 		private modalService: NgbModal,
 		private sanitizer: DomSanitizer,
+		private route: ActivatedRoute,
 		private router: Router) {
-			this.routerState = router.routerState.snapshot;
+		this.routerState = router.routerState.snapshot;
+		this.fragment = router.routerState.snapshot.root.fragment;
 	}
 
 	ngOnInit() {
 		console.log('EntryListComponent Init');
-		this.entries$ = this.store.pipe(select(fromLibrary.getAllEntries));
+		this.contentReady = false;
+		this.entries$ = this.store.pipe(
+			select(fromLibrary.getAllEntries),
+			map((data: Array<Entry>) => {
+				const t0 = performance.now();
+				data.sort((a, b) => {
+					if (a.title == null || b.title == null) { return 1; }
+					return a.title < b.title ? -1 : 1;
+				});
+				const t1 = performance.now();
+				console.log('Sorting took ' + (t1 - t0) + ' milliseconds.');
+				return data;
+			})
+		);
+
 		this.needEntries$ = this.store.pipe(select(fromLibrary.getNeedEntries));
 		this.subs = this.needEntries$.subscribe(needEntries => {
 			if (needEntries) {
 				this.store.dispatch(new LibraryActions.Load());
 			}
 		});
+
+		this.subs.add(this.store.pipe(select(fromLibrary.getSelectedEntry))
+			.subscribe(entry => {
+				console.log('Entry', entry);
+				this.selectedEntry = entry;
+			}));
+
 		this.subs.add(this.store.pipe(select(fromLibrary.getSelectedEntryId))
 			.subscribe((id: string) => {
 				console.log('selectedId:', id);
-				return this.selectedEntryId = id;
+				this.selectedEntryId = id;
+				return id;
 			}));
 
 		this.cdRef.detectChanges();
+	}
+
+	ngAfterViewInit() {
+		this.scrollToSelectedEntry();
+	}
+
+	scrollToSelectedEntry(): void {
+		if (this.selectedEntryId != null) {
+			console.log(`scrollTo - about to scroll to selectedEntryId ${this.selectedEntryId}`);
+			// TODO: Don't call if entry is already fully visible to prevent animation trigger
+			this.virtualScroller.scrollInto(this.selectedEntry);
+		}
 	}
 
 	closeModal(reason) {
@@ -86,7 +144,7 @@ export class EntryListComponent implements OnInit, OnDestroy {
 		} else if (reason === 'close') {
 			return 'by pressing x on the modal';
 		} else {
-			return	`with: ${reason}`;
+			return `with: ${reason}`;
 		}
 	}
 
@@ -96,20 +154,44 @@ export class EntryListComponent implements OnInit, OnDestroy {
 		this.zone.run(() => this.router.navigate(['/library/edit']));
 	}
 
-	trash() {
-		console.log('entry-list.trash() - selectedEntryId:', this.selectedEntryId);
-		this.store.dispatch(new LibraryActions.RemoveEntry({id: this.selectedEntryId}));
+	trackById(index, item) {
+		return item.id;
 	}
 
-	toggleActions(entry: any) {
-		if (!this.modalService.hasOpenModals()) {
-			if (this.selectedEntryId === entry.id) {
-				console.log('closing actions');
-				this.closeActions();
-			} else {
-				console.log('showing actions');
-				this.entryClicked(entry.id);
-			}
+	trash() {
+		console.log('entry-list.trash() - selectedEntryId:', this.selectedEntryId);
+		this.store.dispatch(new LibraryActions.RemoveEntry({ id: this.selectedEntryId }));
+	}
+
+	undecorate(entryBox: HTMLDivElement) {
+		const poster = entryBox.querySelector('.entry-poster') as HTMLImageElement;
+		const entryActions = entryBox.querySelector('.entry-actions') as HTMLDivElement;
+		entryBox.style['backgroundColor'] = 'transparent';
+		poster ? poster.style['opacity'] = '1.0' : {};
+		entryActions.style['opacity'] = '0';
+	}
+
+	decorate(entryBox: HTMLDivElement) {
+		const poster = entryBox.querySelector('.entry-poster') as HTMLImageElement;
+		const entryActions = entryBox.querySelector('.entry-actions') as HTMLDivElement;
+		entryBox.style['backgroundColor'] = '#333';
+		poster ? poster.style['opacity'] = '0.2' : {};
+		entryActions.style['opacity'] = '1';
+	}
+
+	toggleActions(event: Event, entry: any) {
+		event.preventDefault();
+		const entryBox = event.currentTarget as HTMLDivElement;
+		const selectedIndex = this.selected.indexOf(entryBox);
+		if (selectedIndex > -1) {
+			this.selected.splice(selectedIndex, 1);
+			this.undecorate(entryBox);
+			this.store.dispatch(new LibraryActions.DeselectEntry());
+		} else {
+			this.selected.forEach(e => this.undecorate(e));
+			this.selected = [entryBox];
+			this.decorate(entryBox);
+			this.store.dispatch(new LibraryActions.SelectEntry({ id: entry.id }));
 		}
 	}
 

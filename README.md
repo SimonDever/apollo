@@ -4,21 +4,25 @@ Cross platform open source desktop application to manage a local video collectio
 
 Features:
 
-- Searching and loading metadata from [MovieDB](https://themoviedb.org)  
-- Sort and filter entries by metadata fields  
-- JavaScript only embedded persistent database  
+- Searching and loading metadata from [MovieDB](https://themoviedb.org)
+- Sort and filter entries by metadata fields
+- JavaScript only embedded persistent database
+- Resizable and responsive interface with borderless mode
+- Fast rendering and smooth virtual scrolling of thousands of grid items
 
 ## Dependencies
 
-- [Electron 1.8.4](https://github.com/electron/electron)
-- [Angular 5.2.9](https://github.com/angular)
-- [NGRX 5.2.0](https://github.com/ngrx)
-- [NeDB 1.8.0](https://github.com/louischatriot/nedb)
+- [Electron](https://github.com/electron/electron)
+- [Angular](https://github.com/angular)
+- [NGRX](https://github.com/ngrx)
+- [NeDB](https://github.com/louischatriot/nedb)
 - [Bootstrap](https://github.com/twbs/bootstrap)
-- [moviedb-promise](https://github.com/grantholle/moviedb-promise)
+- [themoviedb-javascript-library](https://github.com/cavestri/themoviedb-javascript-library)
+- [ngx-electron](https://github.com/ThorstenHans/ngx-electron)
+- [ngx-virtual-scroller](https://github.com/rintoj/ngx-virtual-scroller)
 - [octicons](https://github.com/primer/octicons)
 
-## Building
+## Building and running
 
 ```
 npm install
@@ -30,7 +34,7 @@ npm run electron
 
 ```
 npm install
-npm run start
+npm start
 ```
 
 To enable MovieDb searching create `.moviedb-api-key` file with API key in root directory.

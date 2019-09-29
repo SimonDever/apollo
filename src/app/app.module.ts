@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { SharedModule } from './modules/shared/shared.module';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
+
 @NgModule({
 	declarations: [
 		AppComponent

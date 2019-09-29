@@ -8,6 +8,7 @@ export interface State {
 	searchTerms: string;
 	metadataSearchResults: any;
 	metadataDetailsResults: Map<any, any>;
+	config: any;
 }
 
 export const initialState: State = {
@@ -16,7 +17,8 @@ export const initialState: State = {
 	searchResults: [],
 	searchTerms: '',
 	metadataSearchResults: null,
-	metadataDetailsResults: new Map()
+	metadataDetailsResults: new Map(),
+	config: null
 };
 
 export function reducer(state: State = initialState, action: LibraryActions.All): State {
@@ -82,6 +84,24 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 			});
 		}
 
+		case LibraryActions.REFRESH_CONFIG: {
+			return Object.assign({}, state, {
+				config: action.payload.config
+			});
+		}
+
+		case LibraryActions.UPDATE_CONFIG: {
+			return Object.assign({}, state, {
+				config: action.payload.config
+			});
+		}
+
+		case LibraryActions.GOT_CONFIG: {
+			return Object.assign({}, state, {
+				config: action.payload.config
+			});
+		}
+
 		case LibraryActions.REMOVE_ENTRY: {
 			let searchResults = state.searchResults;
 			if (state.searchResults != null) {
@@ -102,7 +122,6 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 			const searchResults = state.searchResults;
 			if (searchResults != null) {
 				const searchResultsIndex = searchResults.findIndex(entry => entry.id === action.entry.id);
-				/* searchResults = [...state.searchResults]; */
 				searchResults.splice(searchResultsIndex, 1, action.entry);
 				return Object.assign({}, state, {
 					searchResults: searchResults

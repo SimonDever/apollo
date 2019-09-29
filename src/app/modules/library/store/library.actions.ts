@@ -79,6 +79,29 @@ export class DeselectEntry implements Action {
 	readonly type = DESELECT_ENTRY;
 }
 
+export const UPDATE_CONFIG = '[Entry] Update Config';
+export class UpdateConfig implements Action {
+	readonly type = UPDATE_CONFIG;
+	constructor(public payload: { config: any }) { }
+}
+
+export const REFRESH_CONFIG = '[Entry] Refresh Config';
+export class RefreshConfig implements Action {
+	readonly type = REFRESH_CONFIG;
+	constructor(public payload: { config: any }) { }
+}
+
+export const GET_CONFIG = '[Entry] Get Config';
+export class GetConfig implements Action {
+	readonly type = GET_CONFIG;
+}
+
+export const GOT_CONFIG = '[Entry] Got Config';
+export class GotConfig implements Action {
+	readonly type = GOT_CONFIG;
+	constructor(public payload: { config: any }) { }
+}
+
 export const SHOW_METADATA_RESULTS = '[Entry] Show Metadata Results';
 export class ShowMetadataResults implements Action {
 	readonly type = SHOW_METADATA_RESULTS;
@@ -103,6 +126,10 @@ export type All =
 	SearchForMetadataDetails |
 	ShowMetadataDetailsResults |
 	AddEntry |
+	GetConfig |
+	UpdateConfig |
+	RefreshConfig |
+	GotConfig |
 	ShowResults |
 	DeselectEntry |
 	Load |

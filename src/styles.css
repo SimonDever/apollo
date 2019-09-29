@@ -5,6 +5,10 @@
 	--grid-item-height: 400px;
 }
 
+.version-notification {
+	background: red;
+}
+
 input[type="file"] {
 	display: none;
 }
@@ -29,7 +33,9 @@ pre {
 .search-form {
 /* 	flex-flow: row nowrap;
 	justify-content: center; */
-	margin: 0 auto;
+	/* margin: 0 auto; */
+	margin-right: calc(50vw - (16px * 3.5) - 2rem - 200px);
+	margin-left: auto;
 }
 
 .navbar-toggler {
@@ -402,10 +408,6 @@ textarea {
 	grid-template-columns: 14% auto 226px;
 }
 
-.field-grid.two-column {
-	grid-template-columns: 14% auto;
-}
-
 .field-grid:first-of-type {
 	margin-top: -13px;
 }
@@ -436,17 +438,24 @@ textarea {
 .metadata-field-value div[contenteditable],
 .metadata-field-value input {
 	width: 100%;
-	background-color: transparent;
-	border: none;
+	background-color: #131313;
+  transition: box-shadow 0.30s, border 0.30s ease-in-out;
+  outline: none;
+	padding: 0 10px;
+	border-radius: 4px;
+	border: 1px solid #444;
 	color: #fff;
-	resize: vertical;
 	min-height: 38px;
+	line-height: 38px;
 	white-space: pre-line;
+}
+
+.metadata-field-value div[contenteditable]:focus,
+.metadata-field-value input:focus {
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  border: 1px solid rgba(81, 203, 238, 1);
 }
 
 .metadata-field-value .new-form-field input {
 	height: 38px;
-	background-color: transparent;
-	border: none;
-	color: #fff;
 }

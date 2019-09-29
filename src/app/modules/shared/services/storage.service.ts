@@ -8,25 +8,26 @@ import { ElectronService } from 'ngx-electron';
 @Injectable()
 export class StorageService {
 
+	importStorageCount: number;
 	datastore;
-	datastorePath: string;
-	backupFile = `${this.electronService.remote.app.getAppPath()}/library-database-backup.json`;
-	databaseFile = `${this.electronService.remote.app.getAppPath()}/library-database.json`;
+	config;
 
-	constructor(private http: HttpClient,
-		private electronService: ElectronService) {
+	constructor(private electronService: ElectronService) {
 
-		console.log('StorageService constructor :: ');
+		console.log('StorageService constructor :: constructor');
+
+
+		this.importStorageCount = 0;
 
 		this.datastore = new Datastore({
-			filename: this.databaseFile,
+			filename: `./library-database`,
+			autoload: true
 		});
 
-		this.datastore.loadDatabase((err) => { if (err) {
-			console.error(err);
-		}});
-
-		// this.backup();
+		this.config = new Datastore({
+			filename: `./library-config`,
+			autoload: true
+		});
 	}
 
 	backup() {
@@ -37,24 +38,63 @@ export class StorageService {
 			}
 
 			this.electronService.remote.require('fs')
-				.writeFile(this.backupFile, JSON.stringify(entries), 'utf8', writeError => {
+				.writeFile(`./library-database-backup`, JSON.stringify(entries), 'utf8', writeError => {
 					if (writeError) {
 						console.log(writeError);
 						return;
 					}
-					console.log('backup file written to disk');
+					console.log('StorageService :: backup() - Backup file written to disk');
 				});
 		});
 	}
 
-	load() {
-		return this.getAllEntries();
+	getConfig() {
+		console.log(`StorageService :: getConfig() - database:`, this.config);
+		return new Observable(subscriber => {
+			this.config.find({id: 'config'}, (err, configItems) => {
+				if (err) {
+					subscriber.error(err);
+				}
+
+				console.log('StorageService :: getConfig() - items:', configItems[0]);
+				subscriber.next(configItems[0]);
+			});
+		});
+	}
+
+	setConfig(configItems: any): Observable<any> {
+		return new Observable(subscriber => {
+			/*
+			this.config.find({id: 'config'}, (err, configItems) => {
+				if (err) {
+					subscriber.error(err);
+				}
+
+				if(!configItems || Array.isArray(configItems) && configItems.length === 0) {
+					this.config.insert...
+					subscriber.next(configItems)
+				}
+			});
+			*/
+			this.config.update(
+				{ id: 'config' },
+				{ $set: { ...configItems }},
+				{ upsert: true },
+				(err, numberOfUpdated) => {
+					if (err) {
+						subscriber.error(err);
+					}
+					console.log('number of items updated: ', numberOfUpdated);
+					subscriber.next(numberOfUpdated);
+				}
+			);
+		});
 	}
 
 	getAllEntries(): Observable<Entry[]> {
 		console.log(`StorageService :: load :: this.datastore.filename: ${this.datastore.filename}`);
 		return new Observable(subscriber => {
-			this.datastore.find({}, function (err, entries) {
+			this.datastore.find({}, (err, entries) => {
 				if (err) {
 					subscriber.error(err);
 				}
@@ -66,7 +106,7 @@ export class StorageService {
 
 	getEntries(): Observable<Entry[]> {
 		return new Observable(subscriber => {
-			this.datastore.find({}, function (err, entries) {
+			this.datastore.find({}, (err, entries) => {
 				if (err) {
 					subscriber.error(err);
 				}
@@ -77,15 +117,15 @@ export class StorageService {
 	}
 
 	getEntry(id: string): Observable<Entry> {
-			return new Observable(subscriber => {
-				this.datastore.find({id: id}, function (err, entry) {
-					if (err) {
-						subscriber.error(err);
-					}
-					console.log('getEntry(id)', entry);
-					subscriber.next(entry);
-				});
+		return new Observable(subscriber => {
+			this.datastore.find({ id: id }, (err, entry) => {
+				if (err) {
+					subscriber.error(err);
+				}
+				console.log('getEntry(id)', entry);
+				subscriber.next(entry);
 			});
+		});
 	}
 
 	updateEntry(id: string, entry: Entry): Observable<Entry> {
@@ -99,10 +139,10 @@ export class StorageService {
 		});
 
 		return new Observable(subscriber => {
-			this.datastore.update({id: id}, {
-				$set: {...entry},
-				$unset: {...valuesToRemove}
-			}, {}, (function (err, numberOfUpdated) {
+			this.datastore.update({ id: id }, {
+				$set: { ...entry },
+				$unset: { ...valuesToRemove }
+			}, {}, ((err, numberOfUpdated) => {
 				if (err) {
 					subscriber.error(err);
 				}
@@ -122,7 +162,7 @@ export class StorageService {
 					{ file: searchRegex },
 					{ cast: searchRegex }
 				],
-			}, function (err, entries) {
+			}, (err, entries) => {
 				if (err) {
 					subscriber.error(err);
 				}
@@ -135,7 +175,7 @@ export class StorageService {
 
 	addEntry(newEntry: Entry): Observable<Entry> {
 		return new Observable(subscriber => {
-			this.datastore.insert(newEntry, function (err, entry) {
+			this.datastore.insert(newEntry, (err, entry) => {
 				if (err) {
 					subscriber.error(err);
 				}
@@ -150,7 +190,7 @@ export class StorageService {
 		console.log('attempting to removeEntry(id)');
 		console.log(id);
 		return new Observable(subscriber => {
-			this.datastore.remove({id: id}, {}, function (err, numRemoved) {
+			this.datastore.remove({ id: id }, {}, (err, numRemoved) => {
 				if (err) {
 					subscriber.error(err);
 				}
@@ -168,7 +208,7 @@ export class StorageService {
 		}
 		const parts = encoded.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.*)/);
 		if (parts && parts.length) {
-			result = { mime: parts[1], data: parts[2]};
+			result = { mime: parts[1], data: parts[2] };
 		} else {
 			console.log('no cigar');
 		}
