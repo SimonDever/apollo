@@ -9,7 +9,7 @@
 	"license": "UNLICENSED",
 	"main": "app/app.js",
 	"updater": {
-		"url": "https://raw.githubusercontent.com/simondever/apollo/master/updates.json"
+		"url": "https://raw.githubusercontent.com/simondever/apollo/electron-upgrade/updates.json"
 	},
 	"build": {
 		"appId": "com.github.simondever.apollo",
