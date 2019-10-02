@@ -8,21 +8,25 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 let mainWindow = null;
 
-app.on('window-all-closed', () => {
-	app.quit();
-});
+const ipc = require('electron').ipcMain;
 
 app.requestSingleInstanceLock();
-app.on('second-instance', (event, argv, cwd) => {
-	console.log(`second-instance triggered`);
-})
-
+app.on('window-all-closed', app.quit);
+app.on('before-quit', () => { if (mainWindow) mainWindow.close(); });
 app.on('ready', () => {
-
 	let displays = electron.screen.getAllDisplays();
   let externalDisplay = displays.find(display => {
     return display.bounds.x !== 0 || display.bounds.y !== 0
   });
+
+	ipc.on('focus-app', () => {
+		mainWindow.show();
+	});
+
+	ipc.on('quit-app', () => {
+		if (mainWindow) mainWindow = null;
+		app.quit();
+	});
 
 	console.log(`externalDisplay:`, externalDisplay);
 
@@ -62,11 +66,10 @@ app.on('ready', () => {
 
 	checkForUpdate();
 
-	fs.exists("./library-database.json", (exists) => {
-		if (exists) {
-			console.log('Save file exists.');
-		} else {
-			console.log('Save file does not exist, creating.');
+	fs.exists(`${app.getPath('userData')}\\posters`, (exists) => {
+		if (!exists) {
+			console.log('Creating poster folder');
+			fs.mkdir(`${app.getPath('userData')}\\posters`, (err) => err ? console.log(err) : {});
 		}
 	});
 

@@ -194,7 +194,7 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 	writeImage(data, filename) {
 		console.log('inside writeImage, data, filename:', data, filename);
 		const remote = this.electronService.remote;
-		const path = `${remote.app.getAppPath()}\\posters\\${filename}`;
+		const path = `${remote.app.getPath('userData')}\\posters\\${filename}`;
 		remote.require('fs').writeFile(path, data, 'base64', (function(err) {
 			console.log('inside write image inside remote file write', this.savedEntry);
 			this.savedEntry.poster_path = path;

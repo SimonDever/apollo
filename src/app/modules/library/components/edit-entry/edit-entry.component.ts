@@ -130,8 +130,8 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 				this.file = null;
 				this.entry = { id: uuid(), title: ''};
 				const group: any = {
-					id: new FormControl(this.entry.id)/*,
-					title: new FormControl(this.entry.title) */
+					id: new FormControl(this.entry.id),
+					title: new FormControl(this.entry.title)
 				};
 				Object.entries(this.entry).forEach(([key, value]) => {
 					if (this.isKeyEnumerable(key)) {
@@ -300,7 +300,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	writeImage(data, filename, changes) {
 		const remote = this.electronService.remote;
-		const path = `${remote.app.getAppPath()}\\posters\\${filename}`;
+		const path = `${remote.app.getPath('userData')}\\posters\\${filename}`;
 		remote.require('fs').writeFile(path, data, 'base64', (function(err) {
 			changes.poster_path = path;
 			console.debug('electronService remove writeFile - image updated');
@@ -364,7 +364,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 			} else {
 				console.error('error getting data parts from ', this.poster_path);
 			}
-		} else if (this.poster_path.startsWith(this.electronService.remote.app.getAppPath())) {
+		} else if (this.poster_path.startsWith(this.electronService.remote.app.getPath('userData'))) {
 			changes.poster_path = this.poster_path;
 			this.sendUpdateAction(changes);
 			this.navigationService.closeEditEntry(this.selectedEntryId);

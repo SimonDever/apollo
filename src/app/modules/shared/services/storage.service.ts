@@ -20,12 +20,12 @@ export class StorageService {
 		this.importStorageCount = 0;
 
 		this.datastore = new Datastore({
-			filename: `./library-database`,
+			filename: `${this.electronService.remote.app.getPath('userData')}\\library-database.json`,
 			autoload: true
 		});
 
 		this.config = new Datastore({
-			filename: `./library-config`,
+			filename: `${this.electronService.remote.app.getPath('userData')}\\library-config.json`,
 			autoload: true
 		});
 	}
@@ -38,7 +38,7 @@ export class StorageService {
 			}
 
 			this.electronService.remote.require('fs')
-				.writeFile(`./library-database-backup`, JSON.stringify(entries), 'utf8', writeError => {
+				.writeFile(`${this.electronService.remote.app.getPath('userData')}\\library-database-backup.json`, JSON.stringify(entries), 'utf8', writeError => {
 					if (writeError) {
 						console.log(writeError);
 						return;

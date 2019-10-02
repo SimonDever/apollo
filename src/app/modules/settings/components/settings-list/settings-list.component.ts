@@ -259,7 +259,7 @@ export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDest
 					if (poster.startsWith('data:image')) {
 						console.log('starts with base64 stuff');
 						const matchData = poster.replace(/^data:image\/[a-z]+;base64,/, '');
-						const poster_path = `./posters/${out.id}.png`;
+						const poster_path = `${this.electronService.remote.app.getPath('userData')}\\posters\\${out.id}.png`;
 						console.log('attempting to write poster to ');
 						console.log(poster_path);
 						this.electronService.remote.require('fs').writeFile(poster_path, matchData, 'base64', (err) => {
