@@ -1,0 +1,111 @@
+<div @fadeInOut>
+	<div class="icon-button-box">
+		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
+		<button octicon="trashcan" class="icon-button trash-button" (click)="showDeleteConfirmation(deleteModal)"></button>
+		<button octicon="check" class="icon-button save-button" (click)="save()">Save</button>
+		<button octicon="search" class="icon-button search-metadata-provider-button"
+			(click)="showSearchDialog(content)"></button>
+	</div>
+
+	<div class="metadata-container">
+		<input (change)="posterChange($event)" type="file" #posterInput />
+		<div class="poster-preview" (click)="posterInput.click()">
+			<div *ngIf="!poster_path" class="poster-placeholder">Select Poster</div>
+			<ng-container *ngIf="poster_path">
+				<ng-container *ngIf="posterIsFile(poster_path)">
+					<img [src]="posterUrl(poster_path)" id="poster-{{selectedEntryId}}" />
+				</ng-container>
+				<ng-container *ngIf="!posterIsFile(poster_path)">
+					<img [src]="poster_path" id="poster-{{selectedEntryId}}" />
+				</ng-container>
+			</ng-container>
+		</div>
+
+		<input (change)="fileChange($event)" type="file" #fileInput />
+
+		<form [formGroup]="entryForm">
+
+			<div class="right-fields">
+
+				<div class="field-grid three-column-reverse">
+					<span class="metadata-field-key">Title</span>
+					<span class="metadata-field-value">
+						<div contenteditable="true" ngDefaultControl formControlName="title"></div>
+					</span>
+					<span></span>
+				</div>
+
+				<div class="field-grid three-column-reverse">
+					<span class="metadata-field-key">Video file</span>
+					<span class="metadata-field-value">{{file}}</span>
+					<button class="btn btn-outline-light" (click)="fileInput.click()">
+						Browse
+					</button>
+				</div>
+
+				<ng-container *ngFor="let field of entry | keyvalue">
+					<div *ngIf="field.key !== 'title' && isKeyEnumerable(field.key)" class="field-grid three-column-reverse" [hidden]="isKeyHidden(field.key)">
+						<span class="metadata-field-key">
+							{{ field.key.split('_').join(' ') | titlecase }}
+						</span>
+						<span class="metadata-field-value">
+							<div contenteditable="true" ngDefaultControl [formControlName]="field.key"></div>
+						</span>
+						<button class="btn btn-outline-light" (click)="removeField(field.key)">Remove</button>
+					</div>
+				</ng-container>
+
+				<div class="field-grid three-column-reverse">
+					<span class="metadata-field-key">New field</span>
+					<span class="metadata-field-value">
+						<form [formGroup]="newFieldForm" class="new-form-field">
+							<input type="text" formControlName="newFieldName" />
+						</form>
+					</span>
+					<button class="btn btn-outline-light" (click)="addNewField()">Add</button>
+				</div>
+
+			</div>
+		</form>
+
+		<app-metadata *ngIf="metadataSearchResult" [entry]="entry"></app-metadata>
+	</div>
+
+	<ng-template #content let-modal>
+		<div class="modal-header">
+			<h4 class="modal-title" id="modal-basic-title">Search Terms</h4>
+			<button type="button" class="close" data-dismiss="modal" (click)="closeModal()" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<form [formGroup]="searchForm">
+				<div class="form-group">
+					<div class="input-group">
+						<input formControlName="searchTerms" class="form-control" placeholder="title, genre, actor, etc." />
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-outline-light" (click)="search()">Search Online</button>
+		</div>
+	</ng-template>
+
+	<ng-template #deleteModal let-modal>
+		<div class="modal-header">
+			<h4 class="modal-title" id="modal-basic-title">Confirm deletion</h4>
+			<button type="button" class="close" data-dismiss="modal" (click)="closeModal()" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<p><strong>Are you sure you want to delete this entry?</strong></p>
+			<p><span class="text-danger">This operation can not be undone.</span></p>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+			<button type="button" class="btn btn-danger" (click)="modal.close('Ok click')">Ok</button>
+		</div>
+	</ng-template>
+</div>

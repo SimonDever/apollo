@@ -1,0 +1,133 @@
+:root {
+	--bright-foreground: #fff;
+	--foreground: #ccc;
+	--border: #444;
+	--background: #222;
+	--input-background: #333;
+	--input-placeholders: #aaa;
+	--input-foreground: #ddd;
+	--menu-background: #343a40;
+}
+
+.file-info {
+	border-color: var(--border);
+}
+
+.file-preview {
+	background-color: var(--input-background);
+}
+
+body {
+	background-color: var(--background);
+	color: var(--foreground);
+}
+
+.entry-box {
+	border-color: var(--border);
+}
+
+.entry-list {
+	background: var(--background);
+}
+
+.entry-box-title {
+	color: var(--foreground);
+}
+
+.search-view-title {
+	color: var(--foreground);
+}
+
+.edit-view,
+.entry-view,
+.search-view {
+	background: var(--background);
+	color: var(--bright-foreground);
+}
+
+.metadata-search-results-view {
+	border-color: var(--border);
+}
+
+
+.metadata-entry {
+	border-top: 2px solid var(--border);
+	border-bottom: 2px solid var(--border);
+}
+
+.edit-view .poster-preview,
+.edit-view .input {
+	/* background: var(--input-background); */
+	border-color: var(--border);
+	color: var(--input-foreground)
+}
+
+.edit-view .input input {
+	background-color: var(--input-background);
+	color: var(--input-foreground);
+}
+
+.icon-button {
+	border-color: var(--foreground);
+	background-color: var(--background);
+}
+
+.icon-button svg {
+	fill: var(--foreground);
+}
+
+.icon-button:hover, .icon-button.selected {
+	background-color: var(--foreground);
+}
+
+.icon-button:hover svg, .icon-button.selected svg {
+	fill: var(--background);
+}
+
+.search-form .search-input {
+	background-color: var(--input-background);
+	color: var(--input-foreground);
+}
+
+.settings-list {
+	color: var(--foreground);
+}
+
+.settings-list input {
+	background-color: var(--input-background);
+	color: var(--input-foreground);
+}
+
+.clear-icon:after {
+	color: var(--input-placeholders);
+}
+
+a:not([href]):not([tabindex]),
+.nav-link,
+.context-title {
+	color: var(--foreground);
+}
+
+a:not([href]):not([tabindex]):hover,
+.nav-link:hover {
+	color: var(--bright-foreground);
+}
+
+.details-button {
+	background: var(--background);
+	border: 1px solid var(--foreground);
+}
+
+.sticky-icon-box {
+	background-color: var(--menu-background);
+}
+
+.btn:not([disabled]):hover {
+	color: var(--menu-background);
+}
+.btn:not([disabled]):focus {
+	color: unset;
+}
+.btn:not([disabled]):focus:hover {
+	color: var(--menu-background);
+}

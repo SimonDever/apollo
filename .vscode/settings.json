@@ -1,0 +1,7 @@
+{
+	"files.exclude": {
+		"**/*.spec.ts": false,
+		"**/*.component.css": false
+	},
+	"eslint.enable": true
+}

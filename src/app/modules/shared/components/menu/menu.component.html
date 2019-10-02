@@ -1,0 +1,34 @@
+<nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-dark">
+
+	<div class="navbar-brand">
+		<img src="./assets/images/logo.png" width="38" height="38" alt="">
+		<div class="app-title d-none">{{ appTitle }}</div>
+	</div>
+
+	<ul class="navbar-links">
+		<li class="nav-item">
+			<a class="nav-link" (click)="showEntryList()">Collection</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" (click)="showSettings()">Settings</a>
+		</li>
+	</ul>
+
+	<button class="navbar-toggler navbar-toggler-right" type="button"
+		(click)="navbarCollapsed= !navbarCollapsed"
+		[attr.aria-expanded]="!navbarCollapsed" aria-controls="navbar"
+		aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+
+	<div [ngbCollapse]="navbarCollapsed" class="navbar-nav collapse navbar-collapse"	id="navbar">
+		<form [formGroup]="searchForm" (submit)="search()" class="search-form form-inline mt-2 mt-sm-0 ml-0 ml-sm-auto">
+			<input required formControlName="title" class="search-input form-control mr-2"
+				type="search" placeholder="title, keyword, actor" aria-label="Search">
+			<button class="clear-icon" type="reset"></button>
+			<button [disabled]="!searchForm.valid" class="btn btn-outline-light"
+				type="submit">Search</button>
+		</form>
+		<button class="btn btn-outline-light" (click)="addEntry()">Add new entry</button>
+	</div>
+</nav>
