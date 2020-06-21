@@ -1,10 +1,11 @@
 <div @fadeInOut>
 	<div class="icon-button-box">
-		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
-		<button octicon="trashcan" class="icon-button trash-button" (click)="showDeleteConfirmation(deleteModal)"></button>
-		<button octicon="check" class="icon-button save-button" (click)="save()">Save</button>
-		<button octicon="search" class="icon-button search-metadata-provider-button"
-			(click)="showSearchDialog(content)"></button>
+		<button octicon="x" class="icon-button close-button" title="Close without saving" (click)="close()"></button>
+		<button octicon="trashcan" class="icon-button trash-button" title="Delete" (click)="showDeleteConfirmation(deleteModal)"></button>
+		<button octicon="check" class="icon-button save-button" title="Save" (click)="save()"></button>
+		<button octicon="plus" class="icon-button search-metadata-provider-button" title="Add field" (click)="showNewFieldDialog(newFieldDialog)"></button>
+		<button octicon="search" class="icon-button search-metadata-provider-button" title="Search online for metadata"
+			(click)="showSearchDialog(searchDialog)"></button>
 	</div>
 
 	<div class="metadata-container">
@@ -23,17 +24,8 @@
 
 		<input (change)="fileChange($event)" type="file" #fileInput />
 
-		<form [formGroup]="entryForm">
 
 			<div class="right-fields">
-
-				<div class="field-grid three-column-reverse">
-					<span class="metadata-field-key">Title</span>
-					<span class="metadata-field-value">
-						<div contenteditable="true" ngDefaultControl formControlName="title"></div>
-					</span>
-					<span></span>
-				</div>
 
 				<div class="field-grid three-column-reverse">
 					<span class="metadata-field-key">Video file</span>
@@ -43,35 +35,24 @@
 					</button>
 				</div>
 
-				<ng-container *ngFor="let field of entry | keyvalue">
-					<div *ngIf="field.key !== 'title' && isKeyEnumerable(field.key)" class="field-grid three-column-reverse" [hidden]="isKeyHidden(field.key)">
+				<form [formGroup]="entryForm">
+					<div *ngFor="let input of inputList" class="field-grid three-column-reverse" [hidden]="isKeyHidden(input.label)">
 						<span class="metadata-field-key">
-							{{ field.key.split('_').join(' ') | titlecase }}
+							{{ input.label.split('_').join(' ') | titlecase }}
 						</span>
 						<span class="metadata-field-value">
-							<div contenteditable="true" ngDefaultControl [formControlName]="field.key"></div>
+							<input type="text" formControlName="{{ input.formControlName }}">
 						</span>
-						<button class="btn btn-outline-light" (click)="removeField(field.key)">Remove</button>
+						
+						<button class="btn btn-outline-light" (click)="removeInputField(input)">Remove field</button>
 					</div>
-				</ng-container>
-
-				<div class="field-grid three-column-reverse">
-					<span class="metadata-field-key">New field</span>
-					<span class="metadata-field-value">
-						<form [formGroup]="newFieldForm" class="new-form-field">
-							<input type="text" formControlName="newFieldName" />
-						</form>
-					</span>
-					<button class="btn btn-outline-light" (click)="addNewField()">Add</button>
-				</div>
-
+				</form>
 			</div>
-		</form>
 
 		<router-outlet></router-outlet>
 	</div>
 
-	<ng-template #content let-modal>
+	<ng-template #searchDialog let-modal>
 		<div class="modal-header">
 			<h4 class="modal-title" id="modal-basic-title">Search Terms</h4>
 			<button type="button" class="close" data-dismiss="modal" (click)="closeModal()" aria-label="Close">
@@ -89,6 +70,25 @@
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-outline-light" (click)="search()">Search Online</button>
+		</div>
+	</ng-template>
+
+	<ng-template #newFieldDialog let-modal>
+		<div class="modal-header">
+			<h4 class="modal-title" id="modal-basic-title">Search Terms</h4>
+			<button type="button" class="close" data-dismiss="modal" (click)="closeModal()" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<div class="form-group">
+				<div class="input-group">
+					<input #newField class="form-control" />
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-outline-light" (click)="addNewField(newField.value)">Add new field</button>
 		</div>
 	</ng-template>
 

@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectorRef, Component, DoCheck, KeyValueDiffers, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DoCheck, KeyValueDiffers, NgZone, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterStateSnapshot } from '@angular/router';
@@ -15,11 +15,8 @@ import { Entry } from '../../store/entry.model';
 import * as LibraryActions from '../../store/library.actions';
 import { StorageService } from './../../../shared/services/storage.service';
 
-
 const uuid = require('uuid/v4');
-/**
- * TODO: enable field reordering and the saving of that order
- */
+
 @Component({
 	selector: 'app-edit-entry',
 	templateUrl: './edit-entry.component.html',
@@ -46,7 +43,6 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	selectedEntrySub: Subscription;
 	entryForm: FormGroup;
 	searchForm: FormGroup;
-	newFieldForm: FormGroup;
 	poster_path: string;
 	file: string;
 	files: File[];
@@ -58,7 +54,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	modalRef: NgbModalRef;
 	fieldsRemoved: string[];
 	closeResult: string;
-	newFields: FormArray;
+	inputList: any[];
 	routerState: RouterStateSnapshot;
 	selectedEntryId: string;
 	_id: string;
@@ -74,70 +70,42 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		private modalService: NgbModal,
 		private sanitizer: DomSanitizer,
 		private navigationService: NavigationService,
-		private differs: KeyValueDiffers) {
-			this.differ = this.differs.find([]).create();
-			this.fieldsRemoved = [];
-			this.newFieldForm = this.formBuilder.group({
-				title: ['', Validators.required],
-				newFieldName: ['']
-			});
-			this.searchForm = this.formBuilder.group({searchTerms: ''});
-		}
-
-		posterUrl(path) {
-			if (path) {
-				if (path.toLowerCase().startsWith('c:\\')) {
-					return this.sanitizer.bypassSecurityTrustResourceUrl('file://' + path);
-				} else if (path.startsWith('data:image')) {
-					return path;
-				}
-			} else {
-				return '';
-			}
-		}
-
-	sortFields(key1, key2) {
-		if (key1 === key2) { return 0; }
-		if (key1 === 'title') { return -1; }
-		if (key2 === 'title') { return 1; }
-		return +key2 - +key1;
-	}
-
+		private differs: KeyValueDiffers
+		)	{}
 
 	ngOnInit() {
 		console.log('EditEntryComponent Init');
+		this.differ = this.differs.find([]).create();
+		this.fieldsRemoved = [];
+		this.inputList = [];
+		this.searchForm = this.formBuilder.group({searchTerms: ''});
+    this.entryForm = this.formBuilder.group({});
 		this.entry$ = this.store.select(fromLibrary.getSelectedEntry);
 		this.subs = this.entry$.pipe(map(entry => {
 			console.log('Edit - entry', entry);
-			if (entry) {
-				this.entry = { ...entry };
-				this.poster_path = entry.poster_path || '';
-				this.file = entry.file || null;
-				const group: any = {};
-				Object.entries(this.entry).forEach(([key, value]) => {
-					if (this.isKeyEnumerable(key)) {
-						group[key] = new FormControl(value || '');
-					}
-				});
-				this.entryForm = new FormGroup(group);
-				this.cdRef.detectChanges();
-			} else {
+			if (!entry) {
 				this.poster_path = '';
 				this.file = null;
-				this.entry = { id: uuid(), title: ''};
-				const group: any = {
-					id: new FormControl(this.entry.id),
-					title: new FormControl(this.entry.title)
+				entry = {
+					id: uuid(),
+					title: ''
 				};
-				Object.entries(this.entry).forEach(([key, value]) => {
-					if (this.isKeyEnumerable(key)) {
-						group[key] = new FormControl(value || '');
-					}
-				});
-				this.entryForm = new FormGroup(group);
-				this.cdRef.detectChanges();
 			}
 
+			this.entry = { ...entry };
+			this.poster_path = entry.poster_path || '';
+			this.file = entry.file || null;
+			Object.entries(this.entry).forEach(([key, value]) => {
+				if (this.isKeyEnumerable(key)) {
+					this.inputList.push({
+						value: value || '',
+						formControlName: key,
+						label: key
+					});
+				}
+			});
+			this.refreshForm();
+			this.cdRef.detectChanges();
 			window.scrollTo(0, 0);
 		})).subscribe();
 
@@ -147,6 +115,55 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 		this.metadataSearchResponse$ = this.store.pipe(select(fromLibrary.getMetadataSearchResults));
 		this.subs.add(this.metadataSearchResponse$.subscribe(response => this.metadataSearchResult = response));
+	}
+	
+  addNewField(fieldName) {
+		this.modalRef.close('newFieldAdded');
+    this.inputList.push({
+      formControlName: fieldName.toLowerCase().replace(' ', '_'),
+			label: fieldName,
+			value: ''
+    });
+    this.refreshForm();
+	}
+	
+  removeInputField(inputField) {
+		Object.entries(this.entry).forEach(([k, v]) => {
+			if (k === inputField.formControlName) {
+				delete this.entry[k];
+				this.entryForm.removeControl(k);
+				this.fieldsRemoved.push(k); // TODO: do we need this?
+				this.cdRef.detectChanges(); // TODO: do we need this?
+			}
+		});
+    this.inputList = this.inputList.filter(field => field !== inputField);
+    this.refreshForm();
+  }
+	
+  refreshForm() {
+    this.inputList.forEach(input => {
+			const newFormControl = this.formBuilder.control({value: input.value, disabled: false});
+			this.entryForm.addControl(input.formControlName, newFormControl);
+    });
+  }
+
+	posterUrl(path) {
+		if (path) {
+			if (path.toLowerCase().startsWith('c:\\')) {
+				return this.sanitizer.bypassSecurityTrustResourceUrl('file://' + path);
+			} else if (path.startsWith('data:image')) {
+				return path;
+			}
+		} else {
+			return '';
+		}
+	}
+
+	sortFields(key1, key2) {
+		if (key1 === key2) { return 0; }
+		if (key1 === 'title') { return -1; }
+		if (key2 === 'title') { return 1; }
+		return +key2 - +key1;
 	}
 
 	isKeyHidden(key: string) {
@@ -177,65 +194,34 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		}
 	}
 
-	removeField(field) {
-		console.log('removeField - field:', field);
-		console.log('removeField - entry[field]:', this.entry[field]);
-		console.log('removeField - entryForm.value: ', this.entryForm.value);
-		Object.entries(this.entry).forEach(([k, v]) => {
-			if (k === field) {
-				delete this.entry[k];
-				this.entryForm.removeControl(field);
-				this.fieldsRemoved.push(field);
-				this.entryForm.updateValueAndValidity();
-				this.cdRef.detectChanges();
-			}
-		});
-
-		console.log('removeField - after change - entryForm.value: ', this.entryForm.value);
-	}
-
-	addNewField() {
-		let newFieldName: string = this.newFieldForm.get('newFieldName').value.toLowerCase();
-		if (newFieldName.replace(/ /g, '').length > 0) {
-			newFieldName = newFieldName.replace(/ /g, '_');
-			console.log(`addNewField - newFieldName: ${newFieldName}`);
-			this.entryForm.addControl(newFieldName, new FormControl(false));
-			this.entryForm.updateValueAndValidity();
-			console.log(`addNewField - this.entryForm.get(newFieldName):`, this.entryForm.get(newFieldName));
-			this.newFieldForm.get('newFieldName').reset();
-			console.log(`addNewField - resetting new field input`);
-			if (this.entry[newFieldName] == null) {
-				this.entry[newFieldName] = '';
-				console.log('addNewField - add field to entry model', this.entry[newFieldName]);
-			}
-			this.cdRef.detectChanges();
-		} else {
-			console.log('no value');
-		}
-	}
-
 	search() {
 		this.modalRef.close('search');
 		const searchTerms = this.searchForm.value.searchTerms;
 		this.router.navigate(['/library/edit']); // TODO: check if we need this
-		// console.log('searchMetadataProvider() entry');
-		// this.navigationService.setMetadataParent(this.router.routerState.snapshot.url);
-		// console.log(`searchMetadataProvider() searching metadata providers with terms ${searchTerms}`);
-		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: searchTerms, tempEntry: { ...this.entryForm.value, ...{ poster_path: this.poster_path, file: this.file }}}));
+		this.store.dispatch(new LibraryActions.SearchForMetadata({
+			keywords: searchTerms,
+			tempEntry: {
+				...this.entryForm.value,
+				...{
+					poster_path: this.poster_path,
+					file: this.file
+				}
+			}
+		}));
 	}
 
 	closeModal() {
 		this.modalRef.dismiss('close');
 	}
 
-	showSearchDialog(content) {
+	showSearchDialog(searchDialog: TemplateRef<any>) {
 		let searchTerms = '';
 		const titleControl = this.entryForm.get('title');
 		if (titleControl) {
 			searchTerms = titleControl.value;
 		}
 		this.searchForm.patchValue({searchTerms: searchTerms});
-		this.modalRef = this.modalService.open(content);
+		this.modalRef = this.modalService.open(searchDialog);
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 		}, (reason) => {
@@ -243,8 +229,17 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		});
 	}
 
-	showDeleteConfirmation(content) {
-		this.modalRef = this.modalService.open(content);
+	showNewFieldDialog(newFieldDialog: TemplateRef<any>) {
+		this.modalRef = this.modalService.open(newFieldDialog);
+		this.modalRef.result.then((result) => {
+			this.closeResult = `Closed with: ${result}`;
+		}, (reason) => {
+			this.closeResult = `Dismissed with: ${this.getDismissReason(reason)}`;
+		});
+	}
+
+	showDeleteConfirmation(deleteDialog: TemplateRef<any>) {
+		this.modalRef = this.modalService.open(deleteDialog);
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 			if (result === 'Ok click') {
@@ -289,11 +284,6 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	posterIsFile(poster_path: string) {
 		return poster_path && !poster_path.startsWith('data:image');
 	}
-
-/* 	sendUpdateAction(entry) {
-		this.store.dispatch(new LibraryActions.UpdateEntry({ entry: entry }));
-		this.navigationService.closeMetadata();
-	} */
 
 	writeImage(data, filename, changes) {
 		const remote = this.electronService.remote;
