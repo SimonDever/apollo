@@ -2,7 +2,7 @@
 	"name": "apollo",
 	"productName": "Apollo",
 	"description": "Desktop movie organiser",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"author": "Simon Dever",
 	"copyright": "© 2019, Simon Dever",
 	"private": true,
@@ -25,6 +25,9 @@
 		],
 		"win": {
 			"target": "squirrel"
+		},
+		"squirrelWindows": {
+			"iconUrl": "https://github.com/SimonDever/Apollo/blob/master/src/assets/images/logo.png"
 		}
 	},
 	"scripts": {
@@ -34,7 +37,9 @@
 		"test": "ng test",
 		"lint": "ng lint",
 		"electron": "electron .",
-		"start": "ng build && electron .",
+		"debug-electron": "./node_modules/electron/dist/electron.exe ./ --inspect",
+		"start": "ng build && ./node_modules/electron/dist/electron.exe ./",
+		"packager": "node_modules/.bin/electron-packager .",
 		"package": "ng build && electron-builder",
 		"electron-builder": "electron-builder",
 		"publish": "node_modules/.bin/publish"
@@ -74,6 +79,7 @@
 		"themoviedb-javascript-library": "^3.0.3",
 		"tslib": "^1.10.0",
 		"uuid": "^3.3.3",
+		"vlc-simple-player": "^0.5.0",
 		"zone.js": "^0.10.2"
 	},
 	"devDependencies": {
@@ -87,9 +93,10 @@
 		"@types/node": "^12.7.8",
 		"app-builder-lib": "^21.2.0",
 		"codelyzer": "^5.1.2",
-		"electron": "^3.0.16",
+		"electron": "^9.0.0",
 		"electron-builder": "^21.2.0",
 		"electron-builder-squirrel-windows": "^21.2.0",
+		"electron-packager": "^14.0.6",
 		"electron-simple-publisher": "^0.6.2",
 		"get-stdin": "^7.0.0",
 		"jasmine-core": "^3.5.0",

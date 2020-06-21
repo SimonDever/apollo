@@ -1,33 +1,70 @@
-<div class="icon-button-box">
-	<button octicon="x" class="icon-button close-button" (click)="close()"></button>
-	<button octicon="check" class="icon-button save-button" (cslick)="save()">Save</button>
-</div>
 <div class="settings-list" @fadeInOut>
+	<ng-container *ngIf="mode" @fadeInOut>
+		<p class="progress-percentage" [attr.data-value]="progressPercentage()">{{ mode }}</p>
+		<progress max="100" [value]="progressPercentage()" class="html5"></progress>
+	</ng-container>
+
+	<input type="file" #fileInput (change)="importJSON($event);" />
+	<button class="btn btn-outline-light" (click)="fileInput.click()">Import old save</button>
+
+	<input type="file" multiple #entriesInput (change)="addEntries($event);" />
+	<button class="btn btn-outline-light" (click)="entriesInput.click()">Add multiple entries</button>
+
+	<button class="btn btn-outline-light" (click)="changeAllFilePaths()">Change All File Paths</button>
+
+	<button class="btn btn-outline-light" (click)="showApiKeyDialog(apiKeyDialog)">Add API Key</button>
+
 	<form [formGroup]="configForm">
-		<input type="file" #fileInput (change)="onChange($event);" />
-		<button class="btn btn-outline-light" (click)="fileInput.click()">Import old save</button>
-
-		<p class="progress-percentage" [attr.data-value]="progressPercentage()">{{ getStatus() }}</p>
-		<progress *ngIf="getStatus()" max="100" [value]="progressPercentage()" class="html5"></progress>
-
 		<div class="field-grid two-column">
-			<span class="metadata-field-key">Virtual Scrolling</span>
-			<span class="metadata-field-value">
-				<input formControlName="virtualScrolling" type="checkbox">
-			</span>
-		</div>
-
-		<div class="field-grid two-column">
-			<span class="metadata-field-key">Box Dimensions</span>
+			<span class="metadata-field-key">Display</span>
 			<span class="metadata-field-value">
 				<label>Width</label>
 				<input placeholder="Width" formControlName="boxWidth" type="text" />
 				<label>Height</label>
 				<input placeholder="Height" formControlName="boxHeight" type="text" />
+				<label>Rounded corners</label>
+				<input type="range" formControlName="borderRadius" value="50" class="form-control-range">
+				<label>Border colour</label>
+				<input type="color" formControlName="borderColor" value="gold">
+				<label>Shadow colour</label>
+				<input type="color" formControlName="shadowColor" value="#e08056">
+				<label>Shadow blur</label>
+				<input type="range" formControlName="shadowBlur" value="20">
+				<label>Shadow spread</label>
+				<input type="range" formControlName="shadowSpread" value="20">
 			</span>
 		</div>
+		<button class="btn btn-outline-light" (click)="save()">Save changes</button>
 	</form>
 
+	<button class="btn btn-danger" (click)="deleteLibrary()">Delete library</button>
+
+	<div class="box-preview">
+		<div class="entry-box" [ngClass]="{'entry-box-selected': selected}" (click)="toggleActions($event)">
+			<img class="poster-preview entry-poster" id="poster-example" />
+			<div class="entry-actions">
+				<div class="entry-title">
+					Lorem Ipsum
+					<span>(1914)</span>
+				</div>
+				<div class="entry-blurb">
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+					Fusce at leo odio. Curabitur eu velit vehicula, semper risus nec,
+					ullamcorper eros. Aenean a maximus nunc, et fringilla nulla.
+					Praesent in rutrum ex. Ut pharetra hendrerit dolor in ultrices.
+					In ut nulla blandit, ultrices risus sit amet, pretium sapien.
+					Pellentesque euismod lobortis ante, nec egestas nisi ornare in.
+				</div>
+				<div class="icon-button-box-horizontal">
+					<button octicon="trashcan" class="icon-button trash-button"></button>
+					<button octicon="pencil" class="icon-button edit-button"></button>
+					<button octicon="play" class="icon-button play-button"></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--
 	<div class="field-grid two-column">
 		<span class="metadata-field-key">Install updates automatically</span>
 		<span class="metadata-field-value">
@@ -36,5 +73,26 @@
 	</div>
 	<button class="btn btn-outline-light" (click)="checkForUpdates()">Check for Updates</button>
 	<button class="btn btn-outline-light" [disabled]="!updateAvailable" (click)="installUpdate()">Install Update</button>
-
+	-->
 </div>
+
+<ng-template #apiKeyDialog let-modal>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title">API Key</h4>
+		<button type="button" class="close" data-dismiss="modal" (click)="closeModal()" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="apiKeyForm">
+			<div class="form-group">
+				<div class="input-group">
+					<input formControlName="apiKey" class="form-control" />
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-light" (click)="saveApiKey()">Save</button>
+	</div>
+</ng-template>

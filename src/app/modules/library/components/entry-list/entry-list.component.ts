@@ -1,4 +1,5 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy, ViewChild, AfterViewInit, SimpleChanges, OnChanges, AfterContentInit, Input } from '@angular/core';
+import { ElectronService } from 'ngx-electron';
+import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy, ViewChild, AfterViewInit, SimpleChanges, OnChanges, AfterContentInit, Input, TemplateRef } from '@angular/core';
 import { Router, RouterStateSnapshot, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
@@ -53,25 +54,23 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 		private cdRef: ChangeDetectorRef,
 		private modalService: NgbModal,
 		private sanitizer: DomSanitizer,
+		private electronService: ElectronService,
 		private route: ActivatedRoute,
 		private router: Router) {
-		this.routerState = router.routerState.snapshot;
-		this.fragment = router.routerState.snapshot.root.fragment;
+			this.routerState = router.routerState.snapshot;
+			this.fragment = router.routerState.snapshot.root.fragment;
 	}
 
 	ngOnInit() {
-		console.log('EntryListComponent Init');
 		this.contentReady = false;
 		this.entries$ = this.store.pipe(
 			select(fromLibrary.getAllEntries),
 			map((data: Array<Entry>) => {
-				const t0 = performance.now();
 				data.sort((a, b) => {
 					if (a.title == null || b.title == null) { return 1; }
 					return a.title < b.title ? -1 : 1;
 				});
-				const t1 = performance.now();
-				console.log('Sorting took ' + (t1 - t0) + ' milliseconds.');
+				this.navigationService.setBookmarks(data);
 				return data;
 			})
 		);
@@ -85,13 +84,13 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		this.subs.add(this.store.pipe(select(fromLibrary.getSelectedEntry))
 			.subscribe(entry => {
-				console.log('Entry', entry);
+				// console.log('Entry', entry);
 				this.selectedEntry = entry;
 			}));
 
 		this.subs.add(this.store.pipe(select(fromLibrary.getSelectedEntryId))
 			.subscribe((id: string) => {
-				console.log('selectedId:', id);
+				// console.log('selectedId:', id);
 				this.selectedEntryId = id;
 				return id;
 			}));
@@ -100,12 +99,16 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	ngAfterViewInit() {
+		this.subs.add(this.navigationService.bookmark$.pipe(map((char: string) => {
+			this.virtualScroller.scrollInto(this.navigationService.getBookmark(char));
+		})).subscribe());
+
 		this.scrollToSelectedEntry();
 	}
 
 	scrollToSelectedEntry(): void {
 		if (this.selectedEntryId != null) {
-			console.log(`scrollTo - about to scroll to selectedEntryId ${this.selectedEntryId}`);
+			// console.log(`scrollTo - about to scroll to selectedEntryId ${this.selectedEntryId}`);
 			// TODO: Don't call if entry is already fully visible to prevent animation trigger
 			this.virtualScroller.scrollInto(this.selectedEntry);
 		}
@@ -125,14 +128,15 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 	}
 
-	showDeleteConfirmation(content) {
+	showDeleteConfirmation(event: Event, content: TemplateRef<any>) {
+    event.stopPropagation();
 		this.modalRef = this.modalService.open(content);
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
-			console.log(this.closeResult);
+			// console.log(this.closeResult);
 		}, (reason) => {
 			this.closeResult = `Dismissed with: ${this.getDismissReason(reason)}`;
-			console.log(this.closeResult);
+			// console.log(this.closeResult);
 		});
 	}
 
@@ -148,10 +152,17 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 	}
 
-	edit() {
-		console.debug(`entry-list.edit() - selectedEntryId: ${this.selectedEntryId}`);
+	edit(event: Event) {
+		event.stopPropagation();
+		// console.log(`entry-list.edit() - selectedEntryId: ${this.selectedEntryId}`);
 		this.navigationService.setEditEntryParent(this.routerState.url);
 		this.zone.run(() => this.router.navigate(['/library/edit']));
+	}
+
+	play(event: Event, file: string) {
+		event.stopPropagation();
+		// console.log('file:', file);
+		this.electronService.ipcRenderer.send('play-video', file);
 	}
 
 	trackById(index, item) {
@@ -159,7 +170,7 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	trash() {
-		console.log('entry-list.trash() - selectedEntryId:', this.selectedEntryId);
+		// console.log('entry-list.trash() - selectedEntryId:', this.selectedEntryId);
 		this.store.dispatch(new LibraryActions.RemoveEntry({ id: this.selectedEntryId }));
 	}
 
@@ -203,7 +214,9 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 				return path;
 			}
 		} else {
-			return '';
+			console.error('Using remote image', path);
+			//return '';
+			return path;
 		}
 	}
 
@@ -215,10 +228,10 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.store.dispatch(new LibraryActions.DeselectEntry());
 	}
 
-	addEntry() {
+	/* addEntry() {
 		const currentLocation = this.routerState.url;
 		this.navigationService.setAddEntryParent(currentLocation);
 		this.navigationService.setViewEntryParent(currentLocation);
 		this.zone.run(() => this.router.navigate(['/library/edit']));
-	}
+	} */
 }

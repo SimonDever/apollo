@@ -14,13 +14,17 @@ import { NgbCollapseModule } from './modules/ngb-collapse/ngb-collapse.module';
 import { WindowRefService } from './services/window-ref.service';
 import { NgxElectronModule } from 'ngx-electron';
 import { DivValueAccessorDirective } from './directives/div-value-accessor.directive';
+import { ToastComponent } from './components/toast/toast.component';
+import { ToastService } from './services/toast.service';
+import { LibraryService } from './services/library.service';
 
 @NgModule({
 	declarations: [
 		MenuComponent,
 		PageNotFoundComponent,
 		DivValueAccessorDirective,
-		OcticonDirective
+		OcticonDirective,
+		ToastComponent
 	],
 	imports: [
 		/* Third party */
@@ -45,6 +49,7 @@ import { DivValueAccessorDirective } from './directives/div-value-accessor.direc
 		OcticonDirective,
 		MenuComponent,
 		PageNotFoundComponent,
+		ToastComponent
 	]
 })
 export class SharedModule {
@@ -55,6 +60,8 @@ export class SharedModule {
 				NavigationService,
 				SearchService,
 				StorageService,
+				ToastService,
+				LibraryService,
 				WindowRefService
 			]
 		};

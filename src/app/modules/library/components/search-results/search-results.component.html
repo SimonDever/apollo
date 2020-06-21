@@ -1,4 +1,4 @@
-<div class="list-view" [@simpleFadeAnimation]="'in'">
+<div class="list-view" @fadeInOut>
 	<div class="icon-button-box">
 		<button  octicon="x" class="icon-button close-button" (click)="close()"></button>
 	</div>
@@ -22,9 +22,9 @@
 					<div class="entry-title">{{entry.title}}</div>
 					<div class="entry-blurb">{{entry.overview}}</div>
 					<div class="icon-button-box-horizontal">
-						<button class="icon-button trash-button"
-							(click)="showDeleteConfirmation(deleteModal)"></button>
-						<button class="icon-button edit-button" (click)="edit()"></button>
+						<button octicon="trashcan" class="icon-button trash-button" (click)="showDeleteConfirmation(deleteModal)"></button>
+						<button octicon="pencil" class="icon-button edit-button" (click)="edit()"></button>
+						<button octicon="play" class="icon-button play-button" (click)="play($event, entry.file)"></button>
 					</div>
 				</div>
 			</div>

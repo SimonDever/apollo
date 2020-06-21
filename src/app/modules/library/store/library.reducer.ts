@@ -15,7 +15,6 @@ export function reducer(state = initialState, action: LibraryActions.All): State
 			return adapter.addAll(action.payload.entries, state);
 		}
 
-		case LibraryActions.IMPORT_ENTRY:
 		case LibraryActions.UPDATE_ENTRY: {
 			console.log('item before update', state.entities[action.payload.entry.id]);
 			console.log('updated item: ', action.payload.entry);
@@ -32,6 +31,10 @@ export function reducer(state = initialState, action: LibraryActions.All): State
 
 		case LibraryActions.REMOVE_ENTRY: {
 			return adapter.removeOne(action.payload.id, state);
+		}
+
+		case LibraryActions.DELETE_ALL_ENTRIES: {
+			return adapter.removeAll(state);
 		}
 
 		default: {

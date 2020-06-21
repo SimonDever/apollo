@@ -1,3 +1,4 @@
+
 .candy {
 	height: calc(100vh - 86px);
 	min-width: 0;
@@ -14,19 +15,18 @@
 	transition-property: all;
 }
 
+.entry-title {
+	overflow-y: auto;
+	max-height: 50%;
+}
+
+.entry-title span {
+	display: contents;
+}
+
 .entry-box {
 	box-sizing: border-box;
 	background-color: transparent;
-}
-
-::ng-deep .scrollable-content {
-	display: grid;
-	grid-gap: 15px;
-	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
-	padding: 0 15px;
-	height: unset !important;
-	max-width: unset !important;
-	max-height: unset !important;
 }
 
 .entry-poster {
@@ -35,6 +35,16 @@
 
 .entry-actions {
 	opacity: 0;
+}
+
+::ng-deep .scrollable-content {
+	display: grid;
+	grid-gap: 40px 71px;
+	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
+	padding: 0 15px;
+	height: unset !important;
+	max-width: unset !important;
+	max-height: unset !important;
 }
 
 ::-webkit-scrollbar {
@@ -68,8 +78,8 @@
 }
 
 .missing-poster-icon {
-	height: 400px;
-	width: 290px;
+	height: 480px;
+	width: 348px;
 	padding-left: 15px;
 	position: absolute;
 }

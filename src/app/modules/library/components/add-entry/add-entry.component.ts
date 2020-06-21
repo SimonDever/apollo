@@ -70,9 +70,11 @@ export class AddEntryComponent implements OnInit {
 	}
 
 	fileChange(event) {
+		console.log('fileChange() - files: ', event.target.files);
 		this.files = event.target.files;
 		if (this.files.length > 0) {
 			this.file = this.files[0].path;
+			console.log('fileChange() - form title: ', this.entryForm.value.title );
 			if (this.entryForm.value.title === '') {
 				const label = this.files[0].path || this.files[0].name;
 				const forwardSlash = label.lastIndexOf('/');
@@ -82,6 +84,7 @@ export class AddEntryComponent implements OnInit {
 					separator = backwardSlash;
 				}
 				const title = label.substring(separator + 1, label.lastIndexOf('.'));
+				console.log('fileChange() - new title', title);
 				this.entryForm.get('title').setValue(title);
 			}
 		}

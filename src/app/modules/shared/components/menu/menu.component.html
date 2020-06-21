@@ -29,6 +29,18 @@
 			<button [disabled]="!searchForm.valid" class="btn btn-outline-light"
 				type="submit">Search</button>
 		</form>
-		<button class="btn btn-outline-light" (click)="addEntry()">Add new entry</button>
+
+		<div ngbDropdown>
+			<button id="bookmarksButton" class="btn btn-outline-light" ngbDropdownToggle>Bookmarks</button>
+			<div ngbDropdownMenu aria-labelledby="bookmarksButton">
+				<ng-container *ngFor="let char of alphabet">
+					<button ngbDropdownItem (click)="goto(char)">{{char}}</button>
+				</ng-container>
+			</div>
+		</div>
+
+		<!-- <button class="btn btn-outline-light" (click)="addEntry()">Add new entry</button> -->
+		<input type="file" multiple #entriesInput (change)="addEntries($event);" />
+		<button class="btn btn-outline-light" (click)="entriesInput.click()">Add</button>
 	</div>
 </nav>

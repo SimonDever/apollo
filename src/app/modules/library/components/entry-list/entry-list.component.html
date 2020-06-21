@@ -4,15 +4,20 @@
 			<div *ngFor="let entry of scroll.viewPortItems" class="entry-box" (click)="toggleActions($event, entry)">
 				<img *ngIf="posterUrl(entry.poster_path) else missingPoster" class="poster-preview entry-poster" id="poster-{{entry.id}}" [src]="posterUrl(entry.poster_path)" />
 				<ng-template #missingPoster>
-					<div class="missing-poster-icon" class="missing-poster" [width]="'260'" [color]="'#ccc'" octicon="question">
+					<div class="missing-poster-icon" class="missing-poster" [width]="'348'" [color]="'#ccc'" octicon="question">
 					</div>
 				</ng-template>
 				<div class="entry-actions">
-					<div class="entry-title">{{entry.title}}</div>
+					<div class="entry-title">
+						{{entry.title}}
+						<span *ngIf="entry.year">({{entry.year}})</span>
+						<span *ngIf="!entry.year && entry.release_date">({{entry.release_date | date: 'yyyy'}})</span>
+					</div>
 					<div class="entry-blurb">{{entry.overview}}</div>
 					<div class="icon-button-box-horizontal">
-						<button octicon="trashcan" class="icon-button trash-button" (click)="showDeleteConfirmation(deleteModal)"></button>
-						<button octicon="pencil" class="icon-button edit-button" (click)="edit()"></button>
+						<button octicon="trashcan" class="icon-button trash-button" (click)="showDeleteConfirmation($event, deleteModal)"></button>
+						<button octicon="pencil" class="icon-button edit-button" (click)="edit($event)"></button>
+						<button octicon="play" class="icon-button play-button" (click)="play($event, entry.file)"></button>
 					</div>
 				</div>
 			</div>

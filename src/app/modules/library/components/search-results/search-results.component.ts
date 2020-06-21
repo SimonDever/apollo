@@ -10,6 +10,7 @@ import * as LibraryActions from '../../store/library.actions';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal, NgbModalRef, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { map } from 'rxjs/operators';
+import { ElectronService } from 'ngx-electron';
 
 @Component({
 	selector: 'app-search-results',
@@ -45,6 +46,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 		private zone: NgZone,
 		private cdRef: ChangeDetectorRef,
 		private modalService: NgbModal,
+		private electronService: ElectronService,
 		private sanitizer: DomSanitizer,
 		private route: ActivatedRoute,
 		private router: Router) {
@@ -79,6 +81,12 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 
 	close() {
 		this.navigationService.closeSearchResults();
+	}
+
+	play(event: Event, file: string) {
+		event.preventDefault();
+		console.log('file:', file);
+		this.electronService.ipcRenderer.send('play-video', file);
 	}
 
 	closeModal(reason) {

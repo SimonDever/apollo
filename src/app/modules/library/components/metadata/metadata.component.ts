@@ -1,28 +1,22 @@
-import { StorageService } from './../../../shared/services/storage.service';
-import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ElementRef,
-	KeyValueChanges, KeyValueDiffer, KeyValueDiffers,
-	OnInit, Renderer2, ViewChild, NgZone, Output, OnDestroy, DoCheck, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, KeyValueDiffer, KeyValueDiffers, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbPopover, NgbPopoverConfig } from '@ng-bootstrap/ng-bootstrap';
 import { select, Store } from '@ngrx/store';
-import { Observable ,  Subscription } from 'rxjs';
-import { SearchService } from '../../../shared/services/search.service';
+import { Observable, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { LibraryService } from '../../../shared/services/library.service';
 import * as fromLibrary from '../../store';
-import { Entry } from '../../store/entry.model';
 import * as LibraryActions from '../../store/library.actions';
-import { NavigationService } from '../../../shared/services/navigation.service';
-import { EventEmitter } from 'electron';
-import { ElectronService } from 'ngx-electron';
 
 const uuid = require('uuid/v4');
+
 @Component({
 	selector: 'app-metadata',
 	templateUrl: './metadata.component.html',
 	styleUrls: ['./metadata.component.css'],
 	providers: [NgbPopoverConfig],
 })
-export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
+export class MetadataComponent implements OnInit, OnDestroy {
 
 	searchTerms: any;
 	selectedEntryId: number;
@@ -38,28 +32,27 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 	conversionFinished = false;
 	keepersDiffer: KeyValueDiffer<string, any>;
 	converting = false;
-	@Input()
-	entry: any;
-	@ViewChild('entryPopover', {static: false}) public entryPopup: NgbPopover;
-	@ViewChild('posterPopover', {static: false}) public posterPopup: NgbPopover;
-	@ViewChild('savePopover', {static: false}) public savePopup: NgbPopover;
+	selectedEntry$;
+	tempEntry;
+
+	@ViewChild('entryPopover', { static: false })
+	public entryPopup: NgbPopover;
+
+	@ViewChild('posterPopover', { static: false })
+	public posterPopup: NgbPopover;
+
+	@ViewChild('savePopover', { static: false })
+	public savePopup: NgbPopover;
 
 	constructor(private store: Store<fromLibrary.LibraryState>,
-		private el: ElementRef,
-		private zone: NgZone,
-		private renderer: Renderer2,
 		private router: Router,
-		private electronService: ElectronService,
-		private storageService: StorageService,
-		private config: NgbPopoverConfig,
+		private libraryService: LibraryService,
 		private cdRef: ChangeDetectorRef,
-		private http: HttpClient,
-		private searchService: SearchService,
 		private differs: KeyValueDiffers,
-		private navigationService: NavigationService
 	) { }
 
 	ngOnInit() {
+		console.log('onInit');
 		this.page = 1;
 		this.keepers = new Map();
 		this.details = new Map();
@@ -68,8 +61,20 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 
 		this.metadataDetails$ = this.store.pipe(select(fromLibrary.getMetadataDetailsResults));
 
-		this.subs = this.store.pipe(select(fromLibrary.getSearchTerms))
-			.subscribe(searchTerms =>	this.searchTerms = searchTerms);
+		this.selectedEntry$ = this.store.select(fromLibrary.getSelectedEntry);
+
+		this.subs = this.selectedEntry$.pipe(take(1)).subscribe(entry => {
+			// console.log('setting selectedEntry', entry);
+			if (entry) {
+				this.tempEntry = entry;
+			}
+		});
+
+		this.subs.add(this.store.pipe(select(fromLibrary.getTempEntry))
+			.subscribe(tempEntry => this.tempEntry = tempEntry));
+
+		this.subs.add(this.store.pipe(select(fromLibrary.getSearchTerms))
+			.subscribe(searchTerms => this.searchTerms = searchTerms));
 
 		this.subs.add(this.store.pipe(select(fromLibrary.getSelectedEntryId))
 			.subscribe(id => this.selectedEntryId = id));
@@ -81,6 +86,8 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 
 		this.metadataSearchResponse$ = this.store.pipe(select(fromLibrary.getMetadataSearchResults));
 		this.subs.add(this.metadataSearchResponse$.subscribe(response => {
+			console.log('metadataSearchResponse, new results:', response);
+
 			this.cdRef.detectChanges();
 			/*
 			if (this.entryPopup != null) { this.entryPopup.open();	}
@@ -91,6 +98,7 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 	}
 
 	ngOnDestroy() {
+		console.log('destroying');
 		if (this.subs) {
 			this.subs.unsubscribe();
 		}
@@ -103,63 +111,32 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 	}
 
 	getDetails(entry) {
-		console.info(`MetadataComponent.getDetails(${entry.id})`);
-		this.store.dispatch(new LibraryActions.SearchForMetadataDetails({id: entry.id, media_type: entry.media_type}));
-	}
-
-	keepersChanged(changes: KeyValueChanges<string, any>) {
-		changes.forEachAddedItem(record => this.convertPoster(record));
-		changes.forEachChangedItem(record => this.convertPoster(record));
-	}
-
-	ngDoCheck() {
-		const changes = this.keepersDiffer.diff(this.keepers);
-		if (changes) {
-			this.keepersChanged(changes);
-		}
-	}
-
-	convertPoster(record) {
-		this.convertedPoster = null;
-		if (record.key === 'poster_path') {
-			console.log('found poster path value', record.currentValue);
-			const posterUrl = `http://image.tmdb.org/t/p/original${record.currentValue}`;
-			this.converting = true;
-			this.searchService.convertPoster(posterUrl).then(value => {
-				const reader = new FileReader();
-				reader.addEventListener('load', (function () {
-					this.convertedPoster = reader.result;
-					this.converting = false;
-				}.bind(this)), false);
-				if (value) {
-					reader.readAsDataURL(value);
-				}
-			});
-		}
+		//console.info(`MetadataComponent.getDetails(${entry.id})`);
+		this.store.dispatch(new LibraryActions.SearchForMetadataDetails({ id: entry.id, media_type: entry.media_type }));
 	}
 
 	keepField(entry, field): void {
-		console.debug(`keepField(entry, field) - field: ${field}, entry:`, entry);
+		//console.debug(`keepField(entry, field) - field: ${field}, entry:`, entry);
 
 		if (!entry || !field) {
-			console.debug(`Illegal Arguement, entry: ${entry}, field: ${field}`);
+			//console.debug(`Illegal Arguement, entry: ${entry}, field: ${field}`);
 		} else {
 			if (this.savedEntry != null) {
-				console.debug('User chose to keep a field so deselecting entire entry');
+				//console.debug('User chose to keep a field so deselecting entire entry');
 				this.savedEntry = null;
 			}
 
 			if (this.keepers.has(field)) {
-				console.debug(`has field`);
+				//console.debug(`has field`);
 				if (this.keepers.get(field) === entry[field]) {
-					console.debug(`deleting`);
+					//console.debug(`deleting`);
 					this.keepers.delete(field);
 				} else {
-					console.debug(`updating`);
+					//console.debug(`updating`);
 					this.keepers.set(field, entry[field]);
 				}
 			} else {
-				console.debug(`does not already have field so saving`);
+				// console.debug(`does not already have field so saving`);
 				this.keepers.set(field, entry[field]);
 			}
 		}
@@ -183,24 +160,12 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 	}
 
 	cancel() {
-		this.navigationService.closeMetadata();
+		this.router.navigate(['/library/edit']);
 	}
 
 	sendUpdateAction(entry) {
 		this.store.dispatch(new LibraryActions.UpdateEntry({ entry: entry }));
-		this.navigationService.closeMetadata();
-	}
-
-	writeImage(data, filename) {
-		console.log('inside writeImage, data, filename:', data, filename);
-		const remote = this.electronService.remote;
-		const path = `${remote.app.getPath('userData')}\\posters\\${filename}`;
-		remote.require('fs').writeFile(path, data, 'base64', (function(err) {
-			console.log('inside write image inside remote file write', this.savedEntry);
-			this.savedEntry.poster_path = path;
-			this.sendUpdateAction(this.savedEntry);
-			err ? console.log(err) : console.log('poster written to disk');
-		}).bind(this));
+		this.router.navigate(['/library/edit']);
 	}
 
 	finish() {
@@ -208,156 +173,39 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 			if (this.keepers.size > 0) {
 				this.savedEntry = {};
 				Array.from(this.keepers.entries()).forEach(entry => {
-					console.log(`entry: ${entry[0]}: ${entry[1]}`);
-					if (entry[0] !== 'poster_path' &&  entry[0] !== 'id') {
+					//console.log(`entry: ${entry[0]}: ${entry[1]}`);
+					if (entry[0] !== 'id') {
 						this.savedEntry[entry[0]] = entry[1];
 					}
 				});
-				console.log('finish() - has keepers', this.keepers);
-				console.log('finish() - savedEntry0:', this.savedEntry);
+				//console.log('finish() - has keepers', this.keepers);
+				//console.log('finish() - savedEntry0:', this.savedEntry);
 			} else {
-				console.log('savedEntry null and no keepers');
+				//console.log('savedEntry null and no keepers');
 				this.savedEntry = {};
 			}
 		}
 
+		//console.log('about to merge new things with existing entry', this.tempEntry);
+
+		if( !this.selectedEntryId) {
+			console.error('no selected entry id while saving searched metadata in edit, generating uuid');
+		}
+
 		this.savedEntry = {
-			...this.entry,
+			...this.tempEntry,
 			...this.savedEntry,
 			...{
-				id: this.selectedEntryId
+				id: this.selectedEntryId || uuid() // TODO: leave id alone or make it whatever moviedb gives us
 			}
 		};
 
-		if (this.convertedPoster && this.convertedPoster.startsWith('data:image')) {
-			console.log('converted poster is base64 string');
-			const dataParts = this.storageService.base64MimeType(this.convertedPoster);
-			if (dataParts.mime && dataParts.data) {
-				const mime = dataParts.mime;
-				const data = dataParts.data;
-				let ext = mime.split('/')[1] || 'png';
-				if (ext === 'jpg') { ext = 'jpeg'; }
-				const filename = `${uuid()}.${ext}`;
-				console.log('writeImage', data.substring(0, 100), filename);
-				this.writeImage(data, filename);
-			} else {
-				console.log('failed to parse data parts');
-			}
-		} else {
-			console.log('no image to save');
-			this.sendUpdateAction(this.savedEntry);
+		this.libraryService.saveEntry(this.savedEntry);
+		const img = document.querySelector('#poster-' + this.savedEntry.id) as HTMLImageElement;
+		if (img) {
+			img.src = this.savedEntry.poster_path;
 		}
-
-		/*
-			if (this.savedEntry.poster_path != null) {
-				if (this.savedEntry.poster_path.startsWith('data:image')) {
-					let ext = this.storageService.base64MimeType(this.savedEntry.poster_path).split('/')[1] || 'png';
-					if (ext === 'jpg') { ext = 'jpeg'; }
-					const data = this.savedEntry.poster_path.replace(/^data:image\/[a-z]+;base64,/, '');
-					const filename = `${uuid()}.${ext}`;
-					console.log('writeImage1', data, filename);
-					this.writeImage(data, filename);
-				} else if (this.savedEntry.poster_path.startsWith('/')) {
-					const path = this.savedEntry.poster_path;
-					const url = `http://image.tmdb.org/t/p/original${path}`;
-					let ext = path ? path.substring(path.lastIndexOf('.') + 1, path.length) : 'png';
-					if (ext === 'jpg') { ext = 'jpeg'; }
-					console.log('ext', ext);
-					const filename = `${uuid()}.${ext}`;
-					console.log('filename', filename);
-					fetch(url).then((function(response) {
-						return response.blob().then((function(data) {
-							const reader = new FileReader();
-							const file =  new File([data], `test.${ext}`, {	type: `image/${ext}`	});
-							reader.addEventListener('load', (function () {
-								console.log('writeImage2', reader.result, filename);
-								this.writeImage(reader.result, filename);
-							}.bind(this)), false);
-							if (file) {
-								reader.readAsDataURL(file);
-							}
-						}).bind(this));
-					}).bind(this));
-				}
-			} else {
-				this.sendUpdateAction(this.savedEntry);
-			}
-		} else if (this.keepers != null && this.keepers.size > 0) {
-
-			console.log(`keepers:`);
-			console.log(this.keepers);
-
-			this.savedEntry = {};
-
-			// this.savedEntry = {...this.entry, ...this.keepers};
-			Array.from(this.keepers.entries()).forEach(entry => {
-				console.log(`entry: ${entry[0]}: ${entry[1]}`);
-				if (entry[0] !== 'poster_path' &&  entry[0] !== 'id') {
-					this.savedEntry[entry[0]] = entry[1];
-				}
-			});
-
-			this.savedEntry = {
-				...this.entry,
-				...this.savedEntry,
-				...{ id: this.selectedEntryId }
-			};
-
-			if (this.savedEntry.poster_path.startsWith('data:image')) {
-				let ext = this.storageService.base64MimeType(this.savedEntry.poster_path).split('/')[1] || 'png';
-				if (ext === 'jpg') { ext = 'jpeg'; }
-				const data = this.savedEntry.poster_path.replace(/^data:image\/[a-z]+;base64,/, '');
-				const filename = `${uuid()}.${ext}`;
-				console.log('writeImage3', data, filename);
-				this.writeImage(data, filename);
-			} else if (this.savedEntry.poster_path.startsWith('/')) {
-				const path = this.savedEntry.poster_path;
-				const url = `http://image.tmdb.org/t/p/original${path}`;
-				let ext = path ? path.substring(path.lastIndexOf('.') + 1, path.length) : 'png';
-				if (ext === 'jpg') { ext = 'jpeg'; }
-				console.log('ext', ext);
-				const filename = `${uuid()}.${ext}`;
-				console.log('filename', filename);
-				fetch(url).then((function(response) {
-					console.log('response!', response);
-					return response.blob().then((function(data) {
-						const reader = new FileReader();
-						const file =  new File([data], `test.${ext}`, {	type: `image/${ext}`	});
-						//fs.readFile()
-						reader.addEventListener('load', (function () {
-							const base64ImageString = String(reader.result).replace(/^data:image\/[a-z]+;base64,/, '');
-							console.log('writeImage', base64ImageString, filename);
-							this.writeImage(base64ImageString, filename);
-						}.bind(this)), false);
-						if (file) {
-							reader.readAsDataURL(file);
-						}
-					}).bind(this));
-				}).bind(this));
-			} */
-
-			// ------------
-
-			/*
-			if (this.keepers.has('poster_path') && this.conversionStarted && !this.conversionFinished) {
-				console.error('Did not get poster data in time for save action');
-			} else if (this.convertedPoster != null) {
-				console.log('setting converted poster into poster_path');
-				const ext = this.storageService.base64MimeType(this.convertedPoster).split('/')[1] || 'png';
-				const data = this.convertedPoster.replace(/^data:image\/[a-z]+;base64,/, '');
-				const filename = `${this.selectedEntryId}.${ext}`;
-				console.log('writeImage3', data, filename);
-				this.writeImage(data, filename);
-			} */
-
-			/*
-			this.store.dispatch(new LibraryActions.UpdateEntry(
-				{ entry: this.savedEntry }
-			));
-			*/
-
-			// this.navigationService.closeMetadata();
-		// }
+		this.router.navigate(['/library/edit']);
 	}
 
 	isEntrySelected(entry): boolean {
@@ -371,21 +219,18 @@ export class MetadataComponent implements OnInit, OnDestroy, DoCheck {
 		} else {
 			this.savedEntry = entry;
 			this.savedEntry.id = this.selectedEntryId;
-
-			console.log('kicking off poster conversion for', this.savedEntry.poster_path);
-			this.convertPoster({key: 'poster_path', currentValue: this.savedEntry.poster_path});
 		}
 	}
 
 	getNextPage(event) {
-		console.debug('getNextPage() entry');
+		//console.debug('getNextPage() entry');
 		this.page++;
-		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: this.searchTerms, page: this.page}));
+		this.store.dispatch(new LibraryActions.SearchForMetadata({ keywords: this.searchTerms, page: this.page }));
 	}
 
 	getPrevPage(event) {
-		console.debug('getPrevPage() entry');
+		//console.debug('getPrevPage() entry');
 		this.page--;
-		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: this.searchTerms, page: this.page}));
+		this.store.dispatch(new LibraryActions.SearchForMetadata({ keywords: this.searchTerms, page: this.page }));
 	}
 }

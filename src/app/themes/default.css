@@ -110,7 +110,7 @@ a:not([href]):not([tabindex]),
 
 a:not([href]):not([tabindex]):hover,
 .nav-link:hover {
-	color: var(--bright-foreground);
+	color: var(--bright-foreground) !important;
 }
 
 .details-button {
@@ -123,7 +123,7 @@ a:not([href]):not([tabindex]):hover,
 }
 
 .btn:not([disabled]):hover {
-	color: var(--menu-background);
+	color: var(--menu-background) !important;
 }
 .btn:not([disabled]):focus {
 	color: unset;

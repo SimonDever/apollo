@@ -10,41 +10,41 @@ import { MetadataComponent } from './components/metadata/metadata.component';
 
 const routes: Routes = [{
 	path: '',
-	data: { title: 'Library' },
+	data: { title: 'Library', shouldReuse: false },
 	component: LibraryComponent,
 	children: [{
 		path: '',
-		data: { title: 'Entry List' },
+		data: { title: 'Entry List', shouldReuse: false },
 		component: EntryListComponent
 	}, {
 		path: 'view',
-		data: { title: 'View Entry' },
+		data: { title: 'View Entry', shouldReuse: false },
 		component: ViewEntryComponent,
 		children: [{
 			path: 'metadata',
-			data: { title: 'Metadata Search Results' },
+			data: { title: 'Metadata Search Results', shouldReuse: false },
 			component: MetadataComponent
 		}]
 	}, {
 		path: 'edit',
-		data: { title: 'Edit Entry' },
+		data: { title: 'Edit Entry', shouldReuse: false },
 		component: EditEntryComponent,
 		children: [{
 			path: 'metadata',
-			data: { title: 'Metadata Search Results' },
+			data: { title: 'Metadata Search Results', shouldReuse: false },
 			component: MetadataComponent
 		}]
 	}, {
 		path: 'search',
-		data: { title: 'Search Results' },
+		data: { title: 'Search Results', shouldReuse: false },
 		component: SearchResultsComponent
 	}, {
 		path: 'add',
-		data: { title: 'Add Entry' },
+		data: { title: 'Add Entry', shouldReuse: false },
 		component: AddEntryComponent,
 		children: [{
 			path: 'metadata',
-			data: { title: 'Metadata Search Results' },
+			data: { title: 'Metadata Search Results', shouldReuse: false },
 			component: MetadataComponent
 		}]
 	}]

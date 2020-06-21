@@ -7,7 +7,26 @@
 	width: auto; /* prevent full width input in xs */
 }
 
-.button-group .btn {
-	margin-left: 2rem;
-	margin-right: 2rem;
+
+.dropdown {
+	margin: 0 15px;
+}
+
+.dropdown-menu {
+	min-width: 0;
+	left: 25%;
+	background-color: #222;
+	border: 1px solid white;
+	border-radius: 4px;
+}
+
+.dropdown-item {
+	color: white;
+	background-color: #222;
+	text-align: center;
+}
+
+.dropdown-item:hover {
+	background-color: white;
+	color: #222;
 }

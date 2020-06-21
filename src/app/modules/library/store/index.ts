@@ -43,6 +43,11 @@ export const getNeedEntries = createSelector(
 	state => state.needEntries
 );
 
+export const getTempEntry = createSelector(
+	selectSearchState,
+	state => state.tempEntry
+);
+
 export const getConfig = createSelector(
 	selectSearchState,
 	state => state.config

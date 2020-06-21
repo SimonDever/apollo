@@ -22,17 +22,24 @@
 } */
 
 .candy {
-	height: calc(100vh - 56px);
+	/* height: calc(100vh - 56px);
 	display: grid;
-	grid-gap: 15px;
+	grid-gap: 40px 71px;
 	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
 	padding-top: 15px;
 	padding-bottom: 15px;
 	padding-right: 70px;
 	padding-left: 15px;
 	min-width: 0;
-	width: calc(100vw - 17px);
-	/* overflow: hidden; */
+	width: calc(100vw - 17px); */
+
+	display: grid;
+	grid-gap: 40px 71px;
+	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
+	padding: 0 15px;
+	height: unset !important;
+	max-width: unset !important;
+	max-height: unset !important;
 }
 
 .entry-box,
@@ -55,29 +62,35 @@
 	opacity: 0;
 }
 
+
+::ng-deep .scrollable-content {
+	display: grid;
+	grid-gap: 40px 71px;
+	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
+	padding: 0 15px;
+	height: unset !important;
+	max-width: unset !important;
+	max-height: unset !important;
+}
+:root {
+	scrollbar-color: rgba(175, 175, 175, .5) #1d1d1d !important;
+	scrollbar-width: thin !important;
+}
 ::-webkit-scrollbar {
-	margin-right: 15px;
-	margin-top: 15px;
-  width: 15px;
-	height: 15px;
-  background-color: transparent;
+	max-width: 25px !important;
+	max-height: 25px !important;
+	background: #1d1d1d !important;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+	background: #1d1d1d !important;
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: #aaa;
-	border-radius: 4px;
+	background: rgba(175, 175, 175, .5) !important;
 }
 
-.missing-poster {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(65, 131, 196, .8) !important;
 }
-
-.missing-poster-icon {
-	height: 400px;
-	width: 290px;
-	padding-left: 15px;
-	position: absolute;
-}
-

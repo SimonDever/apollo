@@ -1,16 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
-import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from './modules/shared/shared.module';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-
+import { ConfigService } from './modules/shared/services/config.service';
 
 @NgModule({
 	declarations: [
@@ -30,7 +29,10 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 		})
 	],
 	providers: [
-		{ provide: 'MOVIEDB_API_KEY', useValue: environment.MOVIEDB_API_KEY }
+		{
+			provide: APP_INITIALIZER, deps: [ConfigService], multi: true,
+			useFactory: (configService: ConfigService) => () => configService.load()
+		}
 	],
 	bootstrap: [AppComponent]
 })

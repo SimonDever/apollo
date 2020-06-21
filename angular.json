@@ -19,6 +19,7 @@
             "assets": [
               "src/assets",
 							"src/favicon.ico",
+              "src/vlc.js",
               "src/app.js"
             ],
             "styles": [
@@ -81,6 +82,7 @@
             "assets": [
               "src/assets",
               "src/favicon.ico",
+              "src/vlc.js",
               "src/app.js"
             ]
           }

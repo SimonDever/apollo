@@ -22,7 +22,7 @@ Features:
 - [ngx-virtual-scroller](https://github.com/rintoj/ngx-virtual-scroller)
 - [octicons](https://github.com/primer/octicons)
 
-## Building and running
+## Developing and Testing
 
 ```
 npm install
@@ -30,11 +30,11 @@ npm run build
 npm run electron
 ```
 
-## Developing
+## Building and Publishing
+
+Setup [code signing certificate](https://www.electron.build/code-signing) and environment variables.
 
 ```
 npm install
-npm start
+npm run package
 ```
-
-To enable MovieDb searching create `.moviedb-api-key` file with API key in root directory.

@@ -1,8 +1,27 @@
 @import './app/themes/default.css';
 
 :root {
-	--grid-item-width: 290px;
-	--grid-item-height: 400px;
+	/* --grid-item-width: 290px; */
+	/* --grid-item-height: 400px; */
+
+	--grid-item-width: 348px;
+	--grid-item-height: 480px;
+
+	/* 	--grid-item-width: 435px; */
+	/* --grid-item-height: 600px; */
+}
+
+
+.missing-poster {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.missing-poster-icon {
+	height: --grid-item-width;
+	width: --grid-item-width;
+	padding-left: 15px;
+	position: absolute;
 }
 
 .version-notification {
@@ -34,7 +53,8 @@ pre {
 /* 	flex-flow: row nowrap;
 	justify-content: center; */
 	/* margin: 0 auto; */
-	margin-right: calc(50vw - (16px * 3.5) - 2rem - 200px);
+	/* margin-right: calc(50vw - (16px * 3.5) - 2rem - 200px); */
+	margin-right: auto;
 	margin-left: auto;
 }
 

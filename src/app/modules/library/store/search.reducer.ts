@@ -3,22 +3,26 @@ import { Entry } from './entry.model';
 
 export interface State {
 	needEntries: boolean;
+	tempEntry: Entry;
 	selectedEntryId: any;
 	searchResults: Entry[];
 	searchTerms: string;
 	metadataSearchResults: any;
 	metadataDetailsResults: Map<any, any>;
 	config: any;
+	apiKey: string;
 }
 
 export const initialState: State = {
 	needEntries: true,
+	tempEntry: null,
 	selectedEntryId: null,
 	searchResults: [],
 	searchTerms: '',
 	metadataSearchResults: null,
 	metadataDetailsResults: new Map(),
-	config: null
+	config: null,
+	apiKey: ''
 };
 
 export function reducer(state: State = initialState, action: LibraryActions.All): State {
@@ -32,6 +36,18 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 		case LibraryActions.SHOW_METADATA_RESULTS: {
 			return Object.assign({}, state, {
 				metadataSearchResults: action.payload.results
+			});
+		}
+
+		case LibraryActions.SEARCH_FOR_METADATA: {
+			return Object.assign({}, state, {
+				tempEntry: action.payload.tempEntry
+			});
+		}
+
+		case LibraryActions.SAVE_API_KEY: {
+			return Object.assign({}, state, {
+				apiKey: action.payload.apiKey
 			});
 		}
 

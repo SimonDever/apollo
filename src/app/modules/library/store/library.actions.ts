@@ -17,7 +17,7 @@ export class Loaded implements Action {
 export const SEARCH_FOR_METADATA = '[Entry] Search For Metadata';
 export class SearchForMetadata implements Action {
 	readonly type = SEARCH_FOR_METADATA;
-	constructor(public payload: { keywords: string, page?: number }) { }
+	constructor(public payload: { keywords: string, page?: number, tempEntry?: Entry }) { }
 }
 
 export const SEARCH_FOR_METADATA_DETAILS = '[Entry] Search For Metadata Details';
@@ -114,18 +114,31 @@ export class UpdateResults implements Action {
 	constructor(public entry: Entry) { }
 }
 
+export const DELETE_ALL_ENTRIES = '[Entry] Delete All Entries';
+export class DeleteAllEntries implements Action {
+	readonly type = DELETE_ALL_ENTRIES;
+	constructor() { }
+}
+
+export const SAVE_API_KEY = '[Entry] Save API Key';
+export class SaveApiKey implements Action {
+	readonly type = SAVE_API_KEY;
+	constructor(public payload: { apiKey: string }) { }
+}
+
 export type All =
 	SelectEntry |
+	SaveApiKey |
 	SearchEntries |
 	UpdateEntry |
 	SearchForMetadata |
 	ShowMetadataResults |
-	SearchForMetadata |
 	RemoveEntry |
 	ImportEntry |
 	SearchForMetadataDetails |
 	ShowMetadataDetailsResults |
 	AddEntry |
+	DeleteAllEntries |
 	GetConfig |
 	UpdateConfig |
 	RefreshConfig |

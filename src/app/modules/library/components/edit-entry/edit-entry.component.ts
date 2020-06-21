@@ -1,21 +1,21 @@
-import { reducers } from './../../../../app.reducer';
-import { StorageService } from './../../../shared/services/storage.service';
-import { Component, OnInit, NgZone, OnDestroy, DoCheck, KeyValueDiffers, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormControl, FormArray } from '@angular/forms';
-import { ActivatedRoute, Router, RouterStateSnapshot, RouterState, NavigationEnd } from '@angular/router';
-import { select, Store } from '@ngrx/store';
-import { Observable ,	Subscription } from 'rxjs';
-
-import { NavigationService } from '../../../shared/services/navigation.service';
-import { Entry } from '../../store/entry.model';
-import * as fromLibrary from '../../store';
-import * as LibraryActions from '../../store/library.actions';
-
-import { NgbModal, ModalDismissReasons, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { map, tap, take } from 'rxjs/operators';
-import { ElectronService } from 'ngx-electron';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { ChangeDetectorRef, Component, DoCheck, KeyValueDiffers, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Router, RouterStateSnapshot } from '@angular/router';
+import { ModalDismissReasons, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { select, Store } from '@ngrx/store';
+import { ElectronService } from 'ngx-electron';
+import { Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { LibraryService } from '../../../shared/services/library.service';
+import { NavigationService } from '../../../shared/services/navigation.service';
+import * as fromLibrary from '../../store';
+import { Entry } from '../../store/entry.model';
+import * as LibraryActions from '../../store/library.actions';
+import { StorageService } from './../../../shared/services/storage.service';
+
+
 const uuid = require('uuid/v4');
 /**
  * TODO: enable field reordering and the saving of that order
@@ -67,6 +67,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		private zone: NgZone,
 		private store: Store<fromLibrary.State>,
 		private router: Router,
+		private libraryService: LibraryService,
 		private electronService: ElectronService,
 		private storageService: StorageService,
 		private cdRef: ChangeDetectorRef,
@@ -83,17 +84,17 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 			this.searchForm = this.formBuilder.group({searchTerms: ''});
 		}
 
-	posterUrl(path) {
-		if (path) {
-			if (path.toLowerCase().startsWith('c:\\')) {
-				return this.sanitizer.bypassSecurityTrustResourceUrl('file://' + path);
-			} else if (path.startsWith('data:image')) {
-				return path;
+		posterUrl(path) {
+			if (path) {
+				if (path.toLowerCase().startsWith('c:\\')) {
+					return this.sanitizer.bypassSecurityTrustResourceUrl('file://' + path);
+				} else if (path.startsWith('data:image')) {
+					return path;
+				}
+			} else {
+				return '';
 			}
-		} else {
-			return '';
 		}
-	}
 
 	sortFields(key1, key2) {
 		if (key1 === key2) { return 0; }
@@ -106,13 +107,8 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	ngOnInit() {
 		console.log('EditEntryComponent Init');
 		this.entry$ = this.store.select(fromLibrary.getSelectedEntry);
-		this.subs = this.entry$.pipe(
-			take(1),
-			tap(entry => {
-				console.log('init entry pipe tap - entry', entry);
-			})
-		).subscribe(entry => {
-			console.log('init entry pipe sub - entry', entry);
+		this.subs = this.entry$.pipe(map(entry => {
+			console.log('Edit - entry', entry);
 			if (entry) {
 				this.entry = { ...entry };
 				this.poster_path = entry.poster_path || '';
@@ -143,7 +139,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 			}
 
 			window.scrollTo(0, 0);
-		});
+		})).subscribe();
 
 		this.store.select(fromLibrary.getSelectedEntryId)
 			.pipe(map(id => this.selectedEntryId = id))
@@ -219,12 +215,13 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	}
 
 	search() {
-		const searchTerms = this.searchForm.value.searchTerms;
-		console.debug('searchMetadataProvider() entry');
-		this.navigationService.setMetadataParent(this.router.routerState.snapshot.url);
-		console.debug(`searchMetadataProvider() searching metadata providers with terms ${searchTerms}`);
-		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: searchTerms}));
 		this.modalRef.close('search');
+		const searchTerms = this.searchForm.value.searchTerms;
+		this.router.navigate(['/library/edit']); // TODO: check if we need this
+		// console.log('searchMetadataProvider() entry');
+		// this.navigationService.setMetadataParent(this.router.routerState.snapshot.url);
+		// console.log(`searchMetadataProvider() searching metadata providers with terms ${searchTerms}`);
+		this.store.dispatch(new LibraryActions.SearchForMetadata({keywords: searchTerms, tempEntry: { ...this.entryForm.value, ...{ poster_path: this.poster_path, file: this.file }}}));
 	}
 
 	closeModal() {
@@ -293,17 +290,17 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		return poster_path && !poster_path.startsWith('data:image');
 	}
 
-	sendUpdateAction(entry) {
+/* 	sendUpdateAction(entry) {
 		this.store.dispatch(new LibraryActions.UpdateEntry({ entry: entry }));
 		this.navigationService.closeMetadata();
-	}
+	} */
 
 	writeImage(data, filename, changes) {
 		const remote = this.electronService.remote;
 		const path = `${remote.app.getPath('userData')}\\posters\\${filename}`;
 		remote.require('fs').writeFile(path, data, 'base64', (function(err) {
 			changes.poster_path = path;
-			console.debug('electronService remove writeFile - image updated');
+			console.debug('electronService remote writeFile - image updated');
 			this.sendUpdateAction(changes);
 			this.navigationService.closeEditEntry(this.selectedEntryId);
 			err ? console.log(err) : console.log('poster written to disk');
@@ -330,12 +327,27 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		this.file = path || event.target.files[0].name;
 		const title = this.entryForm.value.title;
 		if (title == null || title === '') {
-			this.entryForm.value.title = event.target.files[0].name;
+
+			const forwardSlash = this.file.lastIndexOf('/');
+			const backwardSlash = this.file.lastIndexOf('\\');
+			let separator = forwardSlash, newTitle;
+
+			if (forwardSlash === -1) {
+				separator = backwardSlash;
+			}
+			if (this.file.lastIndexOf('(') === -1) {
+				newTitle = this.file.substring(separator + 1, this.file.lastIndexOf('.'));
+			} else {
+				newTitle = this.file.substring(separator + 1, this.file.lastIndexOf('('));
+			}
+
+			this.entryForm.get('title').setValue(newTitle);
 		}
 	}
 
 	save() {
 		const changes = this.entryForm.value;
+		changes.poster_path = this.poster_path;
 		changes.file = this.file;
 		this.fieldsRemoved.forEach(field => {
 			if (!changes.hasOwnProperty(field)) {
@@ -344,50 +356,9 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 			}
 		});
 
-		if (this.poster_path.startsWith('data:image')) {
-			const dataParts = this.storageService.base64MimeType(this.poster_path);
-			if (dataParts.mime && dataParts.data) {
-				const mime = dataParts.mime;
-				const data = dataParts.data;
-				let ext = mime.split('/')[1] || 'png';
-				if (ext === 'jpg') { ext = 'jpeg'; }
-				const filename = `${uuid()}.${ext}`;
-				const file =  new File([data], `test.${ext}`, {	type: `image/${ext}`	});
-				const reader = new FileReader();
-				reader.addEventListener('load', (function () {
-					console.debug('writeImage3', data.substring(0, 100), filename);
-					this.writeImage(data, filename, changes);
-				}.bind(this)), false);
-				if (file) {
-					reader.readAsDataURL(file);
-				}
-			} else {
-				console.error('error getting data parts from ', this.poster_path);
-			}
-		} else if (this.poster_path.startsWith(this.electronService.remote.app.getPath('userData'))) {
-			changes.poster_path = this.poster_path;
-			this.sendUpdateAction(changes);
-			this.navigationService.closeEditEntry(this.selectedEntryId);
-		} else if (this.poster_path.startsWith('/')) {
-			const path = this.poster_path;
-			const url = `http://image.tmdb.org/t/p/original${path}`;
-			let ext = path ? path.substring(path.lastIndexOf('.') + 1, path.length) : 'png';
-			if (ext === 'jpg') { ext = 'jpeg'; }
-			const filename = `${uuid()}.${ext}`;
-			fetch(url).then((function(response) {
-				return response.blob().then((function(data) {
-					const file =  new File([data], `test.${ext}`, {	type: `image/${ext}`	});
-					const reader = new FileReader();
-					reader.addEventListener('load', (function () {
-						console.debug('writeImage4', data.substring(0, 100), filename);
-						this.writeImage(data, filename, changes);
-					}.bind(this)), false);
-					if (file) {
-						reader.readAsDataURL(file);
-					}
-				}).bind(this));
-			}).bind(this));
-		}
+		this.libraryService.saveEntry(changes);
+		this.navigationService.closeMetadata();
+		this.navigationService.closeEditEntry(this.selectedEntryId);
 	}
 
 	close() {

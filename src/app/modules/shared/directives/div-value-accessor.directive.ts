@@ -26,9 +26,9 @@ export class DivValueAccessorDirective implements ControlValueAccessor {
 
 	public writeValue(value: string): void {
 		let normalizedValue = String(value);
-		if (normalizedValue) {
+		/* if (normalizedValue) {
 			normalizedValue = normalizedValue.replace(/^s|s$/g, ' ');
-		}
+		} */
 
 		this._renderer.setElementProperty(
 			this._elementRef.nativeElement, 'innerHTML', normalizedValue);

@@ -1,4 +1,4 @@
-import { Injectable, NgZone, EventEmitter } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -10,6 +10,9 @@ import * as LibraryActions from './library.actions';
 import { SearchService } from '../../shared/services/search.service';
 import { NavigationService } from '../../shared/services/navigation.service';
 import { map, mergeMap, tap } from 'rxjs/operators';
+import { Entry } from './entry.model';
+import { ConfigService } from '../../shared/services/config.service';
+import { LibraryService } from '../../shared/services/library.service';
 
 @Injectable()
 export class LibraryEffects {
@@ -17,18 +20,23 @@ export class LibraryEffects {
 	constructor(private router: Router,
 		private storageService: StorageService,
 		private searchService: SearchService,
+		private configService: ConfigService,
+		private libraryService: LibraryService,
 		private actions$: Actions,
 		private navigationService: NavigationService,
 		private zone: NgZone,
 		private store: Store<fromLibrary.LibraryState>) {
 	}
 
-	@Effect({ dispatch: false })
-	updateEntry$ = this.actions$.pipe(
+	@Effect()
+	updateEntry$: Observable<Action> = this.actions$.pipe(
 		ofType(LibraryActions.UPDATE_ENTRY),
 		map(action => (action as LibraryActions.UpdateEntry).payload.entry),
 		mergeMap(entry => this.storageService.updateEntry(entry.id, entry)),
-		tap(response => console.log(`library.effects - storage response`, response)));
+		map((entry: Entry) => {
+			console.log(`library.effects - storage response`, entry);
+			return new LibraryActions.SelectEntry({id: entry.id});
+		}));
 
 	@Effect({ dispatch: false })
 	loaded$ = this.actions$.pipe(
@@ -41,34 +49,42 @@ export class LibraryEffects {
 		mergeMap(() => this.storageService.getAllEntries()),
 		map(entries => new LibraryActions.Loaded({ entries: entries })));
 
-	@Effect({ dispatch: false })
+	@Effect()
 	addEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.ADD_ENTRY),
 		map(action => (action as LibraryActions.AddEntry).payload.entry),
 		mergeMap(entry => this.storageService.addEntry(entry)),
-		tap(response => {
-			console.log(`library.effects - storage response`, response);
-			this.zone.run(() => this.router.navigate(['/library/view']));
+		map(entry => {
+			//this.zone.run(() => this.router.navigate(['/library/view']));
+			return new LibraryActions.SelectEntry({ id: entry.id });
 		}));
 
-	@Effect({ dispatch: false })
+	@Effect()
 	importEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.IMPORT_ENTRY),
 		map(action => (action as LibraryActions.ImportEntry).payload.entry),
-		mergeMap(entry => this.storageService.addEntry(entry)),
-		tap(response => {
-			console.log(`library.effects - storage response`, response);
-			this.storageService.importStorageCount++;
+		mergeMap(entry => this.searchService.getFirstResult(entry)),
+		tap(entry => console.log('got first result and saving', entry)),
+		map(entry => {
+			this.libraryService.convertUrlPath(entry);
+			return new LibraryActions.AddEntry({entry});
 		}));
 
 	@Effect({ dispatch: false })
+	saveAPiKey$ = this.actions$.pipe(
+		ofType(LibraryActions.SAVE_API_KEY),
+		map(action => (action as LibraryActions.SaveApiKey).payload.apiKey),
+		tap(apiKey => this.configService.save(apiKey)));
+
+	@Effect()
 	removeEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.REMOVE_ENTRY),
 		map(action => (action as LibraryActions.RemoveEntry).payload.id),
 		mergeMap(id => this.storageService.removeEntry(id)),
-		tap(response => {
+		map(response => {
 			console.log(`library.effects - storage response`, response);
 			this.zone.run(() => this.router.navigate(['/library']));
+			return new LibraryActions.Load();
 		}));
 
 	@Effect()
@@ -104,8 +120,7 @@ export class LibraryEffects {
 		ofType(LibraryActions.SHOW_METADATA_RESULTS),
 		map(action => (action as LibraryActions.ShowMetadataResults).payload.results),
 		tap(results => {
-			console.log(`${this.navigationService.metadataParent}/metadata`);
-			this.zone.run(() => this.router.navigate([`${this.navigationService.metadataParent}/metadata`]));
+			this.zone.run(() => this.router.navigate(['/library/edit/metadata']));
 		}));
 
 	@Effect({ dispatch: false })
@@ -123,8 +138,8 @@ export class LibraryEffects {
 		map(config => {
 			if (config == null || (Array.isArray(config) && config.length === 0)) {
 				config = { // TODO: move to model file or store index, move from setting component too
-					boxHeight: '400px',
-					boxWidth: '290px',
+					boxHeight: '480px',
+					boxWidth: '348px',
 					virtualScrolling: true
 				};
 			}

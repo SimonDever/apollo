@@ -8,10 +8,11 @@ import * as fromLibrary from '../../../library/store';
 import * as LibraryActions from '../../../library/store/library.actions';
 import { trigger, style, transition, animate } from '@angular/animations';
 import { Subscription, Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
-import { NgbCheckBox } from '@ng-bootstrap/ng-bootstrap';
+import { map, take, mergeMap } from 'rxjs/operators';
+import { NgbCheckBox, NgbModalRef, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
+import { LibraryService } from '../../../shared/services/library.service';
 
 const uuid = require('uuid/v4');
 
@@ -34,46 +35,58 @@ const uuid = require('uuid/v4');
 		])
 	]
 })
-export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDestroy, AfterViewInit {
+export class SettingsListComponent implements OnInit, DoCheck, OnDestroy {
 
-	importData: Array<any>;
+	mode: '' | 'Deleting library' | 'Parsing library' | 'Import complete' |
+		'Importing library' | 'Adding entries' | 'Loading posters' | 'Reading file';
+	
 	config: any;
-	ready: boolean;
 	config$: Observable<any>;
 	subs: Subscription;
 	configForm: FormGroup;
 	differ: any;
-	posterCount: number;
-	notLoading: boolean;
-	estimatedCount: number;
-	readingFile: boolean;
-	readingFileCount: number;
-	tempCount: number;
 	interval: any;
 	updater;
 	updateAvailable;
+	fs: any;
+	path: any;
+	userDataFolder: String;
+	closeResult: string;
+	modalRef: NgbModalRef;
+	apiKeyForm: FormGroup;
+	selected: boolean;
+
+	importCount: number;
+	deletedCount: number;
+	posterCount: number;
+	estimatedCount: number;
+	parsedCount: number;
 
 	constructor(private formBuilder: FormBuilder,
-		private sanitization: DomSanitizer,
 		private storageService: StorageService,
 		private router: Router,
+		private sanitizer: DomSanitizer,
+		private libraryService: LibraryService,
 		private cdRef: ChangeDetectorRef,
+		private modalService: NgbModal,
 		private store: Store<fromLibrary.LibraryState>,
 		private electronService: ElectronService,
 		private differs: KeyValueDiffers) {
+
 		this.differ = this.differs.find([]).create();
+		this.fs = this.electronService.remote.require('fs');
+		this.path = this.electronService.remote.require('path');
+		this.userDataFolder = this.electronService.remote.app.getPath('userData');
+		this.apiKeyForm = this.formBuilder.group({apiKey: ''});
 	}
 
 	ngOnInit() {
-
-		this.tempCount = 0;
-		this.readingFile = false;
-		this.readingFileCount = 0;
-		this.notLoading = true;
+		this.importCount = 0;
+		this.deletedCount = 0;
 		this.posterCount = 0;
 		this.estimatedCount = 0;
-		this.storageService.importStorageCount = 0;
-		this.ready = false;
+		this.parsedCount = 0;
+		this.selected = false;
 		this.store.dispatch(new LibraryActions.GetConfig());
 		this.config$ = this.store.select(fromLibrary.getConfig);
 		this.subs = this.config$.pipe(map(config => {
@@ -81,8 +94,13 @@ export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDest
 			const configFormGroup = {};
 			const defaultConfig: any = {
 				virtualScrolling: true,
-				boxWidth: '290px',
-				boxHeight: '400px'
+				boxWidth: '348px',
+				boxHeight: '480px',
+				borderRadius: '5px',
+				borderColor: 'gold',
+				shadowColor: '#e08056',
+				shadowBlur: '2px',
+				shadowSpread: '2px'
 			};
 			config = { ...defaultConfig, ...(config || {}) };
 			Object.entries(config).forEach(([key, value]) => {
@@ -99,8 +117,9 @@ export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDest
 		})).subscribe();
 	}
 
-	ngAfterViewInit() {
-		this.ready = true;
+	toggleActions(event: Event) {
+		event.preventDefault();
+		this.selected = !this.selected;
 	}
 
 	ngDoCheck() {
@@ -108,21 +127,16 @@ export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDest
 			this.configForm.patchValue(this.config);
 		}
 	}
-
-	getStatus() {
-		const savingNewDetails = this.storageService.importStorageCount > 0
-			&& this.storageService.importStorageCount < this.estimatedCount;
-		if (this.readingFile) {
-			return 'Reading movie details from file';
-		} else if (this.posterCount > 0 && this.storageService.importStorageCount === 0
-			&& this.estimatedCount > 0) {
-			return 'Saving movie posters to disk';
-		} else if (savingNewDetails) {
-			return 'Saving movie details to new database';
-		} else if (this.estimatedCount === 0) {
-			return 'Nothing loaded';
-		} else if (this.posterCount === this.estimatedCount && this.storageService.importStorageCount === this.estimatedCount) {
-			return `Finished loading ${this.estimatedCount} movies`;
+	
+	posterUrl(path) {
+		if (path) {
+			if (path.toLowerCase().startsWith('c:\\')) {
+				return this.sanitizer.bypassSecurityTrustResourceUrl('file://' + path);
+			} else if (path.startsWith('data:image')) {
+				return path;
+			}
+		} else {
+			return '';
 		}
 	}
 
@@ -151,60 +165,119 @@ export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDest
 	progressStyle() {
 		const progressStyle = 'width:' + this.progressPercentage() + '%';
 		console.log('progressStyle ::', style);
-		return this.sanitization.bypassSecurityTrustStyle(progressStyle);
+		return this.sanitizer.bypassSecurityTrustStyle(progressStyle);
 	}
 
-	ngOnChanges() {
-		if (this.progressPercentage() !== 0 && this.progressPercentage() !== 100) {
+	saveApiKey() {
+		this.store.dispatch(new LibraryActions.SaveApiKey({
+			apiKey: this.apiKeyForm.value.apiKey
+		}));
+		this.modalRef.close('save');
+	}
 
+	showApiKeyDialog(content) {
+		this.modalRef = this.modalService.open(content);
+		this.modalRef.result.then((result) => {
+			this.closeResult = `Closed with: ${result}`;
+		}, (reason) => {
+			this.closeResult = `Dismissed with: ${this.getDismissReason(reason)}`;
+		});
+	}
+
+	getDismissReason(reason: any): string {
+		if (reason === ModalDismissReasons.ESC) {
+			return 'by pressing ESC';
+		} else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+			return 'by clicking on a backdrop';
+		} else if (reason === 'close') {
+			return 'by pressing x on the modal';
+		} else {
+			return	`with: ${reason}`;
 		}
+	}
+
+	closeModal() {
+		this.modalRef.dismiss('close');
 	}
 
 	progressPercentage() {
-		console.log('check prog: this.posterCount: ', this.posterCount);
-		/* console.log('progressPercentage :: estimatedCount: ' + this.estimatedCount
-			+ 'importStorageCount: ' + this.storageService.importStorageCount
-			+ ', percentage: ' + this.storageService.importStorageCount / this.estimatedCount
-			+ '(' + ((this.storageService.importStorageCount / this.estimatedCount) * 100) + '%)'); */
-		if (this.estimatedCount === 0 && !this.readingFile) {
-			console.log(`progressPercentage - Nothing loaded, this.estimatedCount: ${this.estimatedCount}`);
+		
+		if (this.estimatedCount === 0) {
 			return 0;
-		} else if (this.readingFile ||
-			(this.storageService.importStorageCount === 0 && this.estimatedCount > 0)) {
-			/* console.log(`progressPercentage - Reading file, this.readingFileCount: ${this.readingFileCount}, perc: ${(this.readingFileCount / this.estimatedCount) * 100}`); */
-			if (this.posterCount >= this.estimatedCount) { return 100; }
-			return Math.ceil((this.posterCount / this.estimatedCount) * 100); // (this.readingFileCount / this.estimatedCount) * 100;
-
-
-			/*	else if (this.posterCount > 0 && this.posterCount < this.estimatedCount
-				&& this.storageService.importStorageCount === 0) {
-				console.log(`progressPercentage - Writing posters to disk, this.posterCount: ${this.posterCount}, perc: ${(this.posterCount / this.estimatedCount) * 100}`);
-				return Math.ceil((this.posterCount / this.estimatedCount) * 100);
-			*/
-
-		} else if (this.storageService.importStorageCount > 0
-			&& this.storageService.importStorageCount < this.estimatedCount) {
-			console.log(`progressPercentage - Loading movie into database, this.storageService.importStorageCount: ${this.storageService.importStorageCount}, perc: ${(this.storageService.importStorageCount / this.estimatedCount) * 100}`);
-			return Math.ceil((this.storageService.importStorageCount / this.estimatedCount) * 100);
-		} else if (this.storageService.importStorageCount === this.estimatedCount) {
-			return 100;
 		}
 
-		console.log('oops, no progress');
-		return 0;
-		// const percentage = (this.storageService.importStorageCount / this.estimatedCount) * 100;
-		// const percentage = this.posterCount / this.estimatedCount;
-		// return percentage;
+		switch (this.mode) {
+			case 'Deleting library': {
+				console.log(`progress :: estimatedCount=${this.estimatedCount} deletedCount=${this.deletedCount}`);
+				return Math.ceil((this.deletedCount / this.estimatedCount) * 100);
+			}
+			case 'Importing library' || 'Adding entries': {
+				console.log(`progress :: estimatedCount=${this.estimatedCount} importCount=${this.importCount}`);
+				return Math.ceil((this.importCount / this.estimatedCount) * 100);
+			}
+			case 'Parsing library': {
+				console.log(`progress :: estimatedCount=${this.estimatedCount} parsedCount=${this.parsedCount}`);
+				return Math.ceil((this.parsedCount / this.estimatedCount) * 100);
+			}
+			case 'Loading posters': {
+				console.log(`progress :: estimatedCount=${this.estimatedCount} posterCount=${this.posterCount}`);
+				return Math.ceil((this.posterCount / this.estimatedCount) * 100);
+			}
+			case 'Import complete': {
+				return 100;
+			}
+			case 'Reading file': {
+				return 50;
+			}
+			default: {
+				return 0;
+			}
+		}
 	}
 
-	onChange(event) {
-		this.estimatedCount = 0;
-		this.readingFile = true;
-		this.tempCount = 0;
-		this.posterCount = 0;
-		this.storageService.importStorageCount = 0;
-		console.log('onChange :: entry');
-		console.log(event.target.files[0].name);
+	deleteLibrary() {
+		this.mode = 'Deleting library';
+		this.deletedCount = 0;
+		// this.cdRef.detectChanges();
+		this.store.select(fromLibrary.getTotalEntries).pipe(
+			take(1),
+			mergeMap(count => {
+				console.log('DeleteLibrary :: estimatedCount=', count);
+				this.estimatedCount = count;
+				// this.cdRef.detectChanges();
+				console.log('DeleteLibrary :: Deleting from database');
+				return this.storageService.deleteAllEntries();
+			}),
+			map(countRemoved => {
+				console.log('DeleteLibrary :: countRemoved=', countRemoved);
+				console.log('DeleteLibrary :: Deleting from NGRX Store');
+				this.store.dispatch(new LibraryActions.DeleteAllEntries());
+				console.log('DeleteLibrary :: Deleting posters from file system');
+				const posterFolder = `${this.userDataFolder}\\posters`;
+				this.fs.readdir(posterFolder, (err, files) => {
+					if (err) {
+						console.error(err);
+						throw err;
+					}
+					this.estimatedCount = files.length;
+					for (const file of files) {
+						this.fs.unlink(this.path.join(posterFolder, file), err => {
+							if (err) {
+								console.error(err);
+								throw err;
+							}
+							this.deletedCount++;
+							// this.cdRef.detectChanges();
+						});
+					}
+				});
+			})
+		).subscribe();
+	}
+
+	importJSON(event) {
+		this.mode = 'Reading file';
+		console.log('importSave :: entry. file:', event.target.files[0]);
 		const reader = new FileReader();
 		reader.onload = (function (f) {
 			return function (e) {
@@ -214,24 +287,36 @@ export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDest
 		reader.readAsText(event.target.files[0]);
 	}
 
-	/*
-	stillLoading() {
-		if (this.notLoading) { return false; }
-		console.log('stillLoading() :: this.posterCount', this.posterCount);
-		console.log('stillLoading() :: this.estimatedCount - ', this.estimatedCount);
-		console.log('stillLoading() returning (this.posterCount < this.estimatedCount) ', this.posterCount < this.estimatedCount);
-		return this.posterCount < this.estimatedCount;
+	addEntries(event) {
+		this.mode = "Adding entries";
+		this.importCount = 0;
+		console.log('addEntries :: entry. files:', event.target.files);
+		const files = event.target.files;
+		this.estimatedCount = files.length;
+		for (const file of files) {
+			this.libraryService.createEntry(file);
+			this.importCount++;
+			// this.cdRef.detectChanges();
+		}
+		console.log('addEntries :: finished raising all actions');
 	}
-	*/
 
+	changeAllFilePaths(filepath: string) {
+		// TODO: implement function to change all database entry paths but not file names
+		this.subs.add(this.storageService.changeAllPathsTo().pipe(map(done => {
+			console.log('changeAllFilePaths sub result:', done);
+		})).subscribe());
+	}
 
 	onReaderLoad(event) {
-		this.readingFile = false;
+		this.mode = 'Parsing library';
+		this.parsedCount = 0;
 		const obj = JSON.parse(event.target.result);
 		this.estimatedCount = Object.keys(obj).length;
 		console.log('onReaderLoad :: obj: ', obj);
+		const newEntries = [];
+		const postersToWrite = [];
 		for (const data of obj) {
-			this.tempCount++;
 			console.log('data:', data);
 			const out: Entry = {
 				id: uuid(),
@@ -262,22 +347,13 @@ export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDest
 						const poster_path = `${this.electronService.remote.app.getPath('userData')}\\posters\\${out.id}.png`;
 						console.log('attempting to write poster to ');
 						console.log(poster_path);
-						this.electronService.remote.require('fs').writeFile(poster_path, matchData, 'base64', (err) => {
-							err ? console.log(err) : console.log('poster written to disk');
-							this.posterCount++;
-							this.cdRef.detectChanges();
-						});
+						postersToWrite.push({ poster_path, matchData });
 						out.poster_path = poster_path;
 					} else {
 						console.log('not base64 poster, just going to save whatever it is');
 						out.poster_path = match.Poster;
-						this.posterCount++;
-						this.cdRef.detectChanges();
 					}
 				}
-			} else {
-				this.posterCount++;
-				this.cdRef.detectChanges();
 			}
 			if (match.Year) { out.year = match.Year; }
 			if (match.Rated) { out.rated = match.Rated; }
@@ -297,8 +373,34 @@ export class SettingsListComponent implements OnInit, OnChanges, DoCheck, OnDest
 			if (match.Type) { out.type = match.Type; }
 
 			console.log('finished one: ', out);
-			this.store.dispatch(new LibraryActions.ImportEntry({ entry: out }));
+			newEntries.push(out);
+			this.parsedCount++;
+			// this.cdRef.detectChanges();
 		}
+
+		this.mode = "Importing library";
+		this.importCount = 0;
+		// this.cdRef.detectChanges();
+		this.estimatedCount = newEntries.length;
+		for (const entry of newEntries) {
+			this.store.dispatch(new LibraryActions.ImportEntry({ entry: entry }));
+			this.importCount++;
+			// this.cdRef.detectChanges();
+		}
+
+		this.mode = "Loading posters";
+		this.posterCount = 0;
+		// this.cdRef.detectChanges();
+		this.estimatedCount = postersToWrite.length;
+		for (const poster of postersToWrite) {
+			this.fs.writeFile(poster.poster_path, poster.matchData, 'base64', (err) => {
+				err ? console.log(err) : console.log('poster written to disk');
+				this.posterCount++;
+				// this.cdRef.detectChanges();
+			});
+		}
+
+		this.mode = "Import complete";
 
 		console.log('finished all');
 	}
