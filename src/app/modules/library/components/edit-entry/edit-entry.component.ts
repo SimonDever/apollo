@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectorRef, Component, DoCheck, KeyValueDiffers, NgZone, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, DoCheck, KeyValueDiffers, NgZone, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterStateSnapshot } from '@angular/router';
@@ -52,12 +52,12 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	originalEntry: Entry;
 	differ: any;
 	modalRef: NgbModalRef;
-	fieldsRemoved: string[];
 	closeResult: string;
 	inputList: any[];
 	routerState: RouterStateSnapshot;
 	selectedEntryId: string;
 	_id: string;
+	fieldsRemoved: string[];
 
 	constructor(private formBuilder: FormBuilder,
 		private zone: NgZone,
@@ -70,31 +70,41 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		private modalService: NgbModal,
 		private sanitizer: DomSanitizer,
 		private navigationService: NavigationService,
-		private differs: KeyValueDiffers
+		private differs: KeyValueDiffers,
+		private renderer: Renderer2
 		)	{}
 
 	ngOnInit() {
 		console.log('EditEntryComponent Init');
 		this.differ = this.differs.find([]).create();
-		this.fieldsRemoved = [];
 		this.inputList = [];
+		this.fieldsRemoved = [];
 		this.searchForm = this.formBuilder.group({searchTerms: ''});
     this.entryForm = this.formBuilder.group({});
 		this.entry$ = this.store.select(fromLibrary.getSelectedEntry);
 		this.subs = this.entry$.pipe(map(entry => {
+			window.scrollTo(0, 0);
 			console.log('Edit - entry', entry);
+			this.inputList = [];
 			if (!entry) {
-				this.poster_path = '';
-				this.file = null;
 				entry = {
 					id: uuid(),
-					title: ''
+					touched: true
 				};
 			}
-
+			if (!entry.title) {
+				entry.title = '';
+			}
+			if (!entry.poster_path) {
+				entry.poster_path = ''
+			}
+			if (!entry.file) {
+				entry.file = null;
+			}
 			this.entry = { ...entry };
 			this.poster_path = entry.poster_path || '';
 			this.file = entry.file || null;
+			
 			Object.entries(this.entry).forEach(([key, value]) => {
 				if (this.isKeyEnumerable(key)) {
 					this.inputList.push({
@@ -104,9 +114,10 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 					});
 				}
 			});
+			
 			this.refreshForm();
 			this.cdRef.detectChanges();
-			window.scrollTo(0, 0);
+			
 		})).subscribe();
 
 		this.store.select(fromLibrary.getSelectedEntryId)
@@ -115,6 +126,22 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 		this.metadataSearchResponse$ = this.store.pipe(select(fromLibrary.getMetadataSearchResults));
 		this.subs.add(this.metadataSearchResponse$.subscribe(response => this.metadataSearchResult = response));
+	}
+
+	isKeyEnumerable(key: string) {
+		return key !== 'id' && key !== '_id' && key !== 'poster_path' && key !== 'file' && key !== 'gotDetails';
+	}
+
+	isKeyHidden(key: string) {
+		const hiddenKeys = ['title', 'poster_path', 'file', 'id', '_id', '_rev', 'rev', 'touched', 'gotDetails'];
+
+		for (const hiddenKey of hiddenKeys) {
+			if (key === hiddenKey) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 	
   addNewField(fieldName) {
@@ -126,19 +153,10 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
     });
     this.refreshForm();
 	}
-	
-  removeInputField(inputField) {
-		Object.entries(this.entry).forEach(([k, v]) => {
-			if (k === inputField.formControlName) {
-				delete this.entry[k];
-				this.entryForm.removeControl(k);
-				this.fieldsRemoved.push(k); // TODO: do we need this?
-				this.cdRef.detectChanges(); // TODO: do we need this?
-			}
-		});
-    this.inputList = this.inputList.filter(field => field !== inputField);
-    this.refreshForm();
-  }
+
+	getGenres(genres) {
+		return genres.map(e => e.name).join(", ");
+	}
 	
   refreshForm() {
     this.inputList.forEach(input => {
@@ -159,29 +177,6 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		}
 	}
 
-	sortFields(key1, key2) {
-		if (key1 === key2) { return 0; }
-		if (key1 === 'title') { return -1; }
-		if (key2 === 'title') { return 1; }
-		return +key2 - +key1;
-	}
-
-	isKeyHidden(key: string) {
-		const hiddenKeys = ['poster_path', 'file', 'id', '_id', '_rev', 'rev'];
-
-		for (const hiddenKey of hiddenKeys) {
-			if (key === hiddenKey) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	isKeyEnumerable(key: string) {
-		return key !== 'poster_path' && key !== 'file';
-	}
-
 	ngDoCheck() {
 		if (this.differ.diff(this.entry)) {
 			this.entryForm.patchValue(this.entry);
@@ -197,21 +192,22 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	search() {
 		this.modalRef.close('search');
 		const searchTerms = this.searchForm.value.searchTerms;
-		this.router.navigate(['/library/edit']); // TODO: check if we need this
 		this.store.dispatch(new LibraryActions.SearchForMetadata({
 			keywords: searchTerms,
 			tempEntry: {
+				...this.entry,
 				...this.entryForm.value,
 				...{
-					poster_path: this.poster_path,
-					file: this.file
+					id: this.selectedEntryId,
+					file: this.file,
+					poster_path: this.poster_path
 				}
 			}
 		}));
 	}
 
 	closeModal() {
-		this.modalRef.dismiss('close');
+		this.modalRef.close();
 	}
 
 	showSearchDialog(searchDialog: TemplateRef<any>) {
@@ -220,8 +216,10 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		if (titleControl) {
 			searchTerms = titleControl.value;
 		}
+		
 		this.searchForm.patchValue({searchTerms: searchTerms});
 		this.modalRef = this.modalService.open(searchDialog);
+		(this.modalRef as any)._beforeDismiss = function() {return false;};
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 		}, (reason) => {
@@ -231,6 +229,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	showNewFieldDialog(newFieldDialog: TemplateRef<any>) {
 		this.modalRef = this.modalService.open(newFieldDialog);
+		(this.modalRef as any)._beforeDismiss = function() {return false;};
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 		}, (reason) => {
@@ -240,6 +239,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	showDeleteConfirmation(deleteDialog: TemplateRef<any>) {
 		this.modalRef = this.modalService.open(deleteDialog);
+		(this.modalRef as any)._beforeDismiss = function() {return false;};
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 			if (result === 'Ok click') {
@@ -335,17 +335,43 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		}
 	}
 
+  removeInputField(inputField) {
+		Object.entries(this.entry).forEach(([k, v]) => {
+			if (k === inputField.formControlName) {
+				delete this.entry[k];
+				this.entryForm.removeControl(k);
+				/* if (!this.entry.hasOwnProperty(k)) {
+					console.log('editEntryComponent :: removeInputField :: property:', k);
+					this.entry[k] = null;
+				} */
+				this.fieldsRemoved.push(k); // TODO: do we need this?
+			}
+		});
+    this.inputList = this.inputList.filter(field => field !== inputField);
+    this.refreshForm();
+	}
+	
 	save() {
-		const changes = this.entryForm.value;
-		changes.poster_path = this.poster_path;
-		changes.file = this.file;
+		console.log('editEntryComponent :: save :: fieldsRemoved:', this.fieldsRemoved);
 		this.fieldsRemoved.forEach(field => {
-			if (!changes.hasOwnProperty(field)) {
-				console.debug('removing:', field);
-				changes[field] = null;
+			if (!this.entry.hasOwnProperty(field)) {
+				console.log('editEntryComponent :: save :: removing:', this.entry);
+				this.entry[field] = null;
 			}
 		});
 
+		console.log('editEntryComponent :: save :: with fields removed:', this.entry);
+		const changes = {
+			...this.entry,
+			...this.entryForm.value,
+			...{
+				id: this.selectedEntryId,
+				file: this.file,
+				poster_path: this.poster_path
+			}
+		};
+
+		console.log('editEntryComponent :: save :: with new fields:', changes);
 		this.libraryService.saveEntry(changes);
 		this.navigationService.closeMetadata();
 		this.navigationService.closeEditEntry(this.selectedEntryId);
@@ -353,6 +379,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	close() {
 		this.navigationService.closeEditEntry(this.selectedEntryId);
+		this.store.dispatch(new LibraryActions.DeselectEntry());
 	}
 
 	trash() {

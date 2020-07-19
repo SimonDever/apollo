@@ -2,6 +2,7 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromRoot from '../../../app.reducer';
 import * as fromLibrary from './library.reducer';
 import * as fromSearch from './search.reducer';
+import { stat } from 'fs';
 
 export interface State extends fromRoot.State {
 	library: LibraryState;
@@ -51,6 +52,11 @@ export const getTempEntry = createSelector(
 export const getConfig = createSelector(
 	selectSearchState,
 	state => state.config
+);
+
+export const getGenres = createSelector(
+	selectSearchState,
+	state => state.genres
 );
 
 export const getSearchTerms = createSelector(

@@ -3,26 +3,34 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
-import { OcticonDirective } from './directives/octicon.directive';
+import { NgxElectronModule } from 'ngx-electron';
 import { MenuComponent } from './components/menu/menu.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { ToastComponent } from './components/toast/toast.component';
+import { ContextMenuDirective } from './directives/context-menu.directive';
+import { DivValueAccessorDirective } from './directives/div-value-accessor.directive';
+import { OcticonDirective } from './directives/octicon.directive';
+import { NgbCollapseModule } from './modules/ngb-collapse/ngb-collapse.module';
+import { LibraryService } from './services/library.service';
 import { NavigationService } from './services/navigation.service';
 import { SearchService } from './services/search.service';
 import { StorageService } from './services/storage.service';
-import { NgbCollapseModule } from './modules/ngb-collapse/ngb-collapse.module';
-import { WindowRefService } from './services/window-ref.service';
-import { NgxElectronModule } from 'ngx-electron';
-import { DivValueAccessorDirective } from './directives/div-value-accessor.directive';
-import { ToastComponent } from './components/toast/toast.component';
 import { ToastService } from './services/toast.service';
-import { LibraryService } from './services/library.service';
+import { WindowRefService } from './services/window-ref.service';
+import { OverrideCssVarDirective } from './directives/override-css-var.directive';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { reducers } from '../library/store';
+import { LibraryEffects } from '../library/store/library.effects';
+
 
 @NgModule({
 	declarations: [
 		MenuComponent,
 		PageNotFoundComponent,
+		ContextMenuDirective,
 		DivValueAccessorDirective,
+		OverrideCssVarDirective,
 		OcticonDirective,
 		ToastComponent
 	],
@@ -34,6 +42,8 @@ import { LibraryService } from './services/library.service';
 		ReactiveFormsModule,
 		NgbModule,
 		NgxElectronModule,
+		StoreModule.forFeature('library', reducers),
+		EffectsModule.forFeature([LibraryEffects]),
 		/* Custom */
 		NgbCollapseModule
 	],
@@ -45,7 +55,9 @@ import { LibraryService } from './services/library.service';
 		NgxElectronModule,
 		/* Custom */
 		NgbCollapseModule,
+		ContextMenuDirective,
 		DivValueAccessorDirective,
+		OverrideCssVarDirective,
 		OcticonDirective,
 		MenuComponent,
 		PageNotFoundComponent,

@@ -3,11 +3,12 @@ import { Injectable, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromLibrary from '../../library/store';
 import * as LibraryActions from '../../library/store/library.actions';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { StorageService } from './storage.service';
 import { ElectronService } from 'ngx-electron';
 import { NavigationService } from './navigation.service';
 import { take, map } from 'rxjs/operators';
+import { Entry } from '../../library/store/entry.model';
 
 const uuid = require('uuid/v4');
 
@@ -19,6 +20,8 @@ export class LibraryService {
 	selectedEntryId: any;
 	userDataFolder: string;
 	fs: any;
+	entries;
+	entries$;
 
 	// Regular expression for image type:
 	// This regular image extracts the "jpeg" from "image/jpeg"
@@ -34,6 +37,11 @@ export class LibraryService {
 		private activatedRoute: ActivatedRoute) {
 			this.userDataFolder = this.electronService.remote.app.getPath('userData');
 			this.fs = this.electronService.remote.require('fs');
+			this.entries$ = this.store.pipe(
+				select(fromLibrary.getAllEntries),
+				map((entries: Array<Entry>) => {
+					this.entries = entries;
+				})).subscribe();
 		}
 
 	setSelectedEntryId(id: any) {
@@ -53,14 +61,29 @@ export class LibraryService {
 		this.writeImage(imageBuffer.data, path);
 	}
 
+	touch(event: Event, entry: any) {
+		if(!entry.touched) {
+			console.log('saving touch');
+			entry.touched = true;
+			this.saveEntry(entry);
+			console.log('touch saved');
+		} else {
+			console.log('touch ignored');
+		}
+	}
+
 	savePoster(entry: any) {
-		console.log('savePoster', entry.poster_path);
-		if (entry.poster_path.startsWith('data:image')) {
-			this.convertDataUri(entry);
-		} else if (entry.poster_path.startsWith(this.userDataFolder)) {
-			// picture already exists
-		} else if (entry.poster_path.startsWith('/')) {
-			this.convertUrlPath(entry);
+		console.log('libraryService :: savePoster :: entry.poster_path', entry.poster_path);
+		if (entry.poster_path) {
+			if (entry.poster_path.startsWith('data:image')) {
+				this.convertDataUri(entry);
+			} else if (entry.poster_path.startsWith(this.userDataFolder)) {
+				// image already saved locally
+			} else if (entry.poster_path.startsWith('/')) {
+				this.convertUrlPath(entry);
+			}
+		} else {
+			// no image in entry
 		}
 	}
 
@@ -74,6 +97,7 @@ export class LibraryService {
 	}
 
 	convertUrlPath(entry: any) {
+		console.log('libraryService :: convertUrlPath :: entry');
 		if (entry.poster_path) {
 			const url = `http://image.tmdb.org/t/p/original${entry.poster_path}`;
 			const filename = entry.poster_path.substring(1);
@@ -95,16 +119,50 @@ export class LibraryService {
 	}
 
 	createEntry(file) {
+		
+		console.log('libraryService :: createEntry :: entry');
 		let tempTitle = file.name
 			.replace(/\.[^/.]+$/, '')
 			.replace(/\(\d{4}\)/, '')
 			.split("-")[0]
 			.trim();
-		
+
+		const entries = this.entries.filter(entry => {
+			file.path === entry.file
+			console.log(`libraryService :: createEntry :: file.path (${file.path}) === entry.file (${entry.file}): ${file.path === entry.file}`)
+		});
+
+		console.log('libraryService :: createEntry :: entries.length', entries.length);
+
+		const message = `Confirm adding possible duplicate with file
+			path: ${file.path}. Existing titles: ${entries.map(e=>e.title).join(', ')};
+			files: ${entries.map(e=>e.file).join(', ')}.`;
+		if (entries.length > 0 &&	!confirm(message)) {
+				return;
+		}
+			/* if (confirm(`Still want to add ${file.path} when you
+				already have ${existingEntriesForFile.join(', ')}.`)) { */
+		const newEntry = {
+			id: uuid(),
+			title: tempTitle,
+			file: file.path
+		};
+		console.log('libraryService :: createEntry :: newEntry', newEntry);
+		this.store.dispatch(new LibraryActions.ImportEntry({ entry: newEntry}));
+
+		/*	}
+		 } else {
+			this.store.dispatch(new LibraryActions.ImportEntry({ entry: {
+				id: uuid(),
+				title: tempTitle,
+				file: file.path
+			}}));
+		} */
+		/* 
 		this.storageService.exists(file.path).pipe(take(1), map(files => {
 			const exists = Array.isArray(files) && files.length > 0;
 			// TODO: move this confirm option into settings page to allow duplicates
-			if (!exists /* || confirm(`Still want to add ${filename} when you already have ${files.join(', ')}.`) */) {
+			if (!exists  || confirm(`Still want to add ${filename} when you already have ${files.join(', ')}.`)) {
 				this.store.dispatch(new LibraryActions.ImportEntry({ entry: {
 					id: uuid(),
 					title: tempTitle,
@@ -114,6 +172,7 @@ export class LibraryService {
 				console.log('Duplicate detected', file.path);
 			}
 		})).subscribe();
+		*/
 	}
 
 

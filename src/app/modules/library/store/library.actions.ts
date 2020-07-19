@@ -8,10 +8,22 @@ export class Load implements Action {
 	constructor() { }
 }
 
+export const LOAD_GENRES = '[Entry] Load Genres';
+export class LoadGenres implements Action {
+	readonly type = LOAD_GENRES;
+	constructor() { }
+}
+
 export const LOADED = '[Entry] Loaded';
 export class Loaded implements Action {
 	readonly type = LOADED;
 	constructor(public payload: { entries: Entry[] }) { }
+}
+
+export const GENRES_LOADED = '[Entry] Genres Loaded';
+export class GenresLoaded implements Action {
+	readonly type = GENRES_LOADED;
+	constructor(public payload: { genres: string[] }) { }
 }
 
 export const SEARCH_FOR_METADATA = '[Entry] Search For Metadata';
@@ -96,6 +108,11 @@ export class GetConfig implements Action {
 	readonly type = GET_CONFIG;
 }
 
+export const NEED_ENTRIES = '[Entry] Need Entries';
+export class NeedEntries implements Action {
+	readonly type = NEED_ENTRIES;
+}
+
 export const GOT_CONFIG = '[Entry] Got Config';
 export class GotConfig implements Action {
 	readonly type = GOT_CONFIG;
@@ -120,6 +137,12 @@ export class DeleteAllEntries implements Action {
 	constructor() { }
 }
 
+export const ALL_ENTRIES_DELETED = '[Entry] All Entries Deleted';
+export class AllEntriesDeleted implements Action {
+	readonly type = ALL_ENTRIES_DELETED;
+	constructor() { }
+}
+
 export const SAVE_API_KEY = '[Entry] Save API Key';
 export class SaveApiKey implements Action {
 	readonly type = SAVE_API_KEY;
@@ -139,6 +162,7 @@ export type All =
 	ShowMetadataDetailsResults |
 	AddEntry |
 	DeleteAllEntries |
+	AllEntriesDeleted |
 	GetConfig |
 	UpdateConfig |
 	RefreshConfig |
@@ -146,5 +170,8 @@ export type All =
 	ShowResults |
 	DeselectEntry |
 	Load |
+	NeedEntries |
+	LoadGenres |
 	Loaded |
+	GenresLoaded |
 	UpdateResults;

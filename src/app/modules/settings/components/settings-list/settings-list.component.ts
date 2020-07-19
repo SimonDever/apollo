@@ -1,5 +1,5 @@
 import { DomSanitizer } from '@angular/platform-browser';
-import { Component, OnInit, ViewChild, KeyValueDiffers, ChangeDetectorRef, DoCheck, OnDestroy, AfterViewInit, OnChanges } from '@angular/core';
+import { Component, OnInit, ViewChild, KeyValueDiffers, ChangeDetectorRef, DoCheck, OnDestroy, AfterViewInit, OnChanges, HostBinding } from '@angular/core';
 import { Entry } from '../../../library/store/entry.model';
 import { StorageService } from '../../../shared/services/storage.service';
 import { ElectronService } from 'ngx-electron';
@@ -35,7 +35,7 @@ const uuid = require('uuid/v4');
 		])
 	]
 })
-export class SettingsListComponent implements OnInit, DoCheck, OnDestroy {
+export class SettingsListComponent implements OnInit, /* DoCheck,  */OnDestroy {
 
 	mode: '' | 'Deleting library' | 'Parsing library' | 'Import complete' |
 		'Importing library' | 'Adding entries' | 'Loading posters' | 'Reading file';
@@ -44,7 +44,6 @@ export class SettingsListComponent implements OnInit, DoCheck, OnDestroy {
 	config$: Observable<any>;
 	subs: Subscription;
 	configForm: FormGroup;
-	differ: any;
 	interval: any;
 	updater;
 	updateAvailable;
@@ -55,7 +54,7 @@ export class SettingsListComponent implements OnInit, DoCheck, OnDestroy {
 	modalRef: NgbModalRef;
 	apiKeyForm: FormGroup;
 	selected: boolean;
-
+	entryCount$: Observable<number>;
 	importCount: number;
 	deletedCount: number;
 	posterCount: number;
@@ -70,14 +69,13 @@ export class SettingsListComponent implements OnInit, DoCheck, OnDestroy {
 		private cdRef: ChangeDetectorRef,
 		private modalService: NgbModal,
 		private store: Store<fromLibrary.LibraryState>,
-		private electronService: ElectronService,
-		private differs: KeyValueDiffers) {
-
-		this.differ = this.differs.find([]).create();
+		private electronService: ElectronService
+	) {
 		this.fs = this.electronService.remote.require('fs');
 		this.path = this.electronService.remote.require('path');
 		this.userDataFolder = this.electronService.remote.app.getPath('userData');
 		this.apiKeyForm = this.formBuilder.group({apiKey: ''});
+		this.entryCount$ = this.store.select(fromLibrary.getTotalEntries);
 	}
 
 	ngOnInit() {
@@ -87,57 +85,11 @@ export class SettingsListComponent implements OnInit, DoCheck, OnDestroy {
 		this.estimatedCount = 0;
 		this.parsedCount = 0;
 		this.selected = false;
-		this.store.dispatch(new LibraryActions.GetConfig());
-		this.config$ = this.store.select(fromLibrary.getConfig);
-		this.subs = this.config$.pipe(map(config => {
-			console.log('SettingsListComponent - ngOnInit :: config', config);
-			const configFormGroup = {};
-			const defaultConfig: any = {
-				virtualScrolling: true,
-				boxWidth: '348px',
-				boxHeight: '480px',
-				borderRadius: '5px',
-				borderColor: 'gold',
-				shadowColor: '#e08056',
-				shadowBlur: '2px',
-				shadowSpread: '2px'
-			};
-			config = { ...defaultConfig, ...(config || {}) };
-			Object.entries(config).forEach(([key, value]) => {
-				if (this.isKeyEnumerable(key)) {
-					console.log(`adding ${key} to the form group`);
-					configFormGroup[key] = new FormControl(value);
-				}
-			});
-
-			console.log('configFormGroup', configFormGroup);
-			this.configForm = this.formBuilder.group(configFormGroup);
-			this.config = config;
-			this.cdRef.detectChanges();
-		})).subscribe();
 	}
 
 	toggleActions(event: Event) {
 		event.preventDefault();
 		this.selected = !this.selected;
-	}
-
-	ngDoCheck() {
-		if (this.differ.diff(this.config)) {
-			this.configForm.patchValue(this.config);
-		}
-	}
-	
-	posterUrl(path) {
-		if (path) {
-			if (path.toLowerCase().startsWith('c:\\')) {
-				return this.sanitizer.bypassSecurityTrustResourceUrl('file://' + path);
-			} else if (path.startsWith('data:image')) {
-				return path;
-			}
-		} else {
-			return '';
-		}
 	}
 
 	ngOnDestroy() {
@@ -148,7 +100,7 @@ export class SettingsListComponent implements OnInit, DoCheck, OnDestroy {
 	}
 
 	isKeyEnumerable(key: string) {
-		return key !== 'id' && key !== '_id';
+		return key !== 'id' && key !== '_id' && key !== 'poster_path' && key !== 'file' && key !== 'touched' && key !== 'gotDetails';
 	}
 
 	close() {
@@ -303,9 +255,29 @@ export class SettingsListComponent implements OnInit, DoCheck, OnDestroy {
 
 	changeAllFilePaths(filepath: string) {
 		// TODO: implement function to change all database entry paths but not file names
-		this.subs.add(this.storageService.changeAllPathsTo().pipe(map(done => {
+		const newSubscription = this.storageService.changeAllPathsTo().pipe(map(done => {
 			console.log('changeAllFilePaths sub result:', done);
-		})).subscribe());
+		})).subscribe();
+
+		if (this.subs) {
+			this.subs.add(newSubscription);
+		} else {
+			this.subs = newSubscription;
+		}
+	}
+	
+	cleanArrays() {
+		const newSubscription = this.storageService.cleanArrays().pipe(map(done => {
+			console.log('cleanArrays sub result', done);
+			this.store.dispatch(new LibraryActions.DeleteAllEntries());
+			this.store.dispatch(new LibraryActions.NeedEntries());
+		})).subscribe();
+
+		if (this.subs) {
+			this.subs.add(newSubscription);
+		} else {
+			this.subs = newSubscription;
+		}
 	}
 
 	onReaderLoad(event) {

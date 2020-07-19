@@ -1,12 +1,17 @@
 .settings-list {
 	margin: 100px auto;
-	width: 30%;
+}
+
+hr {
+	width: 50%;
+	border-color: var(--foreground);
 }
 
 .field-grid.two-column {
-	grid-template-columns: 200px auto;
 	border-bottom: none;
 	border-top: 1px solid #555;
+	display: flex;
+	justify-content: flex-start;
 }
 
 .field-grid:first-of-type {
@@ -18,26 +23,48 @@
 	padding-left: 16px;
 }
 
+.field-grid .metadata-field-key .inner-grid {
+	display: grid;
+	grid-template-columns: 180px 100px 240px;
+	grid-template-rows: auto;
+	grid-template-areas: "label value input";
+}
+
+.grid-label {
+	grid-area: label;
+}
+
+.grid-value {
+	grid-area: value;
+}
+
+.grid-input {
+	grid-area: input;
+}
+
 .field-grid .metadata-field-value {
 	padding: 13px;
 }
 
-.field-grid .metadata-field-value label {
-	width: 40%;
-	display: inline-block;
+.field-grid label {
+	display: block;
 }
 
-.field-grid .metadata-field-value label:not(:first-of-type) {
+.field-grid label:not(:first-of-type) {
 	margin-top: 16px;
 }
 
-.field-grid .metadata-field-value input[type="checkbox"],
-.field-grid .metadata-field-value input[type="text"] {
+.field-grid input[type=range] {
+	padding: 0;
+}
+
+.field-grid input[type="checkbox"],
+.field-grid input[type="text"] {
 	width: auto;
 	display: inline-block;
 }
 
-.field-grid .metadata-field-value input[type="checkbox"] {
+.field-grid input[type="checkbox"] {
 	width: 39px;
 }
 
@@ -61,7 +88,7 @@ progress[value] {
 	border: none;
 
 	/* Add dimensions */
-	width: 100%;
+	width: 50%;
 	height: 20px;
 
 	/* Although firefox doesn't provide any additional pseudo class to style the progress element container, any style applied here works on the container. */
@@ -73,7 +100,7 @@ progress[value] {
 	color: royalblue;
 
 	position: relative;
-	margin: 0;
+	margin: 0 0 0 25%;
 }
 
 /*
@@ -127,7 +154,7 @@ progress[value]::-webkit-progress-value:after {
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5) inset;
 
 	/* Dimensions should be similar to the parent progress element. */
-	width: 100%;
+	width: 50%;
 	height: 20px;
 }
 
@@ -141,6 +168,8 @@ progress[value]::-webkit-progress-value:after {
 
 p[data-value] {
 	position: relative;
+	width: 50%;
+	margin-left: 25%;
 }
 
 /* The percentage will automatically fall in place as soon as we make the width fluid. Now making widths fluid. */
@@ -271,4 +300,8 @@ main {
 .entry-box-selected .entry-poster {
 	background-color: '#333';
 	opacity: 0.2;
+}
+
+.statistics {
+	text-align: center;
 }

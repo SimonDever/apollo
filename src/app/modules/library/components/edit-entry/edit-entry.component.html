@@ -26,30 +26,42 @@
 
 
 			<div class="right-fields">
-
-				<div class="field-grid three-column-reverse">
-					<span class="metadata-field-key">Video file</span>
-					<span class="metadata-field-value">{{file}}</span>
-					<button class="btn btn-outline-light" (click)="fileInput.click()">
-						Browse
-					</button>
-				</div>
-
 				<form [formGroup]="entryForm">
+					<div class="field-grid three-column-reverse">
+						<span class="metadata-field-key">
+							Title
+						</span>
+						<span class="metadata-field-value">
+							<div contenteditable="true" ngDefaultControl formControlName="title"></div>
+						</span>
+					</div>
+
+					<div class="field-grid three-column-reverse">
+						<span class="metadata-field-key">Video file</span>
+						<span class="metadata-field-value">{{file}}</span>
+						<button class="btn btn-outline-light" (click)="fileInput.click()">
+							Browse
+						</button>
+					</div>
+
 					<div *ngFor="let input of inputList" class="field-grid three-column-reverse" [hidden]="isKeyHidden(input.label)">
 						<span class="metadata-field-key">
 							{{ input.label.split('_').join(' ') | titlecase }}
 						</span>
 						<span class="metadata-field-value">
-							<input type="text" formControlName="{{ input.formControlName }}">
+							<!-- <input type="text" formControlName="{{ input.formControlName }}"> -->
+							<div contenteditable="true" ngDefaultControl formControlName="{{ input.formControlName }}"></div>
+							<!-- <div *ngIf="input.label === 'genres'">
+								{{ getGenres(input.value) }}
+							</div> -->
 						</span>
 						
-						<button class="btn btn-outline-light" (click)="removeInputField(input)">Remove field</button>
+						<button class="btn btn-outline-light" (click)="removeInputField(input)">Remove</button>
 					</div>
 				</form>
 			</div>
 
-		<router-outlet></router-outlet>
+			<router-outlet></router-outlet>
 	</div>
 
 	<ng-template #searchDialog let-modal>
@@ -63,7 +75,7 @@
 			<form [formGroup]="searchForm">
 				<div class="form-group">
 					<div class="input-group">
-						<input formControlName="searchTerms" class="form-control" placeholder="title, genre, actor, etc." />
+						<input ngbAutofocus formControlName="searchTerms" class="form-control" placeholder="title, genre, actor, etc." />
 					</div>
 				</div>
 			</form>
@@ -75,7 +87,7 @@
 
 	<ng-template #newFieldDialog let-modal>
 		<div class="modal-header">
-			<h4 class="modal-title" id="modal-basic-title">Search Terms</h4>
+			<h4 class="modal-title" id="modal-basic-title">Add new field</h4>
 			<button type="button" class="close" data-dismiss="modal" (click)="closeModal()" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			</button>
@@ -83,7 +95,7 @@
 		<div class="modal-body">
 			<div class="form-group">
 				<div class="input-group">
-					<input #newField class="form-control" />
+					<input ngbAutofocus #newField class="form-control" />
 				</div>
 			</div>
 		</div>

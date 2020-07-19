@@ -1,4 +1,12 @@
 <div class="settings-list" @fadeInOut>
+
+	<div class="statistics">
+		<h4>Library Statistics</h4>
+		<div class="library-count">Total videos: {{entryCount$ | async}}</div>
+	</div>
+
+	<hr>
+
 	<ng-container *ngIf="mode" @fadeInOut>
 		<p class="progress-percentage" [attr.data-value]="progressPercentage()">{{ mode }}</p>
 		<progress max="100" [value]="progressPercentage()" class="html5"></progress>
@@ -12,57 +20,13 @@
 
 	<button class="btn btn-outline-light" (click)="changeAllFilePaths()">Change All File Paths</button>
 
+	<button class="btn btn-outline-light" (click)="cleanArrays()">Clean Arrays</button>
+
 	<button class="btn btn-outline-light" (click)="showApiKeyDialog(apiKeyDialog)">Add API Key</button>
 
-	<form [formGroup]="configForm">
-		<div class="field-grid two-column">
-			<span class="metadata-field-key">Display</span>
-			<span class="metadata-field-value">
-				<label>Width</label>
-				<input placeholder="Width" formControlName="boxWidth" type="text" />
-				<label>Height</label>
-				<input placeholder="Height" formControlName="boxHeight" type="text" />
-				<label>Rounded corners</label>
-				<input type="range" formControlName="borderRadius" value="50" class="form-control-range">
-				<label>Border colour</label>
-				<input type="color" formControlName="borderColor" value="gold">
-				<label>Shadow colour</label>
-				<input type="color" formControlName="shadowColor" value="#e08056">
-				<label>Shadow blur</label>
-				<input type="range" formControlName="shadowBlur" value="20">
-				<label>Shadow spread</label>
-				<input type="range" formControlName="shadowSpread" value="20">
-			</span>
-		</div>
-		<button class="btn btn-outline-light" (click)="save()">Save changes</button>
-	</form>
 
 	<button class="btn btn-danger" (click)="deleteLibrary()">Delete library</button>
 
-	<div class="box-preview">
-		<div class="entry-box" [ngClass]="{'entry-box-selected': selected}" (click)="toggleActions($event)">
-			<img class="poster-preview entry-poster" id="poster-example" />
-			<div class="entry-actions">
-				<div class="entry-title">
-					Lorem Ipsum
-					<span>(1914)</span>
-				</div>
-				<div class="entry-blurb">
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-					Fusce at leo odio. Curabitur eu velit vehicula, semper risus nec,
-					ullamcorper eros. Aenean a maximus nunc, et fringilla nulla.
-					Praesent in rutrum ex. Ut pharetra hendrerit dolor in ultrices.
-					In ut nulla blandit, ultrices risus sit amet, pretium sapien.
-					Pellentesque euismod lobortis ante, nec egestas nisi ornare in.
-				</div>
-				<div class="icon-button-box-horizontal">
-					<button octicon="trashcan" class="icon-button trash-button"></button>
-					<button octicon="pencil" class="icon-button edit-button"></button>
-					<button octicon="play" class="icon-button play-button"></button>
-				</div>
-			</div>
-		</div>
-	</div>
 
 	<!--
 	<div class="field-grid two-column">

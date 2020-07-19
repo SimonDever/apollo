@@ -1,12 +1,16 @@
 <div class="list-view" @fadeInOut>
-	<div class="entry-list">
-		<virtual-scroller class="candy" #scroll [items]="(entries$ | async)" [bufferAmount]="20">
-			<div *ngFor="let entry of scroll.viewPortItems" class="entry-box" (click)="toggleActions($event, entry)">
-				<img *ngIf="posterUrl(entry.poster_path) else missingPoster" class="poster-preview entry-poster" id="poster-{{entry.id}}" [src]="posterUrl(entry.poster_path)" />
-				<ng-template #missingPoster>
-					<div class="missing-poster-icon" class="missing-poster" [width]="'348'" [color]="'#ccc'" octicon="question">
-					</div>
-				</ng-template>
+	<div class="entry-list" *ngIf="config && !config.tableFormat">
+		<virtual-scroller class="virtual-scroller" #scroll [items]="entries$ | async" [bufferAmount]="20"> <!-- entries$ | async -->
+			<div *ngFor="let entry of scroll.viewPortItems" (click)="toggleActions($event, entry)" class="entry-box"
+				[class.hide-touched]="entry.touched && config.showOnlyUntouched"
+				[class.untouched]="!entry.touched && config.untouchedHighlight">
+				<div class="poster-preview">
+					<img *ngIf="posterUrl(entry.poster_path) else missingPoster" class="entry-poster" id="poster-{{entry.id}}"
+						[src]="posterUrl(entry.poster_path)" />
+					<ng-template #missingPoster>
+						<div class="entry-poster missing-poster-icon" [color]="'#ccc'" octicon="question"></div>
+					</ng-template>
+				</div>
 				<div class="entry-actions">
 					<div class="entry-title">
 						{{entry.title}}
@@ -15,7 +19,8 @@
 					</div>
 					<div class="entry-blurb">{{entry.overview}}</div>
 					<div class="icon-button-box-horizontal">
-						<button octicon="trashcan" class="icon-button trash-button" (click)="showDeleteConfirmation($event, deleteModal)"></button>
+						<button octicon="trashcan" class="icon-button trash-button"
+							(click)="showDeleteConfirmation($event, deleteModal)"></button>
 						<button octicon="pencil" class="icon-button edit-button" (click)="edit($event)"></button>
 						<button octicon="play" class="icon-button play-button" (click)="play($event, entry.file)"></button>
 					</div>
@@ -24,19 +29,50 @@
 		</virtual-scroller>
 	</div>
 
-	<ng-template #deleteModal let-modal>
-		<div class="modal-header">
-			<h4 class="modal-title" id="modal-basic-title">Confirm deletion</h4>
-			<button type="button" class="close" data-dismiss="modal" (click)="closeModal('close')" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-		</div>
-		<div class="modal-body">
-			<p><strong>Are you sure you want to delete this entry?</strong></p>
-			<p><strong>This operation can not be undone.</strong></p>
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-outline-secondary" (click)="closeModal('cancel')">Cancel</button>
-			<button type="button" class="btn btn-danger" (click)="closeModal('ok')">Ok</button>
-		</div>
-	</ng-template>
+	<div class="table-wrapper" *ngIf="config && config.tableFormat">
+		<table class="table table-fixed">
+			<thead>
+				<tr>
+					<th scope="col">Title</th>
+					<th scope="col">Year</th>
+					<th scope="col">Overview</th>
+					<th scope="col">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let entry of (entries$ | async)" [class.hide-touched]="entry.touched && config.showOnlyUntouched"
+					[class.untouched]="!entry.touched && config.untouchedHighlight">
+					<td>{{ entry.title }}</td>
+					<td>{{ entry.year || entry.release_date | date: 'yyyy' }}</td>
+					<td>{{ entry.overview}}</td>
+					<td>
+						<div class="icon-button-box-horizontal">
+							<button octicon="check" class="icon-button confirm-button" *ngIf="!entry.touched"	(click)="touch($event, entry)"></button>
+							<button octicon="trashcan" class="icon-button trash-button"
+								(click)="showDeleteConfirmation($event, deleteModal, entry)"></button>
+							<button octicon="pencil" class="icon-button edit-button" (click)="edit($event, entry)"></button>
+							<button octicon="play" class="icon-button play-button" (click)="play($event, entry.file)"></button>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<ng-template #deleteModal let-modal>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title">Confirm deletion</h4>
+		<button type="button" class="close" data-dismiss="modal" (click)="closeDeleteModal('close')" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<p><strong>Are you sure you want to delete this entry?</strong></p>
+		<p class="text-danger"><strong>This operation can not be undone.</strong></p>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-secondary" (click)="closeDeleteModal('cancel')">Cancel</button>
+		<button type="button" class="btn btn-danger" (click)="closeDeleteModal('delete')">Delete</button>
+	</div>
+</ng-template>

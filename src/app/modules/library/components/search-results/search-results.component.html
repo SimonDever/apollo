@@ -1,29 +1,30 @@
 <div class="list-view" @fadeInOut>
 	<div class="icon-button-box">
-		<button  octicon="x" class="icon-button close-button" (click)="close()"></button>
+		<button octicon="x" class="icon-button close-button" (click)="close()"></button>
 	</div>
-	<div class="search-view-title">Search Results</div>
+	<div class="search-view-title">Search Results - {{searchTerms}}</div>
 	<div class="entry-list">
-		<div class="candy">
-			<div *ngFor="let entry of (entries$ | async); trackBy: trackById" class="entry-box" (click)="toggleActions($event, entry)">
-				<a #selectedEntry id="selectedEntry" *ngIf="entry.id === selectedEntryId"></a>
-					<!-- [ngStyle]="{'background-color': entry.id !== selectedEntryId ? 'transparent' : '#333' }" -->
-				<img *ngIf="posterUrl(entry.poster_path) else missingPoster"
-					class="poster-preview entry-poster" id="poster-{{entry.id}}"
-					[src]="posterUrl(entry.poster_path)" />
-					<!-- [ngStyle]="{'opacity': entry.id !== selectedEntryId ? 1 : 0.2 }" -->
-				<ng-template #missingPoster class="missing-poster">
-					<!-- <div class="entry-title" *ngIf="entry.id === selectedEntryId">{{entry.title}}</div> -->
-					<div class="missing-poster-icon"></div>
-				</ng-template>
-				<!-- <div class="entry-actions"  [hidden]="entry.id !== selectedEntryId"> -->
-						<!-- [ngStyle]="{'display': entry.id !== selectedEntryId ? 'none' : 'flex'}" -->
+		<div class="scrollable-content">
+			<div *ngFor="let entry of (entries$ | async); trackBy: trackById" class="entry-box"
+				[class.hide-touched]="entry.touched && config.showOnlyUntouched"
+				[class.untouched]="!entry.touched && config.untouchedHighlight"
+				(click)="toggleActions($event, entry)">
+				<div class="poster-preview">
+					<a #selectedEntry id="selectedEntry" *ngIf="entry.id === selectedEntryId"></a>
+					<img *ngIf="posterUrl(entry.poster_path) else missingPoster" class="poster-preview entry-poster"
+						id="poster-{{entry.id}}" [src]="posterUrl(entry.poster_path)" />
+					<ng-template #missingPoster>
+						<div class="entry-poster missing-poster-icon" [color]="'#ccc'" octicon="question">
+						</div>
+					</ng-template>
+				</div>
 				<div class="entry-actions">
 					<div class="entry-title">{{entry.title}}</div>
 					<div class="entry-blurb">{{entry.overview}}</div>
 					<div class="icon-button-box-horizontal">
-						<button octicon="trashcan" class="icon-button trash-button" (click)="showDeleteConfirmation(deleteModal)"></button>
-						<button octicon="pencil" class="icon-button edit-button" (click)="edit()"></button>
+						<button octicon="trashcan" class="icon-button trash-button"
+							(click)="showDeleteConfirmation($event, deleteModal)"></button>
+						<button octicon="pencil" class="icon-button edit-button" (click)="edit($event)"></button>
 						<button octicon="play" class="icon-button play-button" (click)="play($event, entry.file)"></button>
 					</div>
 				</div>
@@ -35,16 +36,16 @@
 <ng-template #deleteModal let-modal>
 	<div class="modal-header">
 		<h4 class="modal-title" id="modal-basic-title">Confirm deletion</h4>
-		<button type="button" class="close" data-dismiss="modal" (click)="closeModal('close')" aria-label="Close">
+		<button type="button" class="close" data-dismiss="modal" (click)="closeDeleteModal('close')" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 		</button>
 	</div>
 	<div class="modal-body">
 		<p><strong>Are you sure you want to delete this entry?</strong></p>
-		<p><span class="text-danger">This operation can not be undone.</span></p>
+		<p class="text-danger"><strong>This operation can not be undone.</strong></p>
 	</div>
 	<div class="modal-footer">
-		<button type="button" class="btn btn-outline-secondary" (click)="closeModal('cancel')">Cancel</button>
-		<button type="button" class="btn btn-danger" (click)="closeModal('ok')">Ok</button>
+		<button type="button" class="btn btn-outline-secondary" (click)="closeDeleteModal('cancel')">Cancel</button>
+		<button type="button" class="btn btn-danger" (click)="closeDeleteModal('delete')">Delete</button>
 	</div>
 </ng-template>

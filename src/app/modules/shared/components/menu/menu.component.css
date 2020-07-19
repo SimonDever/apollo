@@ -1,6 +1,9 @@
+h2 {
+	color: white;
+}
 
 .navbar {
-	min-width: 360px;
+	min-width: 1060px;
 }
 
 .form-inline .form-control {
@@ -8,16 +11,27 @@
 }
 
 
-.dropdown {
-	margin: 0 15px;
-}
-
 .dropdown-menu {
-	min-width: 0;
-	left: 25%;
 	background-color: #222;
 	border: 1px solid white;
 	border-radius: 4px;
+	color: white;
+}
+
+.dropdown-menu-genre {
+	left: -30px;
+	min-width: unset;
+	right: -30px;
+}
+
+.dropdown-menu-bookmarks {
+	left: 25%;
+	width: 50%;
+	min-width: unset;
+}
+
+.dropdown-menu-bookmarks .dropdown-item {
+	padding: .25rem 0;
 }
 
 .dropdown-item {
@@ -29,4 +43,64 @@
 .dropdown-item:hover {
 	background-color: white;
 	color: #222;
+}
+
+.field-grid:first-of-type {
+	margin-top: 0 !important;
+}
+
+.field-grid.two-column {
+	border: none;
+	display: flex;
+	justify-content: flex-start;
+}
+
+.field-grid .metadata-field-key {
+	padding: 21px 16px;
+}
+
+.field-grid .metadata-field-key .inner-grid {
+	display: grid;
+	grid-template-columns: 240px 100px 240px;
+	grid-template-rows: auto;
+	grid-template-areas: "label value input";
+}
+
+.grid-label {
+	grid-area: label;
+}
+
+.grid-value {
+	grid-area: value;
+}
+
+.grid-input {
+	grid-area: input;
+}
+
+.field-grid .metadata-field-value {
+	padding: 13px;
+}
+
+.field-grid label {
+	display: block;
+}
+
+.field-grid label:not(:first-of-type) {
+	margin-top: 16px;
+}
+
+.field-grid input[type=range] {
+	padding: 0;
+}
+
+.field-grid input[type="checkbox"],
+.field-grid input[type="text"] {
+	width: auto;
+	display: inline-block;
+}
+
+.field-grid input[type="checkbox"] {
+	width: 39px;
+	align-self: center;
 }

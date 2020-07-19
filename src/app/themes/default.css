@@ -113,7 +113,7 @@ a:not([href]):not([tabindex]):hover,
 	color: var(--bright-foreground) !important;
 }
 
-.details-button {
+.metadata-button {
 	background: var(--background);
 	border: 1px solid var(--foreground);
 }
@@ -123,10 +123,10 @@ a:not([href]):not([tabindex]):hover,
 }
 
 .btn:not([disabled]):hover {
-	color: var(--menu-background) !important;
+	/* color: var(--menu-background) !important; */
 }
 .btn:not([disabled]):focus {
-	color: unset;
+	/* color: unset; */
 }
 .btn:not([disabled]):focus:hover {
 	color: var(--menu-background);

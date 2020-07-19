@@ -1,1 +1,20 @@
-<router-outlet></router-outlet>
+<div *ngIf="config" [overrideCssVar]="[
+  {name: '--grid-item-width', value: config.boxWidth + 'px'},
+  {name: '--grid-item-height', value: config.boxHeight + 'px'},
+  {name: '--grid-item-border-radius', value: config.borderRadius + 'px'},
+  {name: '--grid-item-border-width', value: config.borderWidth + 'px'},
+  {name: '--grid-item-border-color', value: config.borderColor},
+  {name: '--grid-margin-vertical', value: config.marginVertical + 'px'},
+  {name: '--grid-margin-horizontal', value: config.marginHorizontal + 'px'},
+  {name: '--grid-item-shadow-hor-offset', value: config.shadowHorOffset + 'px'},
+  {name: '--grid-item-shadow-ver-offset', value: config.shadowVerOffset + 'px'},
+  {name: '--grid-item-shadow-color', value: config.shadowColor},
+  {name: '--grid-item-shadow-blur', value: config.shadowBlur + 'px'},
+  {name: '--grid-item-shadow-spread', value: config.shadowSpread + 'px'},
+	{name: '--grid-row-gap', value: config.rowGap + 'px'},
+  {name: '--grid-column-gap', value: config.columnGap + 'px'},
+  {name: '--untouched-color', value: config.untouchedColor},
+  {name: '--untouched-highlight', value: config.untouchedHighlight}
+]">
+  <router-outlet></router-outlet>
+</div>

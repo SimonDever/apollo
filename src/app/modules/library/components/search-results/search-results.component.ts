@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router, RouterStateSnapshot, ActivatedRoute } from '@angular/router';
 import { select, Store } from '@ngrx/store';
@@ -11,6 +11,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal, NgbModalRef, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { map } from 'rxjs/operators';
 import { ElectronService } from 'ngx-electron';
+import { VirtualScrollerComponent } from 'ngx-virtual-scroller';
+import { LibraryService } from '../../../shared/services/library.service';
 
 @Component({
 	selector: 'app-search-results',
@@ -33,17 +35,20 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 
 	routerState: RouterStateSnapshot;
 	entries$: Observable<Entry[]>;
-
+	config$;
+	config
 	closeResult;
 	modalRef: NgbModalRef;
 	selectedEntryId: string;
 	subs: Subscription;
 	entriesSub: Subscription;
 	selected = [];
+	searchTerms;
 
 	constructor(private store: Store<fromLibrary.LibraryState>,
 		private navigationService: NavigationService,
 		private zone: NgZone,
+		private libraryService: LibraryService,
 		private cdRef: ChangeDetectorRef,
 		private modalService: NgbModal,
 		private electronService: ElectronService,
@@ -57,16 +62,25 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 
 		this.entries$ = this.store.pipe(select(fromLibrary.getSearchResults),
 			map((data: Array<Entry>) => {
-				const t0 = performance.now();
+				console.log('searchResults :: Resorting entries');
 				data.sort((a, b) => {
-					if (a.title == null || b.title == null) { return 1; }
+					if (a.title == null) { return -1; }
+					if (a.title === b.title) {
+						return a.id < b.id ? -1 : 1
+					}
 					return a.title < b.title ? -1 : 1;
 				});
-				const t1 = performance.now();
-				console.log('Sorting took ' + (t1 - t0) + ' milliseconds.');
 				return data;
 			})
 		);
+
+		this.subs = this.store.pipe(select(fromLibrary.getConfig),
+			map(config => this.config = config)).subscribe();
+
+		this.subs = this.store.pipe(select(fromLibrary.getSearchTerms))
+			.subscribe(searchTerms => {
+				this.searchTerms = searchTerms.replace(':', ': ');
+			});
 
 		this.subs = this.store.pipe(select(fromLibrary.getSelectedEntryId))
 			.subscribe((id: string) => {
@@ -76,7 +90,6 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 			});
 
 		this.cdRef.detectChanges();
-		this.entries$ = this.store.pipe(select(fromLibrary.getSearchResults));
 	}
 
 	close() {
@@ -85,13 +98,15 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 
 	play(event: Event, file: string) {
 		event.preventDefault();
-		console.log('file:', file);
+		event.stopPropagation();
+		console.log('searchResults :: playing:', file);
 		this.electronService.ipcRenderer.send('play-video', file);
 	}
 
-	closeModal(reason) {
-		console.log('closeModal:: reason:', reason);
-		if (reason === 'ok') {
+	closeDeleteModal(reason) {
+		console.log('searchResults :: closeModal :: reason:', reason);
+		if (reason === 'delete') {
+			console.log('searchResults :: closeModal :: trashing');
 			this.trash();
 		}
 		this.modalRef.dismiss('close');
@@ -103,7 +118,9 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	showDeleteConfirmation(content) {
+	showDeleteConfirmation(event, content) {
+		event.preventDefault();
+		event.stopPropagation();
 		this.modalRef = this.modalService.open(content);
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
@@ -126,7 +143,9 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	edit() {
+	edit(event) {
+		event.preventDefault();
+		event.stopPropagation();
 		console.debug(`entry-list.edit() - selectedEntryId: ${this.selectedEntryId}`);
 		this.navigationService.setEditEntryParent(this.routerState.url);
 		this.zone.run(() => this.router.navigate(['/library/edit']));
@@ -137,39 +156,40 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 	}
 
 	trash() {
-		console.log('entry-list.trash() - selectedEntryId:', this.selectedEntryId);
+		console.debug('searchResult :: trash :: this.selectedEntryId:', this.selectedEntryId);
 		this.store.dispatch(new LibraryActions.RemoveEntry({ id: this.selectedEntryId }));
 	}
 
 	undecorate(entryBox: HTMLDivElement) {
 		const poster = entryBox.querySelector('.entry-poster') as HTMLImageElement;
 		const entryActions = entryBox.querySelector('.entry-actions') as HTMLDivElement;
-		entryBox.style['backgroundColor'] = 'transparent';
 		poster ? poster.style['opacity'] = '1.0': {};
-		entryActions.style['opacity'] = '0';
+		entryActions.style['display'] = 'none';
 	}
 
 	decorate(entryBox: HTMLDivElement) {
 		const poster = entryBox.querySelector('.entry-poster') as HTMLImageElement;
 		const entryActions = entryBox.querySelector('.entry-actions') as HTMLDivElement;
-		entryBox.style['backgroundColor'] = '#333';
 		poster ? poster.style['opacity'] = '0.2' : {};
-		entryActions.style['opacity'] = '1';
+		entryActions.style['display'] = 'flex';
 	}
 
 	toggleActions(event: Event, entry: any) {
 		event.preventDefault();
+		this.libraryService.touch(event, entry);
 		const entryBox = event.currentTarget as HTMLDivElement;
 		const selectedIndex = this.selected.indexOf(entryBox);
 		if (selectedIndex > -1) {
 			this.selected.splice(selectedIndex, 1);
 			this.undecorate(entryBox);
+			console.debug(`toggleActions :: DeselectEntry selectedIndex: ${selectedIndex}`);
 			this.store.dispatch(new LibraryActions.DeselectEntry());
 		} else {
 			// number or string?
 			this.selected.forEach(e => this.undecorate(e));
 			this.selected = [entryBox];
 			this.decorate(entryBox);
+			console.debug(`toggleActions :: SelectEntry id:${entry.id}`);
 			this.store.dispatch(new LibraryActions.SelectEntry({ id: entry.id }));
 		}
 	}
@@ -185,19 +205,19 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 			return '';
 		}
 	}
-
+/* 
 	entryClicked(id: number) {
 		this.store.dispatch(new LibraryActions.SelectEntry({ id: id }));
-	}
+	} */
 
-	closeActions() {
+/* 	closeActions() {
 		this.store.dispatch(new LibraryActions.DeselectEntry());
-	}
+	} */
 
-	addEntry() {
+/* 	addEntry() {
 		const currentLocation = this.routerState.url;
 		this.navigationService.setAddEntryParent(currentLocation);
 		this.navigationService.setViewEntryParent(currentLocation);
 		this.zone.run(() => this.router.navigate(['/library/edit']));
-	}
+	} */
 }

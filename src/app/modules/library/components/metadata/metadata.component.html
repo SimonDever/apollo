@@ -1,33 +1,37 @@
 <!-- class="metadata-search-results-view" -->
-<ng-container *ngIf="metadataSearchResponse$ | async as response">
-	<h2 class="metadata-results-count">{{response.total_results}} results</h2>
+<div id="metadata" *ngIf="metadataSearchResponse$ | async as response">
+	<h2  class="metadata-results-count">{{response.total_results}} results</h2>
+	<div class="metadata-icon-button-box">
+		<button octicon="x" class="icon-button close-button" title="Close search results" (click)="cancel($event)"></button>
+		<button octicon="check" class="icon-button save-button" title="Save selected search results" (click)="finish($event)"></button>
+	</div>
 	<div *ngFor="let entry of response.results; index as index" class="metadata-search-result">
-		<div *ngIf="index != 0; else entryPopupTemplate" class="icon-button-box">
+		<!-- <div *ngIf="index != 0; else entryPopupTemplate" class="metadata-icon-button-box">
 			<button title="Keep" octicon="check" class="icon-button save-button" [class.selected]="isEntrySelected(entry)"
 				(click)="keepEntry(entry)">Save</button>
 		</div>
 		<ng-template #entryPopupTemplate>
-			<div class="icon-button-box" #entryPopover="ngbPopover" placement="left" triggers="manual"
+			<div class="metadata-icon-button-box" #entryPopover="ngbPopover" placement="left" triggers="manual"
 				ngbPopover="Select whole entry">
 				<button title="Keep" octicon="check" class="icon-button save-button" [class.selected]="isEntrySelected(entry)"
-					(click)="keepEntry(entry)">Keep this entry</button>
+					(click)="keepEntry(entry)"></button> Keep this whole entry
 			</div>
-		</ng-template>
+		</ng-template> -->
 
 		<div class="poster-preview">
 
 			<button *ngIf="index != 0; else posterPopupTemplate" title="Keep" octicon="check" class="icon-button save-button"
-				[class.selected]="isFieldSelected(entry, 'poster_path')" (click)="keepField(entry, 'poster_path')">
+				[class.selected]="isFieldSelected(entry, 'poster_path', entry.poster_path)" (click)="keepField(entry, 'poster_path', entry.poster_path)">
 				Keep this	poster
 			</button>
 
 			<ng-template #posterPopupTemplate>
 				<button #posterPopover="ngbPopover" title="Keep" octicon="check" placement="right" triggers="manual"
 					ngbPopover="Select only specific posters or fields with smaller checkboxes" class="icon-button save-button"
-					id="poster-button" [class.selected]="isFieldSelected(entry, 'poster_path')"
-					(click)="keepField(entry, 'poster_path')">
+					id="poster-button" [class.selected]="isFieldSelected(entry, 'poster_path', entry.poster_path)"
+					(click)="keepField(entry, 'poster_path', entry.poster_path)">
 					Keep this poster
-			</button>
+				</button>
 			</ng-template>
 
 			<img src="http://image.tmdb.org/t/p/original{{entry.poster_path}}" alt="No poster available" />
@@ -44,7 +48,7 @@
 			<div class="field-grid three-column" *ngFor="let item of ['title', 'name', 'overview']">
 				<ng-container *ngIf="entry[item]">
 					<button title="Keep this {{item}}" octicon="check" class="icon-button save-button"
-						[class.selected]="isFieldSelected(entry, item)" (click)="keepField(entry, item)">
+						[class.selected]="isFieldSelected(entry, item, entry[item])" (click)="keepField(entry, item, entry[item])">
 						Keep this {{ item }}
 					</button>
 					<span class="metadata-field-key">
@@ -56,22 +60,21 @@
 				</ng-container>
 			</div>
 
-			<div *ngIf="metadataDetails$ | async as metadataDetails">
-				<div *ngFor="let details of metadataDetails | keyvalue">
+			<div class="metadata-details" *ngIf="metadataDetails$ | async as metadataDetails">
+				<div class="metadata-detail" *ngFor="let details of metadataDetails | keyvalue">
 					<ng-container *ngIf="details.key === entry.id">
 						<div *ngFor="let field of details.value | keyvalue">
-							<div
-								*ngIf="field.key != 'poster_path' && field.key != 'overview' && field.key != 'title' && field.key != 'name' && field.key != 'id'">
+							<div *ngIf="field.key != 'poster_path' && field.key != 'gotDetails' && field.key != 'overview' && field.key != 'title' && field.key != 'name' && field.key != 'id'">
 								<div class="field-grid three-column">
 									<button title="Keep this" octicon="check" class="icon-button save-button"
-										[class.selected]="isFieldSelected(entry, field)" (click)="keepField(entry, field)">
+										[class.selected]="isFieldSelected(entry, field.key, field.value)" (click)="keepField(entry, field.key, field.value)">
 										Keep this
 									</button>
 									<span class="metadata-field-key">
 										{{ field.key.split('_').join(' ') | titlecase }}
 									</span>
 									<span class="metadata-field-value">
-										{{ field.value | json }}
+										{{ convertArrays(field.value) }}
 									</span>
 								</div>
 							</div>
@@ -79,21 +82,20 @@
 					</ng-container>
 				</div>
 			</div>
-
-			<button class="details-button" [class.d-none]="areDetailsLoaded(entry.id)" id="details-{{entry.id}}"
-				(click)="getDetails(entry)">
+			
+			<button class="metadata-button" *ngIf="!entry.gotDetails"
+				id="details-{{entry.id}}" (click)="getDetails(entry)">
 				Get more details
 			</button>
+
+			<button class="metadata-button" *ngIf="entry.gotDetails"
+				[class.metadata-button-selected]="isEntrySelected(entry)"
+				id="details-{{entry.id}}" (click)="keepEntry(entry, $event)">
+				Keep all fields
+			</button>
+
 		</div>
 	</div>
 	<button class="prev-button btn btn-outline-light" (click)="getPrevPage($event)">Show previous page</button>
 	<button class="next-button btn btn-outline-light" (click)="getNextPage($event)">Show next page</button>
-</ng-container>
-
-<div class="sticky-icon-box">
-	<button class="btn btn-outline-light cancel-button" (click)="cancel($event)">Cancel</button>
-	<button [disabled]="converting" #savePopover="ngbPopover" placement="top" ngbPopover="When you're finished selecting, save your changes."
-		triggers="manual" class="btn btn-outline-light finish-button" (click)="finish($event)">
-		Save selected
-	</button>
 </div>

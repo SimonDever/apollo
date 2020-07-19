@@ -40,6 +40,10 @@ export class SearchService {
 
 				try {
 					response = JSON.parse(data);
+					
+					for (const entry of response.results) {
+						this.cleanArrays(entry);
+					}
 					response.results = response.results.filter(el => el.media_type === 'tv' || el.media_type === 'movie');
 					response.total_pages = Math.ceil(response.results.length / 20);
 					response.total_results = response.results.length;
@@ -65,25 +69,40 @@ export class SearchService {
 		);
 	}
 
+	cleanArrays(entry) {
+		for (const prop in entry) {
+			console.log('cleanArrays :: prop is array = ', Array.isArray(entry[prop]));
+			if (Array.isArray(entry[prop])) {
+				entry[prop] = entry[prop].map(e => e.name).join(', ');
+			}
+		}
+
+		return entry;
+	}
+
 	getFirstResult(entry: any): Observable<any> {
+		console.log(`searchService :: getFirstResult(${entry.title}) :: entry`);
 		this.movieDb.common.api_key = this.configService.apiKey;
-		console.log(`SearchService.getFirstResult(${entry.title})`);
 		return new Observable(subscriber => {
 			this.movieDb.search.getMulti({ 'query': entry.title, page: 1 },
 				data => subscriber.next(JSON.parse(data).results),
 				err => subscriber.error(err));
 		}).pipe(mergeMap((options: any) => {
-			console.log('getFirstResult, entry', entry);
-			console.log('getFirstResult', options);
+			console.log('searchService :: getFirstResult :: result count', options.length);
 			if (options.length === 0) {
 				return of(entry);
 			}
-			console.log(`getFirstResult -> get details about id=${options[0].id}`);
+			console.log(`searchService :: getFirstResult :: movieDb.getById(${options[0].id}`);
 			return new Observable(subscriber => {
 				this.movieDb.movies.getById({ 'id': options[0].id },
 					data => {
-						const output = JSON.parse(data);
+						let output = JSON.parse(data);
+						console.log('searchService :: getFirstResult :: output', output);
+						output = this.cleanArrays(output);
+						console.log('searchService :: getFirstResult :: cleanedArrays output', output)
 						output.file = entry.file;
+						output.id = entry.id;
+						console.log(`searchService :: getFirstResult :: movieDb.getById results`, output);
 						subscriber.next(output);
 					},
 					err => subscriber.error(err));
@@ -100,7 +119,9 @@ export class SearchService {
 		}
 		resource.getById({ 'id': id },
 			(function (data) {
-				this.store.dispatch(new LibraryActions.ShowMetadataDetailsResults({ details: JSON.parse(data) }));
+				const details = JSON.parse(data);
+				this.cleanArrays(details);
+				this.store.dispatch(new LibraryActions.ShowMetadataDetailsResults({details}));
 			}.bind(this)),
 			(function (data) {
 				console.error('Error retrieving search details');

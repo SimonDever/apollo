@@ -7,7 +7,7 @@
 
 	<ul class="navbar-links">
 		<li class="nav-item">
-			<a class="nav-link" (click)="showEntryList()">Collection</a>
+			<a class="nav-link" (click)="showEntryList()" title="Total videos: {{entryCount$ | async}}">Collection</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" (click)="showSettings()">Settings</a>
@@ -29,18 +29,133 @@
 			<button [disabled]="!searchForm.valid" class="btn btn-outline-light"
 				type="submit">Search</button>
 		</form>
+		
+		<div ngbDropdown class="d-inline-block mr-3 ml-0">
+      <button class="btn btn-outline-light" id="dropdownForm1" ngbDropdownToggle>Display</button>
+      <div ngbDropdownMenu aria-labelledby="dropdownForm1" class="dropdown-menu-right" [style.opacity]="config.menuTransparency ? '0.75' : '1'">
+					<div class="field-grid two-column">
+						<span class="metadata-field-key">
+							<form [formGroup]="configForm">
+							<span class="inner-grid">
+								<label class="grid-label">Menu transparency</label>
+								<span class="grid-value">{{config.menuTransparency ? 'On' : 'Off'}}</span>
+								<input class="grid-input" (change)="save()" #menuTransparency formControlName="menuTransparency" type="checkbox">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Table format</label>
+								<span class="grid-value">{{config.tableFormat ? 'On' : 'Off'}}</span>
+								<input class="grid-input" (change)="save()" #tableFormat formControlName="tableFormat" type="checkbox">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Width</label>
+								<span class="grid-value">{{boxWidth.value}}px</span>
+								<input class="grid-input" (input)="save()" #boxWidth formControlName="boxWidth" type="range" min="1" max="700">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Height</label>
+								<span class="grid-value">{{boxHeight.value}}px</span>
+								<input class="grid-input" (input)="save()" #boxHeight formControlName="boxHeight" type="range" min="1" max="700">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Column gap</label>
+								<span class="grid-value">{{columnGap.value}}px</span>
+								<input class="grid-input" (input)="save()" #columnGap formControlName="columnGap" type="range" min="1" max="300">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Row gap</label>
+								<span class="grid-value">{{rowGap.value}}px</span>
+								<input class="grid-input" (input)="save()" #rowGap formControlName="rowGap" type="range" min="1" max="300">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Border radius</label>
+								<span class="grid-value">{{borderRadius.value}}px</span>
+								<input class="grid-input" (input)="save()" type="range" #borderRadius formControlName="borderRadius" min="0" max="200">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Border width</label>
+								<span class="grid-value">{{borderWidth.value}}px</span>
+								<input class="grid-input" (input)="save()" type="range" #borderWidth formControlName="borderWidth" min="0" max="30">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Border color</label>
+								<span class="grid-value">{{borderColor.value}}</span>
+								<input class="grid-input" (input)="save()" type="color" #borderColor formControlName="borderColor">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Margin vertical</label>
+								<span class="grid-value">{{marginVertical.value}}px</span>
+								<input class="grid-input" (input)="save()" #marginVertical formControlName="marginVertical" type="range" min="0" max="300">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Margin horizontal</label>
+								<span class="grid-value">{{marginHorizontal.value}}px</span>
+								<input class="grid-input" (input)="save()" type="range" #marginHorizontal formControlName="marginHorizontal" min="0" max="300">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Shadow color</label>
+								<span class="grid-value">{{shadowColor.value}}</span>
+								<input class="grid-input" (input)="save()" type="color" #shadowColor formControlName="shadowColor">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Shadow blur</label>
+								<span class="grid-value">{{shadowBlur.value}}px</span>
+								<input class="grid-input" (input)="save()" type="range" #shadowBlur formControlName="shadowBlur" min="0" max="200">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Shadow spread</label>
+								<span class="grid-value">{{shadowSpread.value}}px</span>
+								<input class="grid-input" (input)="save()" type="range" #shadowSpread formControlName="shadowSpread" min="0" max="200">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Shadow vertical offset</label>
+								<span class="grid-value">{{shadowVerOffset.value}}px</span>
+								<input class="grid-input" (input)="save()" type="range" #shadowVerOffset formControlName="shadowVerOffset" min="-50" max="50">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Shadow horizontal offset</label>
+								<span class="grid-value">{{shadowHorOffset.value}}px</span>
+								<input class="grid-input" (input)="save()" type="range" #shadowHorOffset formControlName="shadowHorOffset" min="-50" max="50">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Highlight untouched entries</label>
+								<span class="grid-value">{{config.untouchedHighlight ? 'On' : 'Off'}}</span>
+								<input class="grid-input" (change)="save()" #untouchedHighlight formControlName="untouchedHighlight" type="checkbox">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Show only untouched entries</label>
+								<span class="grid-value">{{config.showOnlyUntouched ? 'On' : 'Off'}}</span>
+								<input class="grid-input" (change)="save()" #showOnlyUntouched formControlName="showOnlyUntouched" type="checkbox">
+							</span>
+							<span class="inner-grid">
+								<label class="grid-label">Untouched shadow color</label>
+								<span class="grid-value">{{untouchedColor.value}}</span>
+								<input class="grid-input" (input)="save()" type="color" #untouchedColor formControlName="untouchedColor">
+							</span>
+							</form>
+						</span>
+					</div>
+      </div>
+		</div>
+		
+		<div ngbDropdown class="mr-3 ml-0" *ngIf="genres && genres.length > 0">
+			<button id="genreButton" class="btn btn-outline-light" ngbDropdownToggle>Genres</button>
+			<div ngbDropdownMenu aria-labelledby="genreButton" class="dropdown-menu-genre">
+				<ng-container *ngFor="let genre of genres">
+					<button ngbDropdownItem (click)="gotoGenre(genre)">{{genre | titlecase}}</button>
+				</ng-container>
+			</div>
+		</div>
 
-		<div ngbDropdown>
+		<div ngbDropdown class="mr-3 ml-0">
 			<button id="bookmarksButton" class="btn btn-outline-light" ngbDropdownToggle>Bookmarks</button>
-			<div ngbDropdownMenu aria-labelledby="bookmarksButton">
+			<div ngbDropdownMenu aria-labelledby="bookmarksButton" class="dropdown-menu-bookmarks">
 				<ng-container *ngFor="let char of alphabet">
 					<button ngbDropdownItem (click)="goto(char)">{{char}}</button>
 				</ng-container>
 			</div>
 		</div>
 
-		<!-- <button class="btn btn-outline-light" (click)="addEntry()">Add new entry</button> -->
 		<input type="file" multiple #entriesInput (change)="addEntries($event);" />
-		<button class="btn btn-outline-light" (click)="entriesInput.click()">Add Video</button>
+		<button class="btn btn-outline-light mr-0 ml-0" (click)="entriesInput.value = null; entriesInput.click()">Add Video</button>
 	</div>
 </nav>

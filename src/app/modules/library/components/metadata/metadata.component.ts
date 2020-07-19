@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, KeyValueDiffer, KeyValueDiffers, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, KeyValueDiffer, KeyValueDiffers, OnDestroy, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbPopover, NgbPopoverConfig } from '@ng-bootstrap/ng-bootstrap';
 import { select, Store } from '@ngrx/store';
@@ -16,7 +16,7 @@ const uuid = require('uuid/v4');
 	styleUrls: ['./metadata.component.css'],
 	providers: [NgbPopoverConfig],
 })
-export class MetadataComponent implements OnInit, OnDestroy {
+export class MetadataComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	searchTerms: any;
 	selectedEntryId: number;
@@ -46,20 +46,27 @@ export class MetadataComponent implements OnInit, OnDestroy {
 
 	constructor(private store: Store<fromLibrary.LibraryState>,
 		private router: Router,
+		private elementRef: ElementRef,
 		private libraryService: LibraryService,
-		private cdRef: ChangeDetectorRef,
-		private differs: KeyValueDiffers,
+		/* private cdRef: ChangeDetectorRef, */
+		/* private differs: KeyValueDiffers, */
 	) { }
 
+	ngAfterViewInit() {
+		let el = this.elementRef.nativeElement.querySelector('#metadata');
+		el.scrollIntoView({ 
+			behavior: 'smooth' 
+		});
+	}
+
 	ngOnInit() {
-		console.log('onInit');
 		this.page = 1;
 		this.keepers = new Map();
 		this.details = new Map();
-		this.keepersDiffer = this.differs.find(this.keepers).create();
+		//this.keepersDiffer = this.differs.find(this.keepers).create();
 		this.savedEntry = {};
 
-		this.metadataDetails$ = this.store.pipe(select(fromLibrary.getMetadataDetailsResults));
+		this.metadataDetails$ = this.store.select(fromLibrary.getMetadataDetailsResults);
 
 		this.selectedEntry$ = this.store.select(fromLibrary.getSelectedEntry);
 
@@ -79,16 +86,16 @@ export class MetadataComponent implements OnInit, OnDestroy {
 		this.subs.add(this.store.pipe(select(fromLibrary.getSelectedEntryId))
 			.subscribe(id => this.selectedEntryId = id));
 
-		this.subs.add(this.metadataDetails$.subscribe((details: Map<any, any>) => {
-			this.details = details || new Map();
-			this.cdRef.detectChanges();
-		}));
+		/* this.subs.add(this.metadataDetails$.subscribe((details: Map<any, any>) => {
+			this.details = details// || new Map();
+			//this.cdRef.detectChanges();
+		})); */
 
 		this.metadataSearchResponse$ = this.store.pipe(select(fromLibrary.getMetadataSearchResults));
 		this.subs.add(this.metadataSearchResponse$.subscribe(response => {
 			console.log('metadataSearchResponse, new results:', response);
 
-			this.cdRef.detectChanges();
+			//this.cdRef.detectChanges();
 			/*
 			if (this.entryPopup != null) { this.entryPopup.open();	}
 			if (this.posterPopup != null) { this.posterPopup.open(); }
@@ -97,25 +104,60 @@ export class MetadataComponent implements OnInit, OnDestroy {
 		}));
 	}
 
+	convertArrays(values) {
+		if (Array.isArray(values)) {
+			return values.map(e => e.name).join(', ');
+		} else {
+			return values;
+		}
+	}
+
+	isArray(obj: any) {
+		return Array.isArray(obj);
+	}
+
 	ngOnDestroy() {
-		console.log('destroying');
 		if (this.subs) {
 			this.subs.unsubscribe();
 		}
 
-		this.cdRef.detach();
+		/* this.cdRef.detach(); */
 	}
 
-	areDetailsLoaded(id: any) {
-		return this.details.has(id);
+	areDetailsLoaded(entry/*id: any*/) {
+		return this.details === entry;
+		//return this.details.has(id);
+	}
+
+	isEntrySelected(entry): boolean {
+		return this.savedEntry === entry;
 	}
 
 	getDetails(entry) {
 		//console.info(`MetadataComponent.getDetails(${entry.id})`);
 		this.store.dispatch(new LibraryActions.SearchForMetadataDetails({ id: entry.id, media_type: entry.media_type }));
+		entry.gotDetails = true;
 	}
 
-	keepField(entry, field): void {
+	keepField(entry, field, value): void {
+		if (this.savedEntry != null) {
+			//console.debug('User chose to keep a field so deselecting entire entry');
+			this.savedEntry = null;
+		}
+
+		if (this.keepers.has(field) && this.keepers.get(field) === value) {
+			console.log(`Deleting field\n\n${field}: ${value}\n\n`);
+			this.keepers.delete(field);
+		} else {
+			console.log(`Saving field\n\n${field}: ${value}\n\n`);
+			this.keepers.set(field, value);
+		}
+		console.log('this.keepers');
+		console.log(this.keepers);
+	}
+
+	/*
+ 	keepField(entry, field): void {
 		//console.debug(`keepField(entry, field) - field: ${field}, entry:`, entry);
 
 		if (!entry || !field) {
@@ -136,20 +178,26 @@ export class MetadataComponent implements OnInit, OnDestroy {
 					this.keepers.set(field, entry[field]);
 				}
 			} else {
-				// console.debug(`does not already have field so saving`);
+				console.log(`does not already have field so saving`);
+				console.log('field');
+				console.log(field);
+				console.log('entry[field]');
+				console.log(entry[field]);
 				this.keepers.set(field, entry[field]);
 			}
 		}
 	}
+	*/
 
-	isFieldSelected(entry, field): boolean {
+	isFieldSelected(entry, field, thisvalue): boolean {
 		// console.debug(`isFieldSelected(entry, field) - field: ${field}, entry:`, entry);
-		if (entry && this.keepers.has(field)) {
+		if (String(thisvalue) && this.keepers.has(field)) {
 			// console.debug(`result: true;`);
 			const value = this.keepers.get(field);
 			// console.debug(`isFieldSelected - value: `, value);
 			// console.debug(`isFieldSelected - entry[field]: ${entry[field]}`);
-			return value === entry[field];
+			// return value === entry[field];
+			return value === thisvalue;
 		} else {
 			// console.debug('isFieldSelected: entry:', entry);
 			// console.debug('isFieldSelected: field:', entry);
@@ -172,23 +220,32 @@ export class MetadataComponent implements OnInit, OnDestroy {
 		if (this.savedEntry == null) {
 			if (this.keepers.size > 0) {
 				this.savedEntry = {};
+
+				console.log('keepers');
+				console.log(this.keepers);
+
+				this.keepers.forEach((value, key, map) => {
+					console.log(`m[${key}] = ${value}`);
+				});
+
 				Array.from(this.keepers.entries()).forEach(entry => {
-					//console.log(`entry: ${entry[0]}: ${entry[1]}`);
-					if (entry[0] !== 'id') {
-						this.savedEntry[entry[0]] = entry[1];
+					//console.log(entry);
+					console.log(`keeper entry: ${entry[0]}: ${entry[1]}`);
+
+					if (entry[0] !== 'id' && entry[0] !== 'gotDetails') {
+						if (Array.isArray(entry[0])) {
+							this.savedEntry[entry[0]] = entry[1].map(e => e.name).join(', ');
+						} else {
+							this.savedEntry[entry[0]] = entry[1];
+						}
 					}
 				});
-				//console.log('finish() - has keepers', this.keepers);
-				//console.log('finish() - savedEntry0:', this.savedEntry);
 			} else {
-				//console.log('savedEntry null and no keepers');
 				this.savedEntry = {};
 			}
 		}
 
-		//console.log('about to merge new things with existing entry', this.tempEntry);
-
-		if( !this.selectedEntryId) {
+		if (!this.selectedEntryId) {
 			console.error('no selected entry id while saving searched metadata in edit, generating uuid');
 		}
 
@@ -196,29 +253,24 @@ export class MetadataComponent implements OnInit, OnDestroy {
 			...this.tempEntry,
 			...this.savedEntry,
 			...{
-				id: this.selectedEntryId || uuid() // TODO: leave id alone or make it whatever moviedb gives us
+				id: this.selectedEntryId
 			}
 		};
 
 		this.libraryService.saveEntry(this.savedEntry);
-		const img = document.querySelector('#poster-' + this.savedEntry.id) as HTMLImageElement;
+		/* const img = document.querySelector('#poster-' + this.savedEntry.id) as HTMLImageElement;
 		if (img) {
 			img.src = this.savedEntry.poster_path;
-		}
+		} */
 		this.router.navigate(['/library/edit']);
 	}
 
-	isEntrySelected(entry): boolean {
-		return this.savedEntry === entry;
-	}
-
-	keepEntry(entry): void {
+	keepEntry(entry, event) {
 		this.keepers = new Map();
 		if (this.savedEntry === entry) {
 			this.savedEntry = null;
 		} else {
 			this.savedEntry = entry;
-			this.savedEntry.id = this.selectedEntryId;
 		}
 	}
 

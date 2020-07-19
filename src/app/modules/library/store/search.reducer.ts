@@ -10,6 +10,7 @@ export interface State {
 	metadataSearchResults: any;
 	metadataDetailsResults: Map<any, any>;
 	config: any;
+	genres: string[],
 	apiKey: string;
 }
 
@@ -21,7 +22,28 @@ export const initialState: State = {
 	searchTerms: '',
 	metadataSearchResults: null,
 	metadataDetailsResults: new Map(),
-	config: null,
+	genres: [],
+	config: {
+		boxWidth: '290',
+		boxHeight: '390',
+		borderRadius: '16',
+		borderWidth: '0',
+		borderColor: '#ff0000',
+		marginVertical: '15',
+		marginHorizontal: '15',
+		shadowColor: '#ffffff',
+		shadowBlur: '6',
+		shadowVerOffset: '0',
+		shadowHorOffset: '0',
+		shadowSpread: '4',
+		menuTransparency: false,
+		rowGap: '25',
+		columnGap: '25',
+		untouchedColor: '#00ff00',
+		untouchedHighlight: true,
+		showOnlyUntouched: false,
+		tableFormat: false,
+	},
 	apiKey: ''
 };
 
@@ -77,6 +99,24 @@ export function reducer(state: State = initialState, action: LibraryActions.All)
 		case LibraryActions.LOADED: {
 			return Object.assign({}, state, {
 				needEntries: false
+			});
+		}
+
+		case LibraryActions.NEED_ENTRIES: {
+			return Object.assign({}, state, {
+				needEntries: true
+			});
+		}
+
+		case LibraryActions.DELETE_ALL_ENTRIES: {
+			return Object.assign({}, state, {
+				genres: []
+			});
+		}
+
+		case LibraryActions.GENRES_LOADED: {
+			return Object.assign({}, state, {
+				genres: action.payload.genres
 			});
 		}
 

@@ -88,32 +88,19 @@ export class StorageService {
 	}
 
 	deleteAllEntries(): Observable<number> {
-		//console.log(`StorageService :: deleteAllEntries :: `);
+		console.log(`StorageService :: deleteAllEntries :: entry`);
 		return new Observable(subscriber => {
 			this.datastore.remove({}, { multi: true }, function (err, countRemoved) {
 				if (err) {
 					subscriber.error(err);
 				} else {
-					//console.log('deleteAllEntries() complete');
 					subscriber.next(countRemoved);
 				}
+				console.log('StorageService :: deleteAllEntries :: complete');
 			});
 		})
 	}
 
-	getAllEntries(): Observable<Entry[]> {
-		//console.log(`StorageService :: load :: this.datastore.filename: ${this.datastore.filename}`);
-		return new Observable(subscriber => {
-			this.datastore.find({}, (err, entries) => {
-				if (err) {
-					subscriber.error(err);
-				} else {
-					//console.log('load()', entries);
-					subscriber.next(entries);
-				}
-			});
-		});
-	}
 
 	getEntries(): Observable<Entry[]> {
 		return new Observable(subscriber => {
@@ -125,6 +112,37 @@ export class StorageService {
 				subscriber.next(entries);
 			});
 		});
+	}
+
+	getAllGenres(): Observable<any[]> {
+		return new Observable(subscriber => {
+			this.datastore.find({}, (err, entries) => {
+				if (err) {
+					subscriber.error(err);
+				}
+
+				let genreList = [];
+				for(const entry of entries) {
+					if (entry.genres) {
+						if (Array.isArray(entry.genres)) {
+							genreList = [...genreList, ...entry.genres.map(genre => genre.name)];
+						} else {
+							genreList = [...genreList, ...entry.genres.split(',')];
+						}
+					}
+				}
+
+				genreList = genreList.map(genre => {
+					return genre.toLowerCase().trim();
+				});
+
+				genreList = Array.from(new Set(genreList));
+
+				console.log('genreList:', genreList);
+
+				subscriber.next(genreList);
+			})
+		})
 	}
 
 	getEntry(id: string): Observable<Entry> {
@@ -165,63 +183,76 @@ export class StorageService {
 		});
 	}
 
+	getAllEntries(): Observable<Entry[]> {
+		//console.log(`StorageService :: load :: this.datastore.filename: ${this.datastore.filename}`);
+		return new Observable(subscriber => {
+			this.datastore.find({}, (err, entries) => {
+				if (err) {
+					subscriber.error(err);
+				} else {
+					//console.log('load()', entries);
+					subscriber.next(entries);
+				}
+			});
+		});
+	}
+	
 	searchEntry(input: string): Observable<Entry[]> {
 		const parts = input.split(':');
 		if (parts.length === 2) {
-			const field = parts[0];
-			const keyword = parts[1];
+			const toFind = {};
+			let field = parts[0].toLowerCase();
+			if(field === 'genre') {
+				field = 'genres';
+			}
+			const keyword = { $regex: new RegExp(parts[1], 'i')};
+			toFind[field] = keyword;
+			// console.log(toFind);
 			return new Observable(subscriber => {
-				this.datastore.find({ $where: () =>
-					Object.entries(this).filter(([key, value]) =>
-						key.toLowerCase() === field.toLowerCase() &&
-						value.toLowerCase().includes(keyword.toLowerCase())
-					)}, (err, entries) => {
+				this.datastore.find(toFind, (err, entries) => {
 					if (err) {
 						subscriber.error(err);
 					} else {
-						console.log(`searchEntry(${input}) results:`);
-						console.log(entries);
+						// console.log(`searchEntry(${input}) results:`);
+						// console.log(entries);
 						subscriber.next(entries);
 					}
 				});
 			});
 		} else {
-			const keyword = parts[0];
-			console.log('keyword', keyword);
+			const keyword = new RegExp(parts[0], 'i');
 			return new Observable(subscriber => {
-				this.datastore.find({ $where: () =>
-					Object.values(this).includes(keyword)
+				this.datastore.find({
+					// This doesn't take into account custom fields
+					$or: [
+						{overview: keyword},
+						{release_date: keyword},
+						{original_title: keyword},
+						{media_type: keyword},
+						{original_language: keyword},
+						{title: keyword},
+						{origin_country: keyword},
+						{name: keyword},
+						{original_name: keyword},
+						{known_for: keyword},
+						{belongs_to_collection: keyword},
+						{genres: keyword},
+						{production_companies: keyword},
+						{production_countries: keyword},
+						{spoken_languages: keyword},
+						{tagline: keyword}
+					],
 				}, (err, entries) => {
 					if (err) {
 						subscriber.error(err);
 					} else {
-						console.log(`searchEntry(${input}) results:`);
-						console.log(entries);
+						// console.log(`searchEntry(${input}) results:`);
+						// console.log(entries);
 						subscriber.next(entries);
 					}
 				});
 			});
 		}
-		/*		
-		return new Observable(subscriber => {
-			this.datastore.find({
-				$or: [
-					{ title: searchRegex },
-					{ overview: searchRegex },
-					{ file: searchRegex },
-					{ cast: searchRegex }
-				],
-			}, (err, entries) => {
-				if (err) {
-					subscriber.error(err);
-				} else {
-					//console.log('searchEntry(title)');
-					//console.log(entries);
-					subscriber.next(entries);
-				}
-			});
-		});
-		*/
 	}
 
 	getFileFromPath(file: string) {
@@ -233,6 +264,43 @@ export class StorageService {
 		}
 		newTitle = file.substring(separator + 1);
 		return newTitle;
+	}
+
+	cleanArrays(): Observable<Entry[]> {
+		return new Observable(subscriber => {
+			console.log('storageService :: cleanArrays - finding entries');
+			this.datastore.find({}, (err, entries) => {
+				if (err) {
+					subscriber.error(err);
+				} else {
+					for(const entry of entries) {
+						for (const prop in entry) {
+							if (Array.isArray(entry[prop])) {
+								console.log('storageService :: cleanArrays - found an array - converting');
+								console.log(`old: `, entry[prop]);
+								entry[prop] = entry[prop].map(e => e.name).join(', ');
+								console.log(`new: `, entry[prop]);
+							}
+						}
+					}
+
+					this.datastore.remove({}, { multi: true}, (err, numRemoved) => {
+						if (err) {
+							console.error('error', err);
+						}
+						// console.log('number removed:', numRemoved);
+						// console.log('updating entries', entries);
+						this.datastore.insert(entries, (err, entriesOut) => {
+							if (err) {
+								subscriber.error(err);
+							}
+							// console.log('new entries after insert: ', entriesOut);
+							subscriber.next(entriesOut);
+						});
+					});
+				}
+			});
+		});
 	}
 
 	changeAllPathsTo(): Observable<Entry> {
@@ -295,13 +363,14 @@ export class StorageService {
 	}
 
 	addEntry(newEntry: Entry): Observable<Entry> {
+		console.log('storageService :: addEntry :: entry');
 		return new Observable(subscriber => {
 			this.datastore.insert(newEntry, (err, entry) => {
 				if (err) {
 					subscriber.error(err);
+					console.log('storageService :: addEntry :: err', err);
 				}
-				//console.log('addEntry(entry)');
-				//console.log(entry);
+				console.log('storageService :: addEntry :: newEntry', entry);
 				subscriber.next(entry);
 			});
 		});
