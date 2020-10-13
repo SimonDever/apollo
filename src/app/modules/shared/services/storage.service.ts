@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { Entry } from '../../library/store/entry.model';
 import * as Datastore from 'nedb';
 import { ElectronService } from 'ngx-electron';
@@ -190,7 +190,7 @@ export class StorageService {
 				if (err) {
 					subscriber.error(err);
 				} else {
-					//console.log('load()', entries);
+					console.log('getAllEntries :: entries', entries);
 					subscriber.next(entries);
 				}
 			});
@@ -267,37 +267,75 @@ export class StorageService {
 	}
 
 	cleanArrays(): Observable<Entry[]> {
+		console.debug('cleanArrays :: function entry');
 		return new Observable(subscriber => {
-			console.log('storageService :: cleanArrays - finding entries');
 			this.datastore.find({}, (err, entries) => {
 				if (err) {
 					subscriber.error(err);
 				} else {
+					console.debug('cleanArrays :: entries before clean', entries);
 					for(const entry of entries) {
 						for (const prop in entry) {
-							if (Array.isArray(entry[prop])) {
-								console.log('storageService :: cleanArrays - found an array - converting');
-								console.log(`old: `, entry[prop]);
-								entry[prop] = entry[prop].map(e => e.name).join(', ');
-								console.log(`new: `, entry[prop]);
+							if (prop !== 'sort_order' && entry[prop] != null) {
+								if (Array.isArray(entry[prop])) {
+									console.debug('storageService :: cleanArrays - found an array - converting');
+									console.debug(`storageService :: cleanArrays :: before conversion`, entry[prop]);
+									entry[prop] = entry[prop].map(e => e.name).join(', ');
+									console.debug(`storageService :: cleanArrays :: after conversion`, entry[prop]);
+								} else if (typeof entry[prop] === 'object') {
+									console.debug('storageService :: cleanArrays :: typeof entry[prop] is object');
+									console.debug(`storageService :: cleanArrays :: before conversion`, entry[prop]);
+									entry[prop] = entry[prop].name;
+									console.debug(`storageService :: cleanArrays :: after conversion`, entry[prop]);
+								}
+							} else {
+								console.debug('cleanArrays :: entry[prop] is null, prop is ' + prop);
 							}
 						}
 					}
 
-					this.datastore.remove({}, { multi: true}, (err, numRemoved) => {
+					console.debug('cleanArrays :: entries after clean', entries);
+
+					/* this.datastore.remove({}, { multi: true}, (err, numRemoved) => {
 						if (err) {
 							console.error('error', err);
 						}
-						// console.log('number removed:', numRemoved);
-						// console.log('updating entries', entries);
-						this.datastore.insert(entries, (err, entriesOut) => {
+						console.debug('number removed:', numRemoved); */
+						//console.debug('cleanArrays :: updating entries', entries);
+
+						/* this.datastore.insert(entries, (err, entriesOut) => {
 							if (err) {
+								console.error('cleanArray :: error inserting after cleaning');
 								subscriber.error(err);
 							}
-							// console.log('new entries after insert: ', entriesOut);
+							console.debug('cleanArray :: new entries after insert: ', entriesOut);
 							subscriber.next(entriesOut);
+						}); */
+
+						const cleanEntries = [];
+						console.debug('cleanArray :: entries.length:', entries.length);
+						let i = 0;
+						for (const entry of entries) {
+							cleanEntries.push(new Observable(subscriber => {
+								this.datastore.update({ _id: entry._id }, entry, { returnUpdatedDocs: true }, (err, numAffected, affectedDocuments) => {
+									if (err) {
+										console.error('cleanArray :: error inserting after cleaning');
+										subscriber.error(err);
+									}
+									console.debug('cleanArray :: new entries after insert ('+numAffected+'):', affectedDocuments);
+									console.debug('cleanArray :: ', ++i);
+									subscriber.next(affectedDocuments);
+								});
+							}));
+						}
+
+						forkJoin(cleanEntries).subscribe(entries => {
+							console.debug('cleanArray :: forkJoin :: entries.length', entries.length);
+							console.debug('cleanArray :: forkJoin :: entries', entries);
+							subscriber.next(entries);
 						});
-					});
+						
+					/* }); */
 				}
 			});
 		});

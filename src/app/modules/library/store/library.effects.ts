@@ -69,7 +69,7 @@ export class LibraryEffects {
 		ofType(LibraryActions.LOAD_GENRES),
 		tap(() => console.log('libraryEffects :: loadGenres :: cleanArrays')),
 		mergeMap(() => this.storageService.cleanArrays()),
-		tap(() => console.log('libraryEffects :: loadGenres :: getAllGenres')),
+		tap(entries => console.log('libraryEffects :: loadGenres :: after cleanArray :: getAllGenres :: entries', entries)),
 		mergeMap(() => this.storageService.getAllGenres()),
 		map(genres => new LibraryActions.GenresLoaded({ genres: genres })));
 	

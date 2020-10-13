@@ -24,3 +24,9 @@ export interface Entry {
 	imdbID?: string;
 	[key: string]: any;
 }
+
+export interface InputField {
+	value: string,
+	formControlName: string,
+	label: string
+}

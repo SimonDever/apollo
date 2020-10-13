@@ -1,7 +1,10 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, session } = require('electron');
 const fs = require('fs');
+
+const loadDevtool = require('electron-load-devtool');
 const updater = require('electron-simple-updater');
 var vlc = require('./vlc');
+const log = require('electron-log');
 const { default: installExtension, REDUX_DEVTOOLS } = require('electron-devtools-installer');
 let mainWindow = null;
 
@@ -20,6 +23,20 @@ if (!app.requestSingleInstanceLock()) {
 
 	// Create myWindow, load the rest of the app, etc...
 	app.on('ready', () => {
+
+		log.transports.console.level = false;
+
+		ipcMain.on('log', (event, args) => {
+			log.info(args);
+		});
+
+		ipcMain.on('debug', (event, args) => {
+			log.debug(args);
+		});
+
+		ipcMain.on('error', (event, args) => {
+			log.error(args);
+		});
 		
 		ipcMain.on('focus-app', () => {
 			mainWindow.show();
@@ -57,9 +74,14 @@ if (!app.requestSingleInstanceLock()) {
 
 		mainWindow.webContents.session.clearCache(function () { })
 		
-		installExtension(REDUX_DEVTOOLS)
+		const reduxDevToolsExtId = 'lmhkpmbekcpmknklioeibfkpmmfibljd';
+		const path = `${app.getPath('userData')}\\extensions\\${reduxDevToolsExtId}`;
+		console.log('load extension: ', path);
+		session.defaultSession.loadExtension(path)
 			.then((name) => console.log(`Added Extension:  ${name}`))
 			.catch((err) => console.log('An error occurred: ', err));
+			
+		//mainWindow.openDevTools();
 			
 		mainWindow.webContents.openDevTools();
 

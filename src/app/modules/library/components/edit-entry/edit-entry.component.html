@@ -22,46 +22,49 @@
 			</ng-container>
 		</div>
 
-		<input (change)="fileChange($event)" type="file" #fileInput />
 
+		<form [formGroup]="entryForm">
+			<div class="right-fields" dragula="inputs" [(dragulaModel)]="inputList">
+				<ng-container *ngFor="let input of inputList">
+					<ng-container *ngIf="input.label === 'title'">
+						<div class="field-grid three-column-reverse">
+							<span class="metadata-field-key">
+								Title
+							</span>
+							<span class="metadata-field-value">
+								<div contenteditable="true" ngDefaultControl formControlName="title"></div>
+							</span>
+							<button class="btn btn-outline-light" (click)="removeInputField(input)">Remove</button>
+						</div>
+					</ng-container>
 
-			<div class="right-fields">
-				<form [formGroup]="entryForm">
-					<div class="field-grid three-column-reverse">
-						<span class="metadata-field-key">
-							Title
-						</span>
-						<span class="metadata-field-value">
-							<div contenteditable="true" ngDefaultControl formControlName="title"></div>
-						</span>
-					</div>
+					<ng-container *ngIf="input.label === 'file'">
+						<div class="field-grid three-column-reverse">
+							<span class="metadata-field-key">Video File</span>
+							<span class="metadata-field-value">{{file}}</span>
+							<input (change)="fileChange($event)" type="file" #fileInput />
+							<button class="btn btn-outline-light" (click)="fileInput.click()">
+								Browse
+							</button>
+						</div>
+					</ng-container>
 
-					<div class="field-grid three-column-reverse">
-						<span class="metadata-field-key">Video file</span>
-						<span class="metadata-field-value">{{file}}</span>
-						<button class="btn btn-outline-light" (click)="fileInput.click()">
-							Browse
-						</button>
-					</div>
-
-					<div *ngFor="let input of inputList" class="field-grid three-column-reverse" [hidden]="isKeyHidden(input.label)">
-						<span class="metadata-field-key">
-							{{ input.label.split('_').join(' ') | titlecase }}
-						</span>
-						<span class="metadata-field-value">
-							<!-- <input type="text" formControlName="{{ input.formControlName }}"> -->
-							<div contenteditable="true" ngDefaultControl formControlName="{{ input.formControlName }}"></div>
-							<!-- <div *ngIf="input.label === 'genres'">
-								{{ getGenres(input.value) }}
-							</div> -->
-						</span>
-						
-						<button class="btn btn-outline-light" (click)="removeInputField(input)">Remove</button>
-					</div>
-				</form>
+					<ng-container *ngIf="input.label !== 'file' && input.label !== 'title'">
+						<div class="field-grid three-column-reverse">
+							<span class="metadata-field-key">
+								{{ input.label.split('_').join(' ') | titlecase }}
+							</span>
+							<span class="metadata-field-value">
+								<div contenteditable="true" ngDefaultControl formControlName="{{ input.formControlName }}"></div>
+							</span>
+							<button class="btn btn-outline-light" (click)="removeInputField(input)">Remove</button>
+						</div>
+					</ng-container>
+				</ng-container>
 			</div>
+		</form>
 
-			<router-outlet></router-outlet>
+		<router-outlet></router-outlet>
 	</div>
 
 	<ng-template #searchDialog let-modal>

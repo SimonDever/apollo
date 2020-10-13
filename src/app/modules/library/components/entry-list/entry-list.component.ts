@@ -1,35 +1,24 @@
-import { ElectronService } from 'ngx-electron';
-import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy, ViewChild, AfterViewInit, SimpleChanges, OnChanges, AfterContentInit, Input, TemplateRef } from '@angular/core';
-import { Router, RouterStateSnapshot, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { AfterViewInit, ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ActivatedRoute, Router, RouterStateSnapshot } from '@angular/router';
+import { ModalDismissReasons, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { select, Store } from '@ngrx/store';
+import { ElectronService } from 'ngx-electron';
+import { VirtualScrollerComponent } from 'ngx-virtual-scroller';
 import { Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { fadeInOut } from '../../../shared/animations/animations';
+import { LibraryService } from '../../../shared/services/library.service';
 import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
-import * as LibraryActions from '../../store/library.actions';
 import { Entry } from '../../store/entry.model';
-import { DomSanitizer } from '@angular/platform-browser';
-import { NgbModalRef, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { map, publishReplay, refCount } from 'rxjs/operators';
-import { trigger, state, style, transition, animate } from '@angular/animations';
-import { VirtualScrollerComponent } from 'ngx-virtual-scroller';
-import { LibraryService } from '../../../shared/services/library.service';
+import * as LibraryActions from '../../store/library.actions';
 
 @Component({
 	selector: 'app-entry-list',
 	templateUrl: './entry-list.component.html',
 	styleUrls: ['./entry-list.component.css'],
-	animations: [
-		trigger('fadeInOut', [
-			transition(':enter', [
-				style({ opacity: 0 }),
-				animate('.5s ease-out', style({ opacity: 1 }))
-			]),
-			transition(':leave', [
-				style({ opacity: 1 }),
-				animate('.5s ease-in', style({ opacity: 0 }))
-			])
-		])
-	]
+	animations: [ fadeInOut ]
 })
 export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 
@@ -68,7 +57,8 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		this.entries$ = this.store.pipe(select(fromLibrary.getAllEntries),
 			map((entries: Array<Entry>) => {
-				console.log('entryList :: Resorting entries');
+				console.debug('entryListComponent :: resorting entries: ', entries);				
+				
 				entries.sort((a, b) => {
 					if (a.title == null) { return -1; }
 					if (a.title === b.title) {
@@ -76,6 +66,7 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 					}
 					return a.title < b.title ? -1 : 1;
 				});
+
 				this.navigationService.setBookmarks(entries);
 				this.entries = entries;
 				return entries;
@@ -87,6 +78,7 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		this.subs.add(this.store.pipe(select(fromLibrary.getNeedEntries),
 			map(needEntries => {
+				console.log('entryListComponent :: needEntries', needEntries);
 				if (needEntries) {
 					this.store.dispatch(new LibraryActions.Load());
 				}

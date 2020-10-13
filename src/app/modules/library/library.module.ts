@@ -15,6 +15,7 @@ import { reducers } from './store';
 import { LibraryEffects } from './store/library.effects';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { VirtualScrollerModule } from 'ngx-virtual-scroller';
+import { DragulaModule } from 'ng2-dragula';
 
 @NgModule({
 	imports: [
@@ -22,6 +23,7 @@ import { VirtualScrollerModule } from 'ngx-virtual-scroller';
 		SharedModule,
 		VirtualScrollerModule,
 		LibraryRoutingModule,
+    DragulaModule.forRoot(),
 		StoreModule.forFeature('library', reducers),
 		EffectsModule.forFeature([LibraryEffects])
 	],

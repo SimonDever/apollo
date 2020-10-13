@@ -71,9 +71,16 @@ export class SearchService {
 
 	cleanArrays(entry) {
 		for (const prop in entry) {
-			console.log('cleanArrays :: prop is array = ', Array.isArray(entry[prop]));
-			if (Array.isArray(entry[prop])) {
-				entry[prop] = entry[prop].map(e => e.name).join(', ');
+			if (prop !== 'sort_order' && entry[prop] != null) {
+				if (Array.isArray(entry[prop])) {
+					console.log('cleanArrays :: prop is array = ', Array.isArray(entry[prop]));
+					entry[prop] = entry[prop].map(e => e.name).join(', ');
+				} else if (typeof entry[prop] === 'object') {
+					console.log('cleanArrays :: typeof entry[prop] is object');
+					entry[prop] = entry[prop].name;
+				}
+			} else {
+				console.debug('cleanArrays :: entry[prop] is null, prop is ' + prop);
 			}
 		}
 

@@ -34,7 +34,9 @@ export class ContextMenuDirective implements OnInit, OnDestroy {
   }
   
   ngOnDestroy() {
-    this.subs.unsubscribe();
+    if (this.subs) {
+      this.subs.unsubscribe();
+    }
   }
 
   private buildMenu() {

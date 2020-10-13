@@ -527,6 +527,7 @@ textarea {
 	display: grid;
 	border-bottom: 1px solid #555;
 	grid-column-gap: 11px;
+	cursor: move;
 }
 
 .field-grid.three-column {
@@ -534,11 +535,10 @@ textarea {
 }
 
 .field-grid.three-column-reverse {
-	/* grid-template-columns: 14% auto 226px; */
 	grid-template-columns: 170px auto 100px;
 }
 
-.field-grid:only-of-type {
+.right-fields:first-child {
 	margin-top: -13px;
 }
 
@@ -590,3 +590,27 @@ textarea {
 	height: 38px;
 }
 
+/* Dragular */
+/* in-flight clone */
+.gu-mirror {
+  position: fixed !important;
+  margin: 0 !important;
+  z-index: 9999 !important;
+  opacity: 0.8;
+	pointer-events: none;
+	cursor: grabbing;
+}
+/* high-performance display:none; helper */
+.gu-hide {
+	/* left: -9999px !important; */
+	/* display: none !important; */
+	visibility: hidden;
+}
+/* added to mirrorContainer (default = body) while dragging */
+.gu-unselectable {
+  user-select: none !important;
+}
+/* added to the source element while its mirror is dragged */
+.gu-transit {
+  opacity: 0.2;
+}

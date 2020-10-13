@@ -120,13 +120,10 @@ export class MetadataComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (this.subs) {
 			this.subs.unsubscribe();
 		}
-
-		/* this.cdRef.detach(); */
 	}
 
-	areDetailsLoaded(entry/*id: any*/) {
+	areDetailsLoaded(entry) {
 		return this.details === entry;
-		//return this.details.has(id);
 	}
 
 	isEntrySelected(entry): boolean {
@@ -134,26 +131,26 @@ export class MetadataComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	getDetails(entry) {
-		//console.info(`MetadataComponent.getDetails(${entry.id})`);
+		console.debug(`getDetails() - MetadataComponent.getDetails(${entry.id})`);
 		this.store.dispatch(new LibraryActions.SearchForMetadataDetails({ id: entry.id, media_type: entry.media_type }));
 		entry.gotDetails = true;
 	}
 
 	keepField(entry, field, value): void {
 		if (this.savedEntry != null) {
-			//console.debug('User chose to keep a field so deselecting entire entry');
+			console.debug('keepField() - User chose to keep a field so deselecting entire entry');
 			this.savedEntry = null;
 		}
 
 		if (this.keepers.has(field) && this.keepers.get(field) === value) {
-			console.log(`Deleting field\n\n${field}: ${value}\n\n`);
+			console.debug(`Deleting field\n\n${field}: ${value}\n\n`);
 			this.keepers.delete(field);
 		} else {
-			console.log(`Saving field\n\n${field}: ${value}\n\n`);
+			console.debug(`Saving field\n\n${field}: ${value}\n\n`);
 			this.keepers.set(field, value);
 		}
-		console.log('this.keepers');
-		console.log(this.keepers);
+		console.debug('this.keepers');
+		console.debug(this.keepers);
 	}
 
 	/*

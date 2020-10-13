@@ -11,15 +11,43 @@ export class ConfigService {
   public apiKey: string;
   public userDataFolder: string;
   public filename: string;
+  private log;
 
   constructor(private electronService: ElectronService) {
     this.fs = this.electronService.remote.require('fs');
     this.userDataFolder = this.electronService.remote.app.getPath('userData');
     this.filename = `${this.userDataFolder}\\api-key.txt`;
+    this.log = console.log;
+  }
+
+  setupLogging() {
+    /*
+    const log = console.log.bind(console);
+    console.log = (...args) => {
+      this.electronService.ipcRenderer.send('log', args);
+      log(...args);
+    };
+    
+    const debug = console.debug.bind(console);
+    console.debug = (...args) => {
+      this.electronService.ipcRenderer.send('debug', args);
+      debug(...args);
+    };
+    
+    const error = console.error.bind(console);
+    console.error = (...args) => {
+      this.electronService.ipcRenderer.send('error', args);
+      error(...args);
+    };
+
+    console.log('Finished setupLogging()');
+    */
   }
 
   load() {
-		if (this.fs.existsSync(this.filename)) {
+    this.setupLogging();
+
+    if (this.fs.existsSync(this.filename)) {
       this.fs.readFile(this.filename, (error, data: string) => {
         if (error) {
           console.error(error);

@@ -1,6 +1,5 @@
-import { animate, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectorRef, Component, DoCheck, KeyValueDiffers, NgZone, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, DoCheck, KeyValueDiffers, NgZone, OnDestroy, OnInit, Renderer2, TemplateRef } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterStateSnapshot } from '@angular/router';
 import { ModalDismissReasons, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -8,12 +7,14 @@ import { select, Store } from '@ngrx/store';
 import { ElectronService } from 'ngx-electron';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { fadeInOut } from '../../../shared/animations/animations';
 import { LibraryService } from '../../../shared/services/library.service';
 import { NavigationService } from '../../../shared/services/navigation.service';
 import * as fromLibrary from '../../store';
-import { Entry } from '../../store/entry.model';
+import { Entry, InputField } from '../../store/entry.model';
 import * as LibraryActions from '../../store/library.actions';
 import { StorageService } from './../../../shared/services/storage.service';
+
 
 const uuid = require('uuid/v4');
 
@@ -21,18 +22,7 @@ const uuid = require('uuid/v4');
 	selector: 'app-edit-entry',
 	templateUrl: './edit-entry.component.html',
 	styleUrls: ['../add-entry/add-entry.component.css'],
-	animations: [
-		trigger('fadeInOut', [
-			transition(':enter', [
-				style({opacity: 0}),
-				animate('.5s ease-out', style({opacity: 1}))
-			]),
-			transition(':leave', [
-				style({opacity: 1}),
-				animate('.5s ease-in', style({opacity: 0}))
-			])
-		])
-	]
+	animations: [fadeInOut]
 })
 export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
@@ -53,11 +43,13 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	differ: any;
 	modalRef: NgbModalRef;
 	closeResult: string;
-	inputList: any[];
+	inputList: InputField[];
+	tempList: InputField[];
 	routerState: RouterStateSnapshot;
 	selectedEntryId: string;
 	_id: string;
 	fieldsRemoved: string[];
+	dragList: any[];
 
 	constructor(private formBuilder: FormBuilder,
 		private zone: NgZone,
@@ -72,52 +64,53 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		private navigationService: NavigationService,
 		private differs: KeyValueDiffers,
 		private renderer: Renderer2
-		)	{}
+	) { }
 
 	ngOnInit() {
 		console.log('EditEntryComponent Init');
 		this.differ = this.differs.find([]).create();
-		this.inputList = [];
+		this.inputList = []
+		this.tempList = [];
 		this.fieldsRemoved = [];
-		this.searchForm = this.formBuilder.group({searchTerms: ''});
-    this.entryForm = this.formBuilder.group({});
+		this.searchForm = this.formBuilder.group({ searchTerms: '' });
+		this.entryForm = this.formBuilder.group({});
 		this.entry$ = this.store.select(fromLibrary.getSelectedEntry);
 		this.subs = this.entry$.pipe(map(entry => {
 			window.scrollTo(0, 0);
 			console.log('Edit - entry', entry);
-			this.inputList = [];
 			if (!entry) {
-				entry = {
-					id: uuid(),
-					touched: true
-				};
-			}
-			if (!entry.title) {
-				entry.title = '';
-			}
-			if (!entry.poster_path) {
-				entry.poster_path = ''
-			}
-			if (!entry.file) {
-				entry.file = null;
-			}
-			this.entry = { ...entry };
-			this.poster_path = entry.poster_path || '';
-			this.file = entry.file || null;
-			
-			Object.entries(this.entry).forEach(([key, value]) => {
-				if (this.isKeyEnumerable(key)) {
-					this.inputList.push({
-						value: value || '',
-						formControlName: key,
-						label: key
-					});
+				console.error('Entry is null');
+			} else {
+				console.log('entry sub changed');
+				if (!entry.title) {
+					entry.title = '';
 				}
-			});
-			
-			this.refreshForm();
-			this.cdRef.detectChanges();
-			
+				if (!entry.poster_path) {
+					entry.poster_path = ''
+				}
+				if (!entry.file) {
+					entry.file = null;
+				}
+				this.entry = { ...entry };
+				this.poster_path = entry.poster_path || '';
+				this.file = entry.file || null;
+
+				Object.entries(this.entry).forEach(([key, value]) => {
+					if (this.isKeyEnumerable(key)) {
+						const field: InputField = {
+							value: value || '',
+							formControlName: key,
+							label: key
+						};
+						this.tempList.push(field);
+					}
+				});
+
+				this.presort();
+				this.resort();
+				this.refreshForm();
+				this.cdRef.detectChanges();
+			}
 		})).subscribe();
 
 		this.store.select(fromLibrary.getSelectedEntryId)
@@ -128,42 +121,65 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		this.subs.add(this.metadataSearchResponse$.subscribe(response => this.metadataSearchResult = response));
 	}
 
-	isKeyEnumerable(key: string) {
-		return key !== 'id' && key !== '_id' && key !== 'poster_path' && key !== 'file' && key !== 'gotDetails';
-	}
-
-	isKeyHidden(key: string) {
-		const hiddenKeys = ['title', 'poster_path', 'file', 'id', '_id', '_rev', 'rev', 'touched', 'gotDetails'];
-
-		for (const hiddenKey of hiddenKeys) {
-			if (key === hiddenKey) {
-				return true;
-			}
+	resort() {
+		if (this.entry.sort_order) {
+			this.tempList.forEach((element, index) => this.inputList[this.entry.sort_order[index]] = element);
+			this.tempList = [...this.inputList];
+		} else {
+			this.inputList = [...this.tempList];
 		}
-
-		return false;
 	}
-	
-  addNewField(fieldName) {
+
+	presort() {
+		this.tempList = this.tempList.sort((a, b) => {
+			if (a.formControlName === 'title') { return -1; }
+			if (b.formControlName === 'title') { return 1; }
+			if (a.formControlName === 'file') { return -1; }
+			return 1;
+		});
+	}
+
+	toTitleCase(str) {
+		return str.replace(
+			/\w\S*/g,
+			function(txt) {
+				return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+			}
+		);
+	}
+
+	isKeyEnumerable(key: string) {
+		return key !== 'sort_order' && 
+			key !== 'id' &&
+			key !== '_id' &&
+			key !== 'poster_path' &&
+			key !== 'gotDetails' &&
+			key !== 'touched';
+	}
+
+	addNewField(fieldName) {
 		this.modalRef.close('newFieldAdded');
-    this.inputList.push({
-      formControlName: fieldName.toLowerCase().replace(' ', '_'),
-			label: fieldName,
+		const newField: InputField = {
+			formControlName: fieldName.toLowerCase().replace(' ', '_'),
+			label: this.toTitleCase(fieldName.replace('_', ' ')),
 			value: ''
-    });
-    this.refreshForm();
+		}
+		this.inputList.push(newField);
+		this.tempList.push(newField);
+		this.refreshForm();
 	}
 
 	getGenres(genres) {
 		return genres.map(e => e.name).join(", ");
 	}
-	
-  refreshForm() {
-    this.inputList.forEach(input => {
-			const newFormControl = this.formBuilder.control({value: input.value, disabled: false});
+
+	refreshForm() {
+		console.log('refreshForm - chcking for duplicates:', this.inputList);
+		this.inputList.forEach(input => {
+			const newFormControl = this.formBuilder.control({ value: input.value, disabled: false });
 			this.entryForm.addControl(input.formControlName, newFormControl);
-    });
-  }
+		});
+	}
 
 	posterUrl(path) {
 		if (path) {
@@ -216,10 +232,10 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		if (titleControl) {
 			searchTerms = titleControl.value;
 		}
-		
-		this.searchForm.patchValue({searchTerms: searchTerms});
+
+		this.searchForm.patchValue({ searchTerms: searchTerms });
 		this.modalRef = this.modalService.open(searchDialog);
-		(this.modalRef as any)._beforeDismiss = function() {return false;};
+		(this.modalRef as any)._beforeDismiss = function () { return false; };
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 		}, (reason) => {
@@ -229,7 +245,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	showNewFieldDialog(newFieldDialog: TemplateRef<any>) {
 		this.modalRef = this.modalService.open(newFieldDialog);
-		(this.modalRef as any)._beforeDismiss = function() {return false;};
+		(this.modalRef as any)._beforeDismiss = function () { return false; };
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 		}, (reason) => {
@@ -239,7 +255,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	showDeleteConfirmation(deleteDialog: TemplateRef<any>) {
 		this.modalRef = this.modalService.open(deleteDialog);
-		(this.modalRef as any)._beforeDismiss = function() {return false;};
+		(this.modalRef as any)._beforeDismiss = function () { return false; };
 		this.modalRef.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 			if (result === 'Ok click') {
@@ -258,7 +274,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		} else if (reason === 'close') {
 			return 'by pressing x on the modal';
 		} else {
-			return	`with: ${reason}`;
+			return `with: ${reason}`;
 		}
 	}
 
@@ -288,7 +304,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	writeImage(data, filename, changes) {
 		const remote = this.electronService.remote;
 		const path = `${remote.app.getPath('userData')}\\posters\\${filename}`;
-		remote.require('fs').writeFile(path, data, 'base64', (function(err) {
+		remote.require('fs').writeFile(path, data, 'base64', (function (err) {
 			changes.poster_path = path;
 			console.debug('electronService remote writeFile - image updated');
 			this.sendUpdateAction(changes);
@@ -335,7 +351,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		}
 	}
 
-  removeInputField(inputField) {
+	removeInputField(inputField: InputField) {
 		Object.entries(this.entry).forEach(([k, v]) => {
 			if (k === inputField.formControlName) {
 				delete this.entry[k];
@@ -347,10 +363,11 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 				this.fieldsRemoved.push(k); // TODO: do we need this?
 			}
 		});
-    this.inputList = this.inputList.filter(field => field !== inputField);
-    this.refreshForm();
+		this.inputList = this.inputList.filter(field => field !== inputField);
+		this.tempList = this.tempList.filter(field => field !== inputField);
+		this.refreshForm();
 	}
-	
+
 	save() {
 		console.log('editEntryComponent :: save :: fieldsRemoved:', this.fieldsRemoved);
 		this.fieldsRemoved.forEach(field => {
@@ -370,6 +387,13 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 				poster_path: this.poster_path
 			}
 		};
+		
+		changes.sort_order = [];
+		for (let i = 0; i < this.tempList.length; i++) {
+			changes.sort_order.push(this.inputList.findIndex(e =>
+				e.formControlName === this.tempList[i].formControlName
+			));
+		}
 
 		console.log('editEntryComponent :: save :: with new fields:', changes);
 		this.libraryService.saveEntry(changes);
@@ -384,6 +408,6 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 
 	trash() {
 		console.debug(`trash(id): ${this.entry.id}`);
-		this.store.dispatch(new LibraryActions.RemoveEntry({id: this.entry.id}));
+		this.store.dispatch(new LibraryActions.RemoveEntry({ id: this.entry.id }));
 	}
 }
