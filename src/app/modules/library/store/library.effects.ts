@@ -52,24 +52,23 @@ export class LibraryEffects {
 		map(action => (action as LibraryActions.AllEntriesDeleted)),
 		map(() => new LibraryActions.LoadGenres()));
 
-	@Effect({ dispatch: false })
-	loaded$ = this.actions$.pipe(
+	@Effect()
+	loaded$: Observable<Action> = this.actions$.pipe(
 		ofType(LibraryActions.LOADED),
-		tap(() =>	this.router.navigate(['/library'])));
+		tap(() =>	this.router.navigate(['/library'])),
+		map(() => new LibraryActions.LoadGenres()));
 
 	@Effect()
 	load$: Observable<Action> = this.actions$.pipe(
 		ofType(LibraryActions.LOAD),
 		mergeMap(() => this.storageService.getAllEntries()),
-		tap(entries => console.log('getAllEntries - entry:', entries)),
+		tap(entries => console.log('load :: getAllEntries():', entries)),
 		map(entries => new LibraryActions.Loaded({ entries: entries })));
 
 	@Effect()
 	loadGenres$: Observable<Action> = this.actions$.pipe(
 		ofType(LibraryActions.LOAD_GENRES),
-		tap(() => console.log('libraryEffects :: loadGenres :: cleanArrays')),
-		mergeMap(() => this.storageService.cleanArrays()),
-		tap(entries => console.log('libraryEffects :: loadGenres :: after cleanArray :: getAllGenres :: entries', entries)),
+		map(() => this.storageService.cleanArrays()),
 		mergeMap(() => this.storageService.getAllGenres()),
 		map(genres => new LibraryActions.GenresLoaded({ genres: genres })));
 	
@@ -77,14 +76,8 @@ export class LibraryEffects {
 	addEntry$ = this.actions$.pipe(
 		ofType(LibraryActions.ADD_ENTRY),
 		map(action => (action as LibraryActions.AddEntry).payload.entry),
-		tap(entry => {
-			console.log('libraryEffects :: addEntry :: entry', entry);
-			console.log('libraryEffects :: addEntry :: cleanArrays');
-		}),
 		map(entry => this.searchService.cleanArrays(entry)),
-		tap(entry => console.log('libraryEffects :: addEntry :: after clean', entry)),
 		mergeMap(entry => this.storageService.addEntry(entry)),
-		tap(entry => console.log('libraryEffects :: addEntry :: after add', entry)),
 		switchMap(entry => [
 			new LibraryActions.SelectEntry({ id: entry.id }),
 			new LibraryActions.LoadGenres()
@@ -96,7 +89,6 @@ export class LibraryEffects {
 		map(action => (action as LibraryActions.ImportEntry).payload.entry),
 		mergeMap(entry => this.searchService.getFirstResult(entry)),
 		map(entry => {
-			console.log('libraryEffects :: importEntry$ :: got first entry result', entry);
 			this.libraryService.convertUrlPath(entry);
 			return new LibraryActions.AddEntry({entry});
 		}));
@@ -112,19 +104,13 @@ export class LibraryEffects {
 		ofType(LibraryActions.REMOVE_ENTRY),
 		map(action => (action as LibraryActions.RemoveEntry).payload.id),
 		mergeMap(id => this.storageService.removeEntry(id)),
-		switchMap(() => [
-			/* console.log(`library.effects - storage response`, response);
-			this.zone.run(() => this.router.navigate(['/library'])); */
-			new LibraryActions.Load(),
-			new LibraryActions.LoadGenres()
-		]));
+		map(() => new LibraryActions.LoadGenres()));
 
 	@Effect()
 	searchEntries$: Observable<Action> = this.actions$.pipe(
 		ofType(LibraryActions.SEARCH_ENTRIES),
 		map(action => (action as LibraryActions.SearchEntries).payload.searchTerms),
 		mergeMap(searchTerms => this.storageService.searchEntry(searchTerms)),
-		tap(response => console.log(`library.effects - storage response`, response)),
 		map(entries => new LibraryActions.ShowResults({ results: entries })));
 
 	@Effect({ dispatch: false })
@@ -151,17 +137,15 @@ export class LibraryEffects {
 	showMetadataResults$ = this.actions$.pipe(
 		ofType(LibraryActions.SHOW_METADATA_RESULTS),
 		map(action => (action as LibraryActions.ShowMetadataResults).payload.results),
-		tap(results => {
-			this.zone.run(() => this.router.navigate(['/library/edit/metadata']));
-		}));
+		tap(results => this.zone.run(() =>
+			this.router.navigate(['/library/edit/metadata'])))
+		);
 
 	@Effect({ dispatch: false })
 	gotConfig$ = this.actions$.pipe(
 		ofType(LibraryActions.GOT_CONFIG),
 		map(action => (action as LibraryActions.GotConfig).payload.config),
-		tap(config => console.log('library.effects - gotConfig - config', config)),
-		mergeMap(config => this.storageService.setConfig(config)),
-		tap(response => console.log(`library.effects - gotConfig - storage response`, response)));
+		mergeMap(config => this.storageService.setConfig(config)));
 
 	@Effect()
 	getConfig$: Observable<Action> = this.actions$.pipe(
@@ -171,7 +155,6 @@ export class LibraryEffects {
 			if (config == null || (Array.isArray(config) && config.length === 0)) {
 				config = initialState.config;
 			}
-			console.log('effects - getConfig', config);
 			return new LibraryActions.GotConfig({ config: config });
 		}));
 }
