@@ -1,5 +1,7 @@
-<div @fadeInOut>
-	<div class="icon-button-box">
+<div @fadeInOut class="view-wrapper">
+	<div *ngIf="config"
+			[class.icon-button-box-left]='!config.editMenuPositionRight'
+			[class.icon-button-box]='config.editMenuPositionRight'>
 		<button octicon="x" class="icon-button close-button" title="Close without saving" (click)="close()"></button>
 		<button octicon="trashcan" class="icon-button trash-button" title="Delete" (click)="showDeleteConfirmation(deleteModal)"></button>
 		<button octicon="check" class="icon-button save-button" title="Save" (click)="save()"></button>

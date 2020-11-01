@@ -10,7 +10,7 @@ export interface State {
 	metadataSearchResults: any;
 	metadataDetailsResults: Map<any, any>;
 	config: any;
-	genres: string[],
+	genres: string[];
 	apiKey: string;
 }
 
@@ -43,6 +43,7 @@ export const initialState: State = {
 		untouchedHighlight: true,
 		showOnlyUntouched: false,
 		tableFormat: false,
+		editMenuPositionRight: true,
 	},
 	apiKey: ''
 };

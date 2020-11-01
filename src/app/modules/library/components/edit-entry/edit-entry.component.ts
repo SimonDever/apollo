@@ -21,7 +21,7 @@ const uuid = require('uuid/v4');
 @Component({
 	selector: 'app-edit-entry',
 	templateUrl: './edit-entry.component.html',
-	styleUrls: ['../add-entry/add-entry.component.css'],
+	styleUrls: ['./edit-entry.component.css'],
 	animations: [fadeInOut]
 })
 export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
@@ -50,6 +50,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 	_id: string;
 	fieldsRemoved: string[];
 	dragList: any[];
+	config;
 
 	constructor(private formBuilder: FormBuilder,
 		private zone: NgZone,
@@ -75,6 +76,7 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 		this.searchForm = this.formBuilder.group({ searchTerms: '' });
 		this.entryForm = this.formBuilder.group({});
 		this.entry$ = this.store.select(fromLibrary.getSelectedEntry);
+		
 		this.subs = this.entry$.pipe(map(entry => {
 			window.scrollTo(0, 0);
 			console.log('Edit - entry', entry);
@@ -112,6 +114,10 @@ export class EditEntryComponent implements OnInit, OnDestroy, DoCheck {
 				this.cdRef.detectChanges();
 			}
 		})).subscribe();
+
+		this.subs.add(this.store.select(fromLibrary.getConfig).pipe(
+			map(config => this.config = config)
+		).subscribe());
 
 		this.store.select(fromLibrary.getSelectedEntryId)
 			.pipe(map(id => this.selectedEntryId = id))

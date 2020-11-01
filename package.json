@@ -65,6 +65,7 @@
 		"@primer/octicons": "^9.1.1",
 		"@types/nedb": "^1.8.9",
 		"bootstrap": "^4.1.2",
+		"bootstrap-switch-button": "^1.1.0",
 		"core-js": "^3.2.1",
 		"electron-devtools-installer": "^2.2.4",
 		"electron-load-devtool": "^1.2.0",

@@ -1,16 +1,15 @@
-@import './app/themes/default.css';
+@import "./app/themes/default.css";
 
 :root {
-
 	--grid-item-width: 348px;
 	--grid-item-height: 480px;
-	
+
 	--grid-row-gap: 70px;
 	--grid-column-gap: 40px;
 
 	--grid-item-border-radius: 8px;
 
-	scrollbar-color: rgba(175, 175, 175, .5) #1d1d1d !important;
+	scrollbar-color: rgba(175, 175, 175, 0.5) #1d1d1d !important;
 	scrollbar-width: thin !important;
 }
 
@@ -39,13 +38,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-	background: rgba(175, 175, 175, .5) !important;
+	background: rgba(175, 175, 175, 0.5) !important;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: rgba(65, 131, 196, .8) !important;
+	background: rgba(65, 131, 196, 0.8) !important;
 }
-
 
 .version-notification {
 	background: red;
@@ -57,7 +55,7 @@ input[type="file"] {
 
 html {
 	height: 100%;
-  scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 body {
@@ -74,7 +72,7 @@ pre {
 }
 
 .search-form {
-/* 	flex-flow: row nowrap;
+	/* 	flex-flow: row nowrap;
 	justify-content: center; */
 	/* margin: 0 auto; */
 	/* margin-right: calc(50vw - (16px * 3.5) - 2rem - 200px); */
@@ -102,6 +100,28 @@ pre {
 	background: var(--background);
 }
 
+.metadata-icon-button-box-left,
+.icon-button-box-left {
+	position: fixed;
+	z-index: 1;
+	height: 100%;
+	background: var(--background);
+	top: calc(var(--grid-item-height) + 57px + 15px + 15px);
+	left: 15px;
+	width: var(--grid-item-width);
+}
+
+.metadata-icon-button-box-left button::after,
+.icon-button-box-left button::after {
+	content: attr(title);
+	color: var(--foreground);
+	position: absolute;
+	width: calc(var(--grid-item-width) - 38px - 15px);
+	line-height: 34px;
+	text-align: left;
+	left: calc(38px + 15px);
+}
+
 .metadata-icon-button-box {
 	z-index: 2;
 	top: 56px;
@@ -110,7 +130,7 @@ pre {
 .entry-box,
 .entry-poster,
 .entry-actions {
-	transition-duration: .05s;
+	transition-duration: 0.05s;
 	transition-timing-function: linear;
 	transition-property: all;
 	cursor: pointer;
@@ -150,6 +170,10 @@ pre {
 
 .table.table-fixed tr.untouched td {
 	color: var(--table-item-outline-color);
+}
+
+.table .title-cell {
+	white-space: nowrap;
 }
 
 .entry-poster {
@@ -200,7 +224,7 @@ pre {
 	height: 38px;
 	margin-right: 15px;
 	margin-top: 15px;
-	border-radius: .25rem;
+	border-radius: 0.25rem;
 }
 
 .icon-button:focus {
@@ -212,7 +236,7 @@ pre {
 	width: 100%;
 }
 
-.icon-button[octicon='trashcan'] svg {
+.icon-button[octicon="trashcan"] svg {
 	margin-left: -2px;
 }
 
@@ -226,7 +250,7 @@ pre {
 }
 
 .clear-icon:after {
-	content: '\02A2F';
+	content: "\02A2F";
 	display: block;
 	width: 25px;
 	height: 25px;
@@ -239,7 +263,7 @@ pre {
 	outline: 0;
 }
 
-input[type=search]:not(:valid) ~ .clear-icon {
+input[type="search"]:not(:valid) ~ .clear-icon {
 	display: none;
 }
 
@@ -279,16 +303,14 @@ input[type=search]:not(:valid) ~ .clear-icon {
 }
 
 .poster-preview {
+	background-color: var(--grid-item-shadow-color);
 	margin-bottom: 30px;
 	width: var(--grid-item-width);
 	height: var(--grid-item-height);
 	vertical-align: top;
 	border-radius: var(--grid-item-border-radius);
-	box-shadow: var(--grid-item-shadow-hor-offset)
-		var(--grid-item-shadow-ver-offset)
-		var(--grid-item-shadow-blur)
-		var(--grid-item-shadow-spread)
-		var(--grid-item-shadow-color);
+	box-shadow: var(--grid-item-shadow-hor-offset) var(--grid-item-shadow-ver-offset) var(--grid-item-shadow-blur)
+		var(--grid-item-shadow-spread) var(--grid-item-shadow-color);
 }
 
 .poster-preview img {
@@ -297,7 +319,7 @@ input[type=search]:not(:valid) ~ .clear-icon {
 	height: var(--grid-item-height);
 	border: var(--grid-item-border-width) solid var(--grid-item-border-color);
 }
- 
+
 .metadata-container .poster-preview {
 	display: inline-block;
 	position: relative;
@@ -368,19 +390,19 @@ input[type=search]:not(:valid) ~ .clear-icon {
 
 .right-fields {
 	display: inline-block;
-	width: calc(100% - 15px
-		- var(--grid-item-width)
-		- var(--grid-item-shadow-spread)
-		- var(--grid-item-shadow-blur));
+	width: calc(100% - 15px - var(--grid-item-width) - var(--grid-item-shadow-spread) - var(--grid-item-shadow-blur));
 	min-width: 450px;
-	margin-left: calc(15px
-		+ var(--grid-item-shadow-blur)
-		+ var(--grid-item-shadow-spread));
+	margin-left: calc(15px + var(--grid-item-shadow-blur) + var(--grid-item-shadow-spread));
 }
 
 .entry-box-media-type {
 	position: absolute;
 	right: 0;
+}
+
+.view-wrapper {
+	position: relative;
+	min-width: 1070px;
 }
 
 .edit-view .input {
@@ -512,6 +534,10 @@ textarea {
 	color: #fff;
 }
 
+.icon-button-box-left ~ .metadata-container {
+	padding-right: 15px;
+}
+
 .metadata-container {
 	padding-top: 15px;
 	padding-bottom: 15px;
@@ -526,7 +552,7 @@ textarea {
 .field-grid {
 	display: grid;
 	border-bottom: 1px solid #555;
-	grid-column-gap: 11px;
+	grid-column-gap: 0;
 	cursor: move;
 }
 
@@ -569,8 +595,8 @@ textarea {
 .metadata-field-value input {
 	width: 100%;
 	background-color: #131313;
-  transition: box-shadow 0.30s, border 0.30s ease-in-out;
-  outline: none;
+	transition: box-shadow 0.3s, border 0.3s ease-in-out;
+	outline: none;
 	padding: 0 10px;
 	border-radius: 4px;
 	border: 1px solid #444;
@@ -578,12 +604,13 @@ textarea {
 	min-height: 38px;
 	line-height: 38px;
 	white-space: pre-line;
+	cursor: text;
 }
 
 .metadata-field-value div[contenteditable]:focus,
 .metadata-field-value input:focus {
-  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-  border: 1px solid rgba(81, 203, 238, 1);
+	box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+	border: 1px solid rgba(81, 203, 238, 1);
 }
 
 .metadata-field-value .new-form-field input {
@@ -593,10 +620,10 @@ textarea {
 /* Dragular */
 /* in-flight clone */
 .gu-mirror {
-  position: fixed !important;
-  margin: 0 !important;
-  z-index: 9999 !important;
-  opacity: 0.8;
+	position: fixed !important;
+	margin: 0 !important;
+	z-index: 9999 !important;
+	opacity: 0.8;
 	pointer-events: none;
 	cursor: grabbing;
 }
@@ -608,9 +635,13 @@ textarea {
 }
 /* added to mirrorContainer (default = body) while dragging */
 .gu-unselectable {
-  user-select: none !important;
+	user-select: none !important;
 }
 /* added to the source element while its mirror is dragged */
 .gu-transit {
-  opacity: 0.2;
+	opacity: 0.2;
+}
+
+.switch.btn {
+	min-width: 5.5rem;
 }

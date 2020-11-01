@@ -19,7 +19,7 @@ import { initialState } from '../../../library/store/search.reducer';
 	templateUrl: './menu.component.html',
 	styleUrls: ['./menu.component.css']
 })
-export class MenuComponent implements OnInit , DoCheck {
+export class MenuComponent implements OnInit, DoCheck {
 
 	alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 	appTitle: string;
@@ -36,6 +36,7 @@ export class MenuComponent implements OnInit , DoCheck {
 	subs: Subscription;
 	differ: any;
 	borderStyles: string[];
+	sorting: string;
 	
 	constructor(private formBuilder: FormBuilder,
 		private storageService: StorageService,
@@ -54,6 +55,7 @@ export class MenuComponent implements OnInit , DoCheck {
 			this.routerState = this.router.routerState.snapshot;
 			this.navbarCollapsed = true;
 			this.title = '';
+			this.sorting = 'Title';
 			this.genres = [];
 			this.configForm = new FormGroup({ });
 		}
@@ -80,12 +82,15 @@ export class MenuComponent implements OnInit , DoCheck {
       this.cdRef.detectChanges();
 		})).subscribe();
 		
-		this.store.dispatch(new LibraryActions.LoadGenres());
 		this.genres$ = this.store.select(fromLibrary.getGenres);
 		this.subs.add(this.genres$.pipe(map(genres => {
-			console.log('MenuComponent - genres:', genres);
 			this.genres = genres;
 		})).subscribe());
+	}
+
+	sortBy(field: string) {
+		this.sorting = field;
+		this.libraryService.triggerSort(field);
 	}
 
 	goto(char: string) {
@@ -93,7 +98,6 @@ export class MenuComponent implements OnInit , DoCheck {
 	}
 
 	gotoGenre(genre: string) {
-		console.log('goto genre', genre);
 		this.navigationService.setSearchResultsParent(this.routerState.url);
 		this.store.dispatch(new LibraryActions.SearchEntries({
 			searchTerms: `genres:${genre}`
@@ -116,7 +120,6 @@ export class MenuComponent implements OnInit , DoCheck {
 
 	save() {
 		this.store.dispatch(new LibraryActions.GotConfig({ config: this.configForm.value }));
-		//this.cdRef.detectChanges(); // TODO: test if needed
 	}
 
 	isKeyEnumerable(key: string) {

@@ -9,6 +9,7 @@ import { ElectronService } from 'ngx-electron';
 import { NavigationService } from './navigation.service';
 import { take, map } from 'rxjs/operators';
 import { Entry } from '../../library/store/entry.model';
+import { Subject } from 'rxjs';
 
 const uuid = require('uuid/v4');
 
@@ -25,7 +26,10 @@ export class LibraryService {
 
 	// Regular expression for image type:
 	// This regular image extracts the "jpeg" from "image/jpeg"
-	imageTypeRegularExpression = /\/(.*?)$/;      
+	imageTypeRegularExpression = /\/(.*?)$/; 
+	
+	sortingSubject = new Subject<string>();
+	sorting$ = this.sortingSubject.asObservable();
 
 	constructor(private router: Router,
 		private location: Location,
@@ -70,6 +74,22 @@ export class LibraryService {
 		} else {
 			console.log('touch ignored');
 		}
+	}
+
+	
+	triggerSort(field: string) {
+		this.sortingSubject.next(field);
+	}
+
+	sortBy(entries: Entry[], field: string) {
+		return entries.sort((a, b) => {
+			console.log('sorting by ' + field);
+			if (a[field] == null) { return -1; }
+					if (a[field] === b[field]) {
+						return a.title < b.title ? -1 : 1
+					}
+					return a[field] < b[field] ? -1 : 1;
+		});
 	}
 
 	savePoster(entry: any) {

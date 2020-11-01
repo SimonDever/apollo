@@ -7,7 +7,7 @@
 	row-gap: var(--grid-row-gap);
 	column-gap: var(--grid-column-gap);
 	grid-template-columns: repeat(auto-fill, var(--grid-item-width));
-	padding: 0 15px;
+	padding: 15px;
 	height: unset !important;
 	max-width: unset !important;
 	max-height: unset !important;

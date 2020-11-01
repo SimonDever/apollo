@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "apollo": {
+    "apollo": { 
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -24,9 +24,11 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap-switch-button/css/bootstrap-switch-button.min.css",
               "src/styles.css"
             ],
             "scripts": [
+              "node_modules/bootstrap-switch-button/dist/bootstrap-switch-button.min.js"
             ]
           },
           "configurations": {
@@ -73,10 +75,9 @@
             "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [
-            ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap-switch-button/css/bootstrap-switch-button.min.css",
               "src/styles.css"
             ],
             "assets": [
@@ -84,6 +85,9 @@
               "src/favicon.ico",
               "src/vlc.js",
               "src/app.js"
+            ],
+            "scripts": [
+              "node_modules/bootstrap-switch-button/dist/bootstrap-switch-button.min.js"
             ]
           }
         },

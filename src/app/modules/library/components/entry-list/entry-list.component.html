@@ -42,7 +42,7 @@
 			<tbody>
 				<tr *ngFor="let entry of (entries$ | async)" [class.hide-touched]="entry.touched && config.showOnlyUntouched"
 					[class.untouched]="!entry.touched && config.untouchedHighlight">
-					<td>{{ entry.title }}</td>
+					<td class="title-cell">{{ entry.title }}</td>
 					<td>{{ entry.year || entry.release_date | date: 'yyyy' }}</td>
 					<td>{{ entry.overview}}</td>
 					<td>

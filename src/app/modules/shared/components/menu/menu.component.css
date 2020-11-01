@@ -3,13 +3,12 @@ h2 {
 }
 
 .navbar {
-	min-width: 1060px;
+	min-width: 1200px;
 }
 
 .form-inline .form-control {
 	width: auto; /* prevent full width input in xs */
 }
-
 
 .dropdown-menu {
 	background-color: #222;
@@ -86,8 +85,17 @@ h2 {
 	display: block;
 }
 
+/* 
 .field-grid label:not(:first-of-type) {
 	margin-top: 16px;
+} */
+
+.field-grid label.btn.btn-primary {
+	cursor: pointer;
+}
+
+.field-grid label.btn.btn-primary:not(.active) {
+	background-color: #222;
 }
 
 .field-grid input[type=range] {

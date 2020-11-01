@@ -57,9 +57,7 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		this.entries$ = this.store.pipe(select(fromLibrary.getAllEntries),
 			map((entries: Array<Entry>) => {
-				console.debug('entryListComponent :: resorting entries: ', entries);				
-				
-				entries.sort((a, b) => {
+				this.entries = entries.sort((a, b) => {
 					if (a.title == null) { return -1; }
 					if (a.title === b.title) {
 						return a.id < b.id ? -1 : 1
@@ -67,8 +65,7 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 					return a.title < b.title ? -1 : 1;
 				});
 
-				this.navigationService.setBookmarks(entries);
-				this.entries = entries;
+				this.navigationService.setBookmarks(this.entries);
 				return entries;
 			})
 		);
@@ -105,6 +102,12 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 		} else {
 			// TODO: scroll to selected entry in table format
 		}
+
+		this.subs.add(this.libraryService.sorting$.pipe(map((field: string) => {
+			if (field) {
+				this.entries = this.libraryService.sortBy(this.entries, field);
+			}
+		})).subscribe());
 	}
 
 	scrollToSelectedEntry(): void {
@@ -185,15 +188,19 @@ export class EntryListComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	undecorate(entryBox: HTMLDivElement) {
 		const poster = entryBox.querySelector('.entry-poster') as HTMLImageElement;
+		const posterPreview = entryBox.querySelector('.poster-preview') as HTMLDivElement;
 		const entryActions = entryBox.querySelector('.entry-actions') as HTMLDivElement;
 		poster ? poster.style['opacity'] = '1.0' : {};
+		posterPreview.style['background-color'] = 'var(--grid-item-shadow-color)';
 		entryActions ? entryActions.style['display'] = 'none': {};
 	}
-
+	
 	decorate(entryBox: HTMLDivElement) {
 		const poster = entryBox.querySelector('.entry-poster') as HTMLImageElement;
+		const posterPreview = entryBox.querySelector('.poster-preview') as HTMLDivElement;
 		const entryActions = entryBox.querySelector('.entry-actions') as HTMLDivElement;
 		poster ? poster.style['opacity'] = '0.2' : {};
+		posterPreview.style['background-color'] = 'transparent';
 		entryActions ? entryActions.style['display'] = 'flex' : {};
 	}
 
