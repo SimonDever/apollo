@@ -71,7 +71,7 @@
 		"electron-load-devtool": "^1.2.0",
 		"electron-log": "^4.2.2",
 		"electron-simple-updater": "^1.5.0",
-		"jquery": "^3.4.1",
+		"jquery": "^3.5.0",
 		"nedb": "^1.8.0",
 		"ng2-dragula": "^2.1.1",
 		"ngrx-store-freeze": "^0.2.4",
